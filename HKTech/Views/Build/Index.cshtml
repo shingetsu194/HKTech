@@ -1,0 +1,569 @@
+@{
+    ViewData["Title"] = "Tự Build PC";
+    ViewData["Description"] = "Tự chọn linh kiện từng slot, kiểm tra tương thích real-time và xem FPS ước tính ngay lập tức.";
+}
+
+@section Styles {
+<style>
+    /* Build Page specific */
+    .build-page-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: var(--space-xl);
+        align-items: start;
+    }
+    @@media (max-width: 992px) {
+        .build-page-grid { grid-template-columns: 1fr; }
+    }
+
+    .total-panel {
+        background: var(--bg-surface);
+        border: var(--border-gold);
+        padding: var(--space-lg);
+        position: sticky;
+        top: 80px;
+    }
+
+    /* .total-label đã được thay thế bằng .panel-label-vn (VT323) trong HTML */
+
+    .total-price {
+        font-family: var(--font-pixel);
+        font-size: 1.1rem;
+        color: var(--gold);
+        text-shadow: var(--glow-gold);
+        transition: all 0.3s ease;
+    }
+
+    .total-price.bump {
+        transform: scale(1.15);
+        color: #FFF176;
+    }
+
+    /* Compatibility status */
+    .compat-status {
+        margin-top: var(--space-md);
+        border-top: var(--border-muted);
+        padding-top: var(--space-md);
+    }
+
+    .compat-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        margin-bottom: var(--space-xs);
+        color: var(--text-muted);
+    }
+
+    .compat-item.ok     { color: var(--green-kindness); }
+    .compat-item.warn   { color: var(--gold); }
+    .compat-item.error  { color: var(--red-soul); }
+
+    /* Bottleneck bar */
+    .bottleneck-section {
+        margin-top: var(--space-md);
+        border-top: var(--border-muted);
+        padding-top: var(--space-md);
+    }
+
+    .bottleneck-bar-wrap {
+        background: #111;
+        border: 1px solid #333;
+        height: 20px;
+        position: relative;
+        margin: var(--space-sm) 0;
+        overflow: hidden;
+    }
+
+    .bottleneck-bar-cpu {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        background: linear-gradient(90deg, var(--blue-patience), transparent);
+        transition: width 0.6s ease;
+    }
+
+    .bottleneck-bar-gpu {
+        position: absolute;
+        right: 0; top: 0; bottom: 0;
+        background: linear-gradient(270deg, var(--red-soul), transparent);
+        transition: width 0.6s ease;
+    }
+
+    .bottleneck-center {
+        position: absolute;
+        left: 50%; top: 50%;
+        transform: translate(-50%,-50%);
+        font-family: var(--font-pixel);
+        font-size: 0.4rem;
+        color: var(--gold);
+        white-space: nowrap;
+        text-shadow: var(--glow-gold);
+    }
+
+    /* FPS table */
+    .fps-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        margin-top: var(--space-sm);
+    }
+
+    .fps-table th {
+        font-family: var(--font-pixel);
+        font-size: 0.4rem;
+        color: var(--gold);
+        padding: 4px 6px;
+        text-align: center;
+        border-bottom: 1px solid #333;
+    }
+
+    .fps-table td {
+        padding: 4px 6px;
+        color: var(--text-secondary);
+        border-bottom: 1px solid #1A1A1A;
+        text-align: center;
+    }
+
+    .fps-table td:first-child { text-align: left; color: var(--text-primary); }
+    .fps-table .fps-good  { color: var(--green-kindness); }
+    .fps-table .fps-ok    { color: var(--gold); }
+    .fps-table .fps-bad   { color: var(--red-soul); }
+
+    /* Select modal */
+    .select-panel {
+        background: var(--bg-card);
+        border: var(--border-gold);
+        padding: var(--space-lg);
+        margin-top: var(--space-xl);
+        display: none;
+    }
+
+    .select-panel.active { display: block; animation: slideDown 0.2s ease; }
+
+    @@keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .mini-product-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: var(--space-md); }
+
+    .mini-product-item {
+        background: var(--bg-surface);
+        border: 1px solid #2A2A2A;
+        padding: var(--space-sm);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+    }
+
+    .mini-product-item:hover { border-color: var(--gold); background: var(--gold-glow); }
+    .mini-product-item.selected { border-color: var(--green-kindness); background: rgba(68,204,68,0.1); }
+
+    .mini-product-img { width: 48px; height: 48px; object-fit: contain; background: #111; padding: 4px; }
+    .mini-product-name { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-primary); }
+    .mini-product-price { font-family: var(--font-pixel); font-size: 0.45rem; color: var(--gold); }
+</style>
+}
+
+<div class="container-hk" style="padding-top: var(--space-xl);">
+
+    <!-- Page Header -->
+    <div class="section-header">
+        <h1 class="section-title-pixel">⚙️ TỰ BUILD PC</h1>
+        <div class="section-line"></div>
+    </div>
+
+    <div class="dialog-box mb-4">
+        Chọn linh kiện cho từng slot. Hệ thống sẽ <span class="text-gold">tự động kiểm tra tương thích</span> và <span style="color:var(--green-kindness);">ước tính FPS</span> real-time.
+    </div>
+
+    <div class="build-page-grid">
+
+        <!-- LEFT: Slot List -->
+        <div>
+            @{
+                var slots = new[]
+                {
+                    new { Key = "cpu",       Icon = "🧠", Label = "CPU",          IsVn = false, Placeholder = "Chọn bộ vi xử lý..." },
+                    new { Key = "mainboard", Icon = "🧩", Label = "MAINBOARD",    IsVn = false, Placeholder = "Chọn bo mạch chủ..." },
+                    new { Key = "ram",       Icon = "💾", Label = "RAM",          IsVn = false, Placeholder = "Chọn bộ nhớ RAM..." },
+                    new { Key = "gpu",       Icon = "🎮", Label = "GPU / VGA",    IsVn = false, Placeholder = "Chọn card đồ họạ..." },
+                    new { Key = "storage",   Icon = "💿", Label = "Ổ CỨNG / SSD", IsVn = true,  Placeholder = "Chọn thiết bị lưu trữ..." },
+                    new { Key = "psu",       Icon = "⚡",  Label = "NGUỒN PSU",    IsVn = true,  Placeholder = "Chọn bộ nguồn..." },
+                    new { Key = "case",      Icon = "🗄️",  Label = "CASE / VỎ",   IsVn = true,  Placeholder = "Chọn vỏ máy..." },
+                    new { Key = "cooling",   Icon = "❄️",  Label = "TẢN NHIỆT",   IsVn = true,  Placeholder = "Chọn tản nhiệt CPU..." },
+                };
+            }
+            <div id="build-slots">
+                @foreach (var slot in slots)
+                {
+                    <div class="build-slot" id="slot-@slot.Key" data-slot="@slot.Key">
+                        <span class="slot-icon">@slot.Icon</span>
+                        @if (slot.IsVn)
+                        {
+                            <span class="slot-label">@slot.Label</span>
+                        }
+                        else
+                        {
+                            <span class="slot-label-en">@slot.Label</span>
+                        }
+                        <span class="slot-selected text-muted-hk" id="selected-@slot.Key">@slot.Placeholder</span>
+                        <span class="slot-price text-muted-hk" id="price-@slot.Key">—</span>
+                        <button class="btn-ut btn-ut-outline btn-vn"
+                                onclick="openSelectPanel('@slot.Key', '@slot.Label')"
+                                id="btn-select-@slot.Key">
+                            CHỌN
+                        </button>
+                        <button class="btn-ut btn-ut-ghost btn-vn"
+                                onclick="clearSlot('@slot.Key')"
+                                id="btn-clear-@slot.Key"
+                                style="display:none;">
+                            ✕
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <!-- Product Select Panel (appears below slots) -->
+            <div class="select-panel" id="selectPanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="text-pixel-vn text-gold" style="font-size:1.1rem;" id="panelTitle">CHỌN LINH KIỆN</div>
+                    <button class="btn-ut btn-ut-ghost btn-vn" onclick="closeSelectPanel()">✕ ĐÓNG</button>
+                </div>
+                <!-- Search -->
+                <div class="form-hk mb-3">
+                    <input type="text" class="form-control-hk" id="productSearch"
+                           placeholder="Tìm kiếm linh kiện..." oninput="filterProducts(this.value)" />
+                </div>
+                <!-- Product Grid -->
+                <div class="mini-product-list" id="productList">
+                    <div class="text-mono text-muted-hk">
+                        * Dữ liệu sẽ tải từ database sau Phase 2.<br/>
+                        Hiện tại hệ thống đang được cấu hình...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add to Cart button -->
+            <div class="mt-4 d-flex gap-3" id="build-actions">
+                <button class="btn-ut btn-ut-primary btn-en" id="btn-add-all-to-cart" onclick="addBuildToCart()" style="padding: 12px 20px;">
+                    <i class="bi bi-cart-plus"></i> ADD TO CART
+                </button>
+                <button class="btn-ut btn-ut-ghost btn-en" onclick="clearBuild()" id="btn-clear-build">
+                    <i class="bi bi-trash"></i> CLEAR
+                </button>
+            </div>
+        </div>
+
+        <!-- RIGHT: Total & Smart Build Panel -->
+        <div class="total-panel" id="totalPanel">
+
+            <!-- Total Price -->
+            <div class="text-vn-mono mb-1" style="font-size:0.85rem;">TỔNG CHI PHÍ BUILD</div>
+            <div class="total-price" id="totalPrice">0 ₫</div>
+            <div class="text-mono mt-1" style="font-size:0.75rem; color:var(--text-muted);">
+                <span id="slotsFilled">0</span>/8 linh kiện đã chọn
+            </div>
+
+            <!-- ===============================================
+                 COMPATIBILITY GUARD
+                 =============================================== -->
+            <div class="compat-status">
+                <div class="panel-label-en mb-2">
+                    🛡️ COMPATIBILITY GUARD
+                </div>
+                <div class="compat-item" id="compat-socket">
+                    <span>⬜</span> Socket CPU / Mainboard
+                </div>
+                <div class="compat-item" id="compat-ram">
+                    <span>⬜</span> RAM Type (DDR4/DDR5)
+                </div>
+                <div class="compat-item" id="compat-psu">
+                    <span>⬜</span> PSU Wattage vs TDP
+                </div>
+                <div class="compat-item" id="compat-form">
+                    <span>⬜</span> Form Factor (ATX/mATX)
+                </div>
+            </div>
+
+            <!-- ===============================================
+                 BOTTLENECK ANALYZER
+                 =============================================== -->
+            <div class="bottleneck-section">
+                <div class="panel-label-en mb-2">
+                    📊 BOTTLENECK ANALYZER
+                </div>
+                <div class="d-flex justify-content-between text-mono mb-1" style="font-size:0.7rem;">
+                    <span style="color: var(--blue-patience);">CPU</span>
+                    <span style="color: var(--text-muted);">vs</span>
+                    <span style="color: var(--red-soul);">GPU</span>
+                </div>
+                <div class="bottleneck-bar-wrap" id="bottleneckBar">
+                    <div class="bottleneck-bar-cpu" id="barCpu" style="width:50%;"></div>
+                    <div class="bottleneck-bar-gpu" id="barGpu" style="width:50%;"></div>
+                    <div class="bottleneck-center" id="bottleneckLabel">—</div>
+                </div>
+                <div class="text-mono mt-1" style="font-size:0.75rem; color:var(--text-muted);" id="bottleneckHint">
+                    * Chọn CPU & GPU để xem phân tích
+                </div>
+            </div>
+
+            <!-- ===============================================
+                 FPS ESTIMATOR
+                 =============================================== -->
+            <div class="bottleneck-section">
+                <div class="panel-label-en mb-2">
+                    🎮 FPS ESTIMATOR
+                </div>
+                <div id="fpsTableWrap">
+                    <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted);">
+                        * Chọn CPU + GPU để xem ước tính FPS
+                    </div>
+                </div>
+            </div>
+
+            <!-- Build Badge -->
+            <div class="mt-3" id="buildBadge" style="display:none;">
+                <span class="badge-ut badge-ut-gold" id="buildBadgeText">🎮 GAMING BUILD</span>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // ============================================================
+    // BUILD STATE
+    // ============================================================
+    const buildState = {
+        cpu: null, mainboard: null, ram: null, gpu: null,
+        storage: null, psu: null, case: null, cooling: null
+    };
+
+    let currentSlot = null;
+    const PRICE_FORMATTER = new Intl.NumberFormat('vi-VN', { style:'currency', currency:'VND' });
+
+    // ============================================================
+    // OPEN / CLOSE SELECT PANEL
+    // ============================================================
+    function openSelectPanel(slotKey, slotLabel) {
+        currentSlot = slotKey;
+        document.getElementById('panelTitle').textContent = `CHỌN ${slotLabel}`;
+        document.getElementById('selectPanel').classList.add('active');
+        document.getElementById('productSearch').value = '';
+        document.getElementById('selectPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // TODO Phase 2: fetch /api/products/category/{slotKey} via AJAX
+        // loadProductsForSlot(slotKey);
+    }
+
+    function closeSelectPanel() {
+        document.getElementById('selectPanel').classList.remove('active');
+        currentSlot = null;
+    }
+
+    function filterProducts(query) {
+        // TODO Phase 2: filter rendered product list
+    }
+
+    // ============================================================
+    // SELECT A PRODUCT INTO A SLOT
+    // ============================================================
+    function selectProduct(product) {
+        if (!currentSlot) return;
+        buildState[currentSlot] = product;
+        updateSlotUI(currentSlot, product);
+        updateTotals();
+        closeSelectPanel();
+
+        // Trigger real-time checks
+        runCompatibilityCheck();
+        runBottleneckAnalysis();
+        runFpsEstimate();
+    }
+
+    function clearSlot(slotKey) {
+        buildState[slotKey] = null;
+        const el = document.getElementById(`slot-${slotKey}`);
+        el.classList.remove('filled', 'error');
+        document.getElementById(`selected-${slotKey}`).textContent = `Chọn linh kiện...`;
+        document.getElementById(`selected-${slotKey}`).className = 'slot-selected text-muted-hk';
+        document.getElementById(`price-${slotKey}`).textContent = '—';
+        document.getElementById(`btn-clear-${slotKey}`).style.display = 'none';
+        updateTotals();
+        runCompatibilityCheck();
+    }
+
+    function updateSlotUI(slotKey, product) {
+        const slotEl = document.getElementById(`slot-${slotKey}`);
+        slotEl.classList.add('filled');
+        const nameEl = document.getElementById(`selected-${slotKey}`);
+        nameEl.textContent = product.name;
+        nameEl.className = 'slot-selected';
+        document.getElementById(`price-${slotKey}`).textContent = PRICE_FORMATTER.format(product.price);
+        document.getElementById(`btn-clear-${slotKey}`).style.display = 'inline-flex';
+    }
+
+    // ============================================================
+    // UPDATE TOTAL PRICE
+    // ============================================================
+    function updateTotals() {
+        let total = 0, filled = 0;
+        for (const [key, product] of Object.entries(buildState)) {
+            if (product) { total += product.price; filled++; }
+        }
+
+        const el = document.getElementById('totalPrice');
+        el.textContent = PRICE_FORMATTER.format(total);
+        el.classList.add('bump');
+        setTimeout(() => el.classList.remove('bump'), 350);
+
+        document.getElementById('slotsFilled').textContent = filled;
+    }
+
+    // ============================================================
+    // COMPATIBILITY CHECK (Phase 4: gọi API, tạm thời mock)
+    // ============================================================
+    function runCompatibilityCheck() {
+        const checks = ['compat-socket', 'compat-ram', 'compat-psu', 'compat-form'];
+        checks.forEach(id => {
+            const el = document.getElementById(id);
+            el.className = 'compat-item';
+            el.querySelector('span').textContent = '⬜';
+        });
+
+        if (!buildState.cpu && !buildState.mainboard) return;
+
+        // TODO Phase 4: fetch /api/compatibility với các slot đã chọn
+        // Temporary demo: sau khi chọn cả CPU và mainboard, giả sử OK
+        if (buildState.cpu && buildState.mainboard) {
+            setCompatStatus('compat-socket', true, 'Socket: Tương thích ✓');
+        }
+        if (buildState.ram && buildState.mainboard) {
+            setCompatStatus('compat-ram', true, 'DDR5: Tương thích ✓');
+        }
+        if (buildState.psu && (buildState.cpu || buildState.gpu)) {
+            setCompatStatus('compat-psu', true, 'PSU: Đủ công suất ✓');
+        }
+        if (buildState.case && buildState.mainboard) {
+            setCompatStatus('compat-form', true, 'Form Factor: Phù hợp ✓');
+        }
+    }
+
+    function setCompatStatus(id, ok, message) {
+        const el = document.getElementById(id);
+        el.className = `compat-item ${ok ? 'ok' : 'error'}`;
+        el.innerHTML = `<span>${ok ? '✅' : '❌'}</span> ${message}`;
+    }
+
+    // ============================================================
+    // BOTTLENECK ANALYSIS (Phase 4: gọi API)
+    // ============================================================
+    function runBottleneckAnalysis() {
+        if (!buildState.cpu || !buildState.gpu) return;
+        // TODO Phase 4: fetch /api/performance
+        // Demo static
+        const cpuScore = buildState.cpu.benchmarkScore || 50;
+        const gpuScore = buildState.gpu.benchmarkScore || 50;
+        const total = cpuScore + gpuScore;
+        const cpuPct = Math.round((cpuScore / total) * 100);
+        const gpuPct = 100 - cpuPct;
+
+        document.getElementById('barCpu').style.width = cpuPct + '%';
+        document.getElementById('barGpu').style.width = gpuPct + '%';
+
+        const diff = Math.abs(cpuPct - gpuPct);
+        let label, hint;
+        if (diff < 10) {
+            label = '✓ CÂN BẰNG'; hint = '* CPU và GPU cân bằng tốt! Build tối ưu.';
+        } else if (cpuPct < gpuPct) {
+            label = `CPU -${diff}%`;
+            hint = `* CPU đang kìm hãm GPU ${diff}%. Cân nhắc nâng CPU.`;
+        } else {
+            label = `GPU -${diff}%`;
+            hint = `* GPU đang kìm hãm CPU ${diff}%. Cân nhắc nâng GPU.`;
+        }
+
+        document.getElementById('bottleneckLabel').textContent = label;
+        document.getElementById('bottleneckHint').textContent = hint;
+    }
+
+    // ============================================================
+    // FPS ESTIMATOR (Phase 4: gọi API)
+    // ============================================================
+    function runFpsEstimate() {
+        if (!buildState.cpu || !buildState.gpu) return;
+        // TODO Phase 4: fetch /api/performance — real data
+        // Demo placeholder table
+        const games = [
+            { name: 'Valorant',   fps1080: 280, fps1440: 200, fps4k: 120 },
+            { name: 'CS2',        fps1080: 240, fps1440: 160, fps4k: 90  },
+            { name: 'GTA V',      fps1080: 140, fps1440: 100, fps4k: 60  },
+            { name: 'Cyberpunk',  fps1080: 80,  fps1440: 55,  fps4k: 30  },
+            { name: 'Minecraft',  fps1080: 300, fps1440: 280, fps4k: 200 },
+        ];
+
+        const fpsClass = fps => fps >= 120 ? 'fps-good' : fps >= 60 ? 'fps-ok' : 'fps-bad';
+
+        const html = `
+            <table class="fps-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left">GAME</th>
+                        <th>1080p</th>
+                        <th>1440p</th>
+                        <th>4K</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${games.map(g => `
+                        <tr>
+                            <td>${g.name}</td>
+                            <td class="${fpsClass(g.fps1080)}">${g.fps1080}</td>
+                            <td class="${fpsClass(g.fps1440)}">${g.fps1440}</td>
+                            <td class="${fpsClass(g.fps4k)}">${g.fps4k}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+            <div class="text-mono mt-1" style="font-size:0.65rem;color:var(--text-muted);">
+                * Ước tính, thực tế có thể chênh ±15%
+            </div>`;
+        document.getElementById('fpsTableWrap').innerHTML = html;
+        document.getElementById('buildBadge').style.display = 'block';
+    }
+
+    // ============================================================
+    // ADD BUILD TO CART
+    // ============================================================
+    function addBuildToCart() {
+        const selected = Object.entries(buildState).filter(([,v]) => v !== null);
+        if (selected.length === 0) {
+            alert('* Vui lòng chọn ít nhất một linh kiện trước!');
+            return;
+        }
+        // TODO Phase 3: POST /Build/AddToCart với danh sách ProductId
+        const productIds = selected.map(([,p]) => p.id);
+        console.log('Adding to cart:', productIds);
+        alert('* Tính năng giỏ hàng sẽ hoàn thiện sau Phase 3. Stay determined!');
+    }
+
+    function clearBuild() {
+        Object.keys(buildState).forEach(k => { buildState[k] = null; });
+        document.querySelectorAll('.build-slot').forEach(el => el.classList.remove('filled','error'));
+        document.querySelectorAll('[id^="selected-"]').forEach(el => { el.textContent = 'Chọn linh kiện...'; el.className = 'slot-selected text-muted-hk'; });
+        document.querySelectorAll('[id^="price-"]').forEach(el => el.textContent = '—');
+        document.querySelectorAll('[id^="btn-clear-"]').forEach(el => el.style.display = 'none');
+        updateTotals();
+        document.getElementById('fpsTableWrap').innerHTML = '<div class="text-mono" style="font-size:0.75rem;color:var(--text-muted);">* Chọn CPU + GPU để xem ước tính FPS</div>';
+        document.getElementById('buildBadge').style.display = 'none';
+        document.getElementById('bottleneckLabel').textContent = '—';
+        document.getElementById('bottleneckHint').textContent = '* Chọn CPU & GPU để xem phân tích';
+    }
+</script>
+}

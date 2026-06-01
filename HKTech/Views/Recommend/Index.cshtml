@@ -1,0 +1,112 @@
+@{
+    ViewData["Title"] = "Gợi ý cấu hình PC";
+    ViewData["Description"] = "Nhập ngân sách và nhu cầu, HKTech sẽ tự động gợi ý combo linh kiện tối ưu nhất cho bạn.";
+}
+
+<div class="container-hk" style="padding: var(--space-xl) 0; max-width: 900px;">
+
+    <div class="section-header">
+        <h1 class="section-title-pixel">⭐ GỢI Ý CẤU HÌNH</h1>
+        <div class="section-line"></div>
+    </div>
+
+    <div class="dialog-box mb-4">
+        * Hệ thống sẽ tự động tìm combo linh kiện phù hợp nhất dựa trên ngân sách và nhu cầu của bạn.
+    </div>
+
+    <!-- FORM -->
+    <div style="background: var(--bg-surface); border: var(--border-gold); padding: var(--space-xl);">
+        <form id="recommendForm" asp-controller="Recommend" asp-action="Index" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-4">
+                <!-- Budget -->
+                <div class="col-md-6 form-hk">
+                    <label class="form-label" for="budget">💰 NGÂN SÁCH (VNĐ)</label>
+                    <select class="form-control-hk form-select-hk" id="budget" name="budget">
+                        <option value="">-- Chọn ngân sách --</option>
+                        <option value="10000000">Dưới 10 triệu</option>
+                        <option value="15000000">10 - 15 triệu</option>
+                        <option value="20000000">15 - 20 triệu</option>
+                        <option value="30000000">20 - 30 triệu</option>
+                        <option value="50000000">30 - 50 triệu</option>
+                        <option value="99999999">Trên 50 triệu</option>
+                    </select>
+                </div>
+
+                <!-- Use Case -->
+                <div class="col-md-6 form-hk">
+                    <label class="form-label" for="useCase">🎯 MỤC ĐÍCH SỬ DỤNG</label>
+                    <select class="form-control-hk form-select-hk" id="useCase" name="useCase">
+                        <option value="">-- Chọn mục đích --</option>
+                        <option value="gaming">🎮 Chơi game AAA (1080p/1440p)</option>
+                        <option value="esports">⚡ Esports / FPS (144+ FPS)</option>
+                        <option value="office">💼 Văn phòng / Học tập</option>
+                        <option value="workstation">🔬 Đồ họa / Video Edit</option>
+                        <option value="streaming">📡 Streaming / Content Creator</option>
+                        <option value="balance">⚖️ Cân bằng mọi thứ</option>
+                    </select>
+                </div>
+
+                <!-- RAM Preference -->
+                <div class="col-md-6 form-hk">
+                    <label class="form-label" for="ramPref">💾 DUNG LƯỢNG RAM TỐI THIỂU</label>
+                    <select class="form-control-hk form-select-hk" id="ramPref" name="ramPref">
+                        <option value="16">16 GB (Tiêu chuẩn)</option>
+                        <option value="32">32 GB (Cao cấp)</option>
+                        <option value="64">64 GB (Workstation)</option>
+                    </select>
+                </div>
+
+                <!-- Notes -->
+                <div class="col-md-6 form-hk">
+                    <label class="form-label" for="notes">📝 GHI CHÚ THÊM (Tuỳ chọn)</label>
+                    <input type="text" class="form-control-hk" id="notes" name="notes"
+                           placeholder="VD: Thích AMD, cần case nhỏ gọn..." maxlength="200" />
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn-ut btn-ut-primary btn-en" id="btn-recommend-submit"
+                        style="padding:12px 28px;">
+                    <i class="bi bi-stars"></i> FIND BUILD
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- RESULTS (placeholder — sẽ có logic từ Phase 3) -->
+    <div class="mt-5" id="recommendResults">
+        <div class="dialog-box">
+            * Nhập ngân sách và mục đích rồi bấm <span class="text-gold">"TÌM CẤU HÌNH PHÙ HỢP"</span> để hệ thống gợi ý cho bạn.
+            Tính năng sẽ hoạt động đầy đủ sau khi database được kết nối (Phase 2-3).
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+    document.getElementById('recommendForm').addEventListener('submit', function (e) {
+        const budget = document.getElementById('budget').value;
+        const useCase = document.getElementById('useCase').value;
+
+        if (!budget || !useCase) {
+            e.preventDefault();
+            document.getElementById('recommendResults').innerHTML = `
+                <div class="alert-ut alert-ut-warning">
+                    Vui lòng chọn cả ngân sách và mục đích sử dụng trước!
+                </div>`;
+            return;
+        }
+
+        // TODO Phase 3: Submit form → RecommendController → Query DB
+        // Hiện tại show placeholder
+        e.preventDefault();
+        document.getElementById('recommendResults').innerHTML = `
+            <div class="dialog-box">
+                * Đang tìm cấu hình phù hợp... (Tính năng hoàn thiện sau Phase 3)
+            </div>`;
+    });
+</script>
+}

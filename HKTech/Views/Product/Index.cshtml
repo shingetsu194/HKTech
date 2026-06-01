@@ -1,0 +1,204 @@
+@{
+    ViewData["Title"] = "Danh sách Linh kiện";
+    ViewData["Description"] = "Khám phá toàn bộ linh kiện máy tính: CPU, GPU, RAM, Mainboard, PSU, Case tại HKTech.";
+}
+
+@section Styles {
+<style>
+    .product-page-layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: var(--space-xl);
+        align-items: start;
+    }
+    @@media (max-width: 768px) {
+        .product-page-layout { grid-template-columns: 1fr; }
+        .filter-sidebar { display: none; }
+        .filter-sidebar.mobile-open { display: block; }
+    }
+
+    .filter-sidebar {
+        background: var(--bg-surface);
+        border: var(--border-muted);
+        border-top: 3px solid var(--gold-dim);
+        padding: var(--space-lg);
+        position: sticky;
+        top: 80px;
+    }
+
+    .filter-title {
+        /* ASCII now → Press Start 2P */
+        font-family: var(--font-pixel);
+        font-size: 0.55rem;
+        color: var(--gold);
+        letter-spacing: 3px;
+        margin-bottom: var(--space-md);
+        padding-bottom: var(--space-sm);
+        border-bottom: var(--border-muted);
+    }
+
+    .filter-group { margin-bottom: var(--space-lg); }
+    .filter-group-label {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: var(--space-sm);
+    }
+
+    .filter-chip {
+        display: block;
+        padding: 6px 10px;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+        border-left: 3px solid transparent;
+        margin-bottom: 2px;
+        text-decoration: none;
+    }
+    .filter-chip:hover { color: var(--gold); border-left-color: var(--gold-dim); background: var(--gold-glow); }
+    .filter-chip.active { color: var(--gold); border-left-color: var(--gold); font-weight: bold; }
+
+    .product-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+        flex-wrap: wrap;
+    }
+
+    .search-bar {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .sort-select {
+        background: var(--bg-void);
+        border: 1px solid #333;
+        color: var(--text-secondary);
+        padding: var(--space-sm) var(--space-md);
+        font-family: var(--font-mono);
+        font-size: 0.85rem;
+        border-radius: 0;
+        outline: none;
+    }
+    .sort-select:focus { border-color: var(--gold); }
+</style>
+}
+
+<div class="container-hk" style="padding-top: var(--space-xl);">
+    <div class="section-header">
+        <h1 class="section-title-pixel">🖥️ LINH KIỆN</h1>
+        <div class="section-line"></div>
+    </div>
+
+    <div class="product-page-layout">
+
+        <!-- SIDEBAR FILTER -->
+        <aside class="filter-sidebar" id="filterSidebar">
+            <div class="filter-title">⚙ FILTER</div>
+
+            <div class="filter-group">
+                <div class="filter-group-label">CATEGORY</div>
+                <a class="filter-chip active" asp-controller="Product" asp-action="Index" id="cat-all">
+                    Tất cả
+                </a>
+                @{
+                    var cats = new[]
+                    {
+                        new { Slug = "cpu",       Name = "🧠 CPU" },
+                        new { Slug = "gpu",       Name = "🎮 GPU / VGA" },
+                        new { Slug = "mainboard", Name = "🧩 Mainboard" },
+                        new { Slug = "ram",       Name = "💾 RAM" },
+                        new { Slug = "psu",       Name = "⚡ Nguồn PSU" },
+                        new { Slug = "case",      Name = "🗄️ Case / Vỏ" },
+                        new { Slug = "storage",   Name = "💿 Ổ cứng / SSD" },
+                        new { Slug = "cooling",   Name = "❄️ Tản nhiệt" },
+                    };
+                }
+                @foreach (var cat in cats)
+                {
+                    <a class="filter-chip" asp-controller="Product" asp-action="Index"
+                       asp-route-category="@cat.Slug" id="cat-filter-@cat.Slug">
+                        @cat.Name
+                    </a>
+                }
+            </div>
+
+            <div class="filter-group form-hk">
+                <div class="filter-group-label">PRICE</div>
+                <div style="display:flex; gap:8px; flex-direction:column;">
+                    <input type="number" class="form-control-hk" placeholder="Giá từ (VNĐ)" id="priceMin" style="font-size:0.8rem;" />
+                    <input type="number" class="form-control-hk" placeholder="Giá đến (VNĐ)" id="priceMax" style="font-size:0.8rem;" />
+                    <button class="btn-ut btn-ut-outline btn-en" onclick="applyPriceFilter()">
+                        APPLY
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- PRODUCT MAIN -->
+        <div>
+            <!-- Toolbar -->
+            <div class="product-toolbar">
+                <div class="search-bar form-hk">
+                    <input type="text" class="form-control-hk" placeholder="🔍 Tìm linh kiện..."
+                           id="productSearchInput" oninput="searchProducts(this.value)" />
+                </div>
+                <select class="sort-select" id="sortSelect" onchange="sortProducts(this.value)">
+                    <option value="default">Sắp xếp: Mặc định</option>
+                    <option value="price-asc">Giá: Thấp → Cao</option>
+                    <option value="price-desc">Giá: Cao → Thấp</option>
+                    <option value="name-asc">Tên: A → Z</option>
+                </select>
+            </div>
+
+            <!-- Product Grid — placeholder, sẽ bind từ Model sau Phase 2 -->
+            <div class="products-grid" id="productGrid">
+                @* Placeholder skeletons *@
+                @for (int i = 0; i < 8; i++)
+                {
+                    <div class="product-card">
+                        <div class="card-img-wrap skeleton" style="height:200px;"></div>
+                        <div class="card-body-hk">
+                            <div class="skeleton" style="height:14px; width:85%; margin-bottom:8px;"></div>
+                            <div class="skeleton" style="height:14px; width:60%; margin-bottom:12px;"></div>
+                            <div class="skeleton" style="height:20px; width:40%;"></div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="skeleton" style="height:32px; width:80px;"></div>
+                            <div class="skeleton" style="height:32px; width:60px;"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="dialog-box mt-4">
+                * Dữ liệu linh kiện sẽ được tải từ database sau Phase 2.
+                Database đang được thiết lập...
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function searchProducts(q) {
+        // TODO Phase 2: AJAX search hoặc filter client-side
+        console.log('Search:', q);
+    }
+    function sortProducts(val) {
+        // TODO Phase 2: Re-fetch or sort rendered cards
+        console.log('Sort:', val);
+    }
+    function applyPriceFilter() {
+        const min = document.getElementById('priceMin').value;
+        const max = document.getElementById('priceMax').value;
+        // TODO Phase 2
+        console.log('Price filter:', min, max);
+    }
+</script>
+}

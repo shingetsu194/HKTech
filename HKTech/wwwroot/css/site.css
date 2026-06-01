@@ -1,0 +1,920 @@
+/* ============================================================
+   HKTECH — UNDERTALE-INSPIRED DESIGN SYSTEM
+   "DETERMINATION" Theme
+   ============================================================ */
+
+/* --- Google Fonts (Pixel + Monospace) --- */
+/* Press Start 2P : Pixel font, CHỈ dùng cho ASCII (không có glyph tiếng Việt) */
+/* VT323          : Terminal/pixel font hỗ trợ đầy đủ Unicode + tiếng Việt    */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Mono:wght@400;500&display=swap&subset=vietnamese');
+
+/* --- CSS Custom Properties (Design Tokens) --- */
+:root {
+    /* Core Colors — The Underground */
+    --bg-void:        #000000;
+    --bg-deep:        #0A0A0A;
+    --bg-cave:        #111111;
+    --bg-surface:     #1A1A1A;
+    --bg-elevated:    #222222;
+    --bg-card:        #1C1C1C;
+
+    /* Undertale Soul Colors */
+    --gold:           #FFD700;   /* SAVE point / Determination */
+    --gold-dim:       #B8960C;
+    --gold-glow:      rgba(255, 215, 0, 0.25);
+    --red-soul:       #FF4444;   /* Frisk / FIGHT */
+    --red-dim:        #CC2222;
+    --red-glow:       rgba(255, 68, 68, 0.25);
+    --blue-patience:  #4488FF;   /* Sans / Patience */
+    --cyan-integrity: #00DDDD;
+    --green-kindness: #44CC44;   /* Kindness */
+    --purple-persev:  #BB44FF;   /* Perseverance */
+
+    /* Text */
+    --text-primary:   #FFFFFF;
+    --text-secondary: #AAAAAA;
+    --text-muted:     #666666;
+    --text-gold:      #FFD700;
+
+    /* Borders — Pixel style */
+    --border-gold:    2px solid var(--gold);
+    --border-muted:   1px solid #333333;
+    --border-red:     2px solid var(--red-soul);
+
+    /* Fonts */
+    /* Press Start 2P: dùng cho label/badge ASCII ngắn (CPU, RAM, NEW, SAVE...) */
+    --font-pixel:     'Press Start 2P', monospace;
+    /* VT323: dùng cho text tiếng Việt cần pixel style — fallback khi thiếu glyph    */
+    --font-pixel-vn:  'VT323', 'Share Tech Mono', 'Noto Sans Mono', monospace;
+    --font-mono:      'Share Tech Mono', monospace;
+    --font-body:      'Rajdhani', sans-serif;
+
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-med:  0.3s ease;
+
+    /* Shadows — Neon glow */
+    --glow-gold: 0 0 8px var(--gold), 0 0 20px var(--gold-glow);
+    --glow-red:  0 0 8px var(--red-soul), 0 0 20px var(--red-glow);
+}
+
+/* --- Reset & Base --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+    background-color: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    min-height: 100vh;
+    /* Subtle scanline texture */
+    background-image: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(255,255,255,0.01) 2px,
+        rgba(255,255,255,0.01) 4px
+    );
+}
+
+/* --- Scrollbar Undertale Style --- */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-cave); }
+::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold); box-shadow: var(--glow-gold); }
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.navbar-hktech {
+    background: var(--bg-void);
+    border-bottom: var(--border-gold);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 20px var(--gold-glow);
+}
+
+.navbar-brand-hk {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    padding: var(--space-md) var(--space-lg);
+}
+
+.navbar-brand-hk .brand-pixel {
+    font-family: var(--font-pixel);
+    font-size: 0.85rem;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: 2px;
+    line-height: 1;
+}
+
+.navbar-brand-hk .brand-sub {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+}
+
+.heart-icon {
+    color: var(--red-soul);
+    font-size: 1.2rem;
+    animation: heartbeat 1.5s ease-in-out infinite;
+    text-shadow: var(--glow-red);
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50%       { transform: scale(1.15); }
+}
+
+.nav-links { display: flex; align-items: center; list-style: none; }
+
+.nav-links .nav-item .nav-link-hk {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: var(--space-md) var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    border-bottom: 3px solid transparent;
+    transition: all var(--transition-fast);
+    letter-spacing: 1px;
+    position: relative;
+}
+
+.nav-links .nav-item .nav-link-hk:hover,
+.nav-links .nav-item .nav-link-hk.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+    text-shadow: var(--glow-gold);
+}
+
+/* "SAVE" animated badge on nav */
+.save-badge {
+    font-family: var(--font-pixel);
+    font-size: 0.45rem;
+    background: var(--gold);
+    color: var(--bg-void);
+    padding: 2px 4px;
+    border-radius: 0;
+    animation: savePulse 2s ease-in-out infinite;
+}
+
+@keyframes savePulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.5; }
+}
+
+/* Cart badge */
+.cart-badge {
+    position: absolute;
+    top: 6px; right: 2px;
+    background: var(--red-soul);
+    color: white;
+    font-size: 0.6rem;
+    font-family: var(--font-pixel);
+    width: 16px; height: 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 0;
+    box-shadow: var(--glow-red);
+}
+
+/* Mobile hamburger */
+.navbar-toggler-hk {
+    background: none;
+    border: var(--border-gold);
+    color: var(--gold);
+    padding: var(--space-xs) var(--space-sm);
+    cursor: pointer;
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    display: none;
+}
+
+/* ============================================================
+   LAYOUT — Main Content
+   ============================================================ */
+.site-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    padding: var(--space-xl) 0;
+}
+
+.container-hk {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+/* ============================================================
+   UNDERTALE DIALOG BOX (reusable)
+   ============================================================ */
+.dialog-box {
+    background: var(--bg-void);
+    border: 3px solid var(--text-primary);
+    padding: var(--space-lg);
+    position: relative;
+    font-family: var(--font-mono);
+}
+
+.dialog-box::before {
+    content: '* ';
+    color: var(--gold);
+    font-family: var(--font-mono);
+}
+
+/* ============================================================
+   CARDS — Linh kiện (Component Cards)
+   ============================================================ */
+.product-card {
+    background: var(--bg-card);
+    border: 1px solid #2A2A2A;
+    border-top: 3px solid var(--gold);
+    padding: 0;
+    transition: all var(--transition-med);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.product-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--gold-glow), transparent);
+    opacity: 0;
+    transition: opacity var(--transition-med);
+    pointer-events: none;
+}
+
+.product-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px var(--gold-glow), var(--glow-gold);
+}
+
+.product-card:hover::after { opacity: 1; }
+
+.product-card .card-img-wrap {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: var(--bg-surface);
+}
+
+.product-card .card-img-wrap img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    padding: var(--space-md);
+    transition: transform var(--transition-med);
+}
+
+.product-card:hover .card-img-wrap img { transform: scale(1.05); }
+
+.product-card .card-category-badge {
+    position: absolute;
+    top: var(--space-sm);
+    left: var(--space-sm);
+    font-family: var(--font-pixel);
+    font-size: 0.4rem;
+    background: var(--gold);
+    color: var(--bg-void);
+    padding: 3px 6px;
+    letter-spacing: 1px;
+}
+
+.product-card .card-body-hk {
+    padding: var(--space-md);
+}
+
+.product-card .card-title-hk {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.product-card .card-price {
+    font-family: var(--font-pixel);
+    font-size: 0.7rem;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+}
+
+.product-card .card-price span { color: var(--text-muted); font-size: 0.6rem; }
+
+.product-card .card-actions {
+    display: flex;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+}
+
+/* ============================================================
+   BUTTONS — Undertale style
+   ============================================================ */
+.btn-ut {
+    /* VT323 mặc định — hầu hết buttons trong project là tiếng Việt */
+    font-family: var(--font-pixel-vn);
+    font-size: 1rem;
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    letter-spacing: 1px;
+    transition: all var(--transition-fast);
+    border-radius: 0;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+.btn-ut-primary {
+    background: var(--gold);
+    color: var(--bg-void);
+}
+.btn-ut-primary:hover {
+    background: #FFF176;
+    box-shadow: var(--glow-gold);
+    color: var(--bg-void);
+    transform: translateY(-1px);
+}
+
+.btn-ut-danger {
+    background: var(--red-soul);
+    color: white;
+}
+.btn-ut-danger:hover {
+    background: #FF6666;
+    box-shadow: var(--glow-red);
+    transform: translateY(-1px);
+}
+
+.btn-ut-outline {
+    background: transparent;
+    color: var(--gold);
+    border: var(--border-gold);
+}
+.btn-ut-outline:hover {
+    background: var(--gold-glow);
+    box-shadow: var(--glow-gold);
+}
+
+.btn-ut-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: var(--border-muted);
+}
+.btn-ut-ghost:hover { color: var(--text-primary); border-color: #555; }
+
+/* ============================================================
+   SECTION HEADERS
+   ============================================================ */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.section-title-pixel {
+    /* VT323 cho tiếng Việt, size lớn hơn để bù cho font to hơn */
+    font-family: var(--font-pixel-vn);
+    font-size: 1.4rem;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: 2px;
+}
+
+.section-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--gold), transparent);
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+.hero-section {
+    background: var(--bg-void);
+    border-bottom: var(--border-gold);
+    padding: var(--space-2xl) 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 20% 50%, rgba(255,215,0,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(255,68,68,0.06) 0%, transparent 60%);
+}
+
+.hero-content { position: relative; z-index: 1; }
+
+.hero-eyebrow {
+    /* ASCII only → Press Start 2P OK */
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--red-soul);
+    letter-spacing: 4px;
+    text-shadow: var(--glow-red);
+    margin-bottom: var(--space-md);
+}
+
+.hero-title {
+    /* VT323: tiếng Việt có dấu — hỗ trợ Unicode, vẫn pixel style */
+    font-family: var(--font-pixel-vn);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    line-height: 1.3;
+    margin-bottom: var(--space-lg);
+    letter-spacing: 2px;
+}
+
+.hero-subtitle {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin-bottom: var(--space-xl);
+}
+
+.hero-cta { display: flex; gap: var(--space-md); flex-wrap: wrap; }
+
+/* Pixel art PC illustration in hero */
+.hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ── OLD emoji fallback (kept for safety) ── */
+.pixel-pc {
+    font-size: 8rem;
+    filter: drop-shadow(0 0 20px var(--gold-glow));
+    animation: float 3s ease-in-out infinite;
+}
+
+/* ── NEW: Undertale Pixel Art PC Wrapper ── */
+.pixel-pc-wrap {
+    position: relative;
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+}
+
+.pixel-pc-svg {
+    display: block;
+    /* Scale up for dramatic effect */
+    width: clamp(180px, 22vw, 280px);
+    height: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    /* Gold outer glow */
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5))
+            drop-shadow(0 0 30px rgba(255, 215, 0, 0.2));
+}
+
+/* Pulsing red heart group on screen */
+.pixel-heart-group {
+    animation: heart-pulse 1.2s ease-in-out infinite;
+}
+
+/* Legacy: keep for compat */
+.pixel-heart {
+    animation: heart-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes heart-pulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 4px #FF4444) brightness(1);
+    }
+    50% {
+        filter: drop-shadow(0 0 12px #FF4444) drop-shadow(0 0 24px rgba(255,68,68,0.6)) brightness(1.3);
+    }
+}
+
+/* Glow rings behind the PC */
+.pc-glow-ring {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.pc-glow-gold {
+    width: 70%;
+    height: 35%;
+    background: radial-gradient(ellipse, rgba(255,215,0,0.15) 0%, transparent 70%);
+    animation: glow-breathe 3s ease-in-out infinite;
+    bottom: 0;
+    top: auto;
+}
+
+.pc-glow-red {
+    width: 40%;
+    height: 40%;
+    background: radial-gradient(ellipse, rgba(255,68,68,0.2) 0%, transparent 70%);
+    top: 30%;
+    animation: glow-breathe 1.2s ease-in-out infinite;
+}
+
+@keyframes glow-breathe {
+    0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+    50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-12px); }
+}
+
+/* ============================================================
+   GRID LAYOUTS
+   ============================================================ */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: var(--space-lg);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* ============================================================
+   FEATURE CARDS (Home page)
+   ============================================================ */
+.feature-card {
+    background: var(--bg-surface);
+    border: 1px solid #2A2A2A;
+    padding: var(--space-xl);
+    text-align: center;
+    transition: all var(--transition-med);
+}
+
+.feature-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px var(--gold-glow);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+    display: block;
+}
+
+.feature-title {
+    /* VT323: các title card có thể chứa tiếng Việt */
+    font-family: var(--font-pixel-vn);
+    font-size: 1rem;
+    color: var(--gold);
+    margin-bottom: var(--space-sm);
+    letter-spacing: 1px;
+}
+
+.feature-desc {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer-hk {
+    background: var(--bg-void);
+    border-top: var(--border-gold);
+    padding: var(--space-xl) 0 var(--space-lg);
+    margin-top: auto;
+}
+
+.footer-brand {
+    /* ASCII "HKTech PC Builder" → Press Start 2P OK */
+    font-family: var(--font-pixel);
+    font-size: 0.7rem;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    margin-bottom: var(--space-sm);
+}
+
+.footer-tagline {
+    /* VT323 cho tagline tiếng Việt */
+    font-family: var(--font-pixel-vn);
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.footer-bottom {
+    border-top: var(--border-muted);
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.save-point-text {
+    color: var(--gold);
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    animation: savePulse 2s ease-in-out infinite;
+}
+
+/* ============================================================
+   ALERTS & TOAST
+   ============================================================ */
+.alert-ut {
+    border: 2px solid;
+    border-radius: 0;
+    padding: var(--space-md) var(--space-lg);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    position: relative;
+}
+
+.alert-ut::before { content: '* '; color: inherit; }
+
+.alert-ut-success { border-color: var(--green-kindness); color: var(--green-kindness); background: rgba(68,204,68,0.1); }
+.alert-ut-danger  { border-color: var(--red-soul);       color: var(--red-soul);       background: var(--red-glow); }
+.alert-ut-warning { border-color: var(--gold);            color: var(--gold);            background: var(--gold-glow); }
+.alert-ut-info    { border-color: var(--blue-patience);  color: var(--blue-patience);  background: rgba(68,136,255,0.1); }
+
+/* ============================================================
+   BUILD PC — Slot Items
+   ============================================================ */
+.build-slot {
+    background: var(--bg-surface);
+    border: 1px solid #2A2A2A;
+    border-left: 4px solid var(--gold-dim);
+    padding: var(--space-md) var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    transition: all var(--transition-med);
+    margin-bottom: var(--space-sm);
+}
+
+.build-slot.filled { border-left-color: var(--green-kindness); }
+.build-slot.error  { border-left-color: var(--red-soul); }
+
+.build-slot:hover { border-color: var(--gold); }
+
+.slot-icon { font-size: 1.8rem; width: 40px; text-align: center; }
+.slot-label {
+    /* VT323: slot labels có tiếng Việt (NGUỒN PSU, TẢN NHIỆT...) */
+    font-family: var(--font-pixel-vn);
+    font-size: 0.95rem;
+    color: var(--gold);
+    width: 120px;
+    letter-spacing: 1px;
+    line-height: 1.2;
+}
+
+.slot-selected {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+}
+
+.slot-price {
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    color: var(--gold);
+    min-width: 120px;
+    text-align: right;
+}
+
+/* ============================================================
+   FORMS — Undertale input style
+   ============================================================ */
+.form-hk .form-label {
+    /* VT323: labels form thường có tiếng Việt */
+    font-family: var(--font-pixel-vn);
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 1px;
+    margin-bottom: var(--space-xs);
+    display: block;
+}
+
+.form-hk .form-control-hk {
+    background: var(--bg-void);
+    border: 2px solid #333;
+    color: var(--text-primary);
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    width: 100%;
+    border-radius: 0;
+    transition: border-color var(--transition-fast);
+    outline: none;
+}
+
+.form-hk .form-control-hk:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-glow);
+}
+
+.form-hk .form-select-hk {
+    background: var(--bg-void) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23FFD700' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
+    -webkit-appearance: none;
+}
+
+/* ============================================================
+   BADGE / TAGS
+   ============================================================ */
+.badge-ut {
+    font-family: var(--font-pixel);
+    font-size: 0.4rem;
+    padding: 3px 8px;
+    border-radius: 0;
+    letter-spacing: 1px;
+}
+
+.badge-ut-gold   { background: var(--gold);          color: var(--bg-void); }
+.badge-ut-red    { background: var(--red-soul);      color: #fff; }
+.badge-ut-green  { background: var(--green-kindness); color: var(--bg-void); }
+.badge-ut-blue   { background: var(--blue-patience); color: #fff; }
+
+/* ============================================================
+   SKELETON LOADING
+   ============================================================ */
+@keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #1A1A1A 25%, #2A2A2A 50%, #1A1A1A 75%);
+    background-size: 400px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 0;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+    .navbar-toggler-hk { display: flex; }
+
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        background: var(--bg-void);
+        border-bottom: var(--border-gold);
+        padding: var(--space-md);
+    }
+    .nav-links.open { display: flex; }
+    .nav-links .nav-item .nav-link-hk { padding: var(--space-md); border-bottom: none; width: 100%; }
+
+    .hero-title { font-size: 1.8rem; } /* VT323 lớn hơn Press Start 2P */
+    .pixel-pc   { font-size: 5rem; }
+    .products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .build-slot { flex-wrap: wrap; gap: var(--space-sm); }
+    .slot-label { width: auto; }
+    .footer-bottom { flex-direction: column; gap: var(--space-sm); text-align: center; }
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+.text-gold      { color: var(--gold); }
+.text-red       { color: var(--red-soul); }
+.text-muted-hk  { color: var(--text-muted); }
+.text-pixel     { font-family: var(--font-pixel); }
+.text-pixel-vn  { font-family: var(--font-pixel-vn); }
+.text-mono      { font-family: var(--font-mono); }
+.glow-gold      { text-shadow: var(--glow-gold); }
+.glow-red       { text-shadow: var(--glow-red); }
+.border-gold    { border: var(--border-gold); }
+.bg-surface-hk  { background: var(--bg-surface); }
+.pixel-hr       { border: none; border-top: 2px solid var(--gold-dim); margin: var(--space-xl) 0; }
+
+/* ============================================================
+   MIXED FONT SYSTEM — English (Press Start 2P) + VN (VT323)
+   Tỉ lệ kích thước: PS2P ~0.45x so với VT323 để cân bằng visual
+   ============================================================ */
+
+/* Hero title mixed spans */
+.hero-title .en {
+    font-family: var(--font-pixel);
+    font-size: 0.45em;   /* ~1.6rem tại parent 3.5rem — bằng VT323 về visual */
+    letter-spacing: 3px;
+    vertical-align: middle;
+}
+.hero-title .vn {
+    font-family: var(--font-pixel-vn);
+    vertical-align: middle;
+}
+
+/* Section header variants */
+.section-title-en {
+    /* English-only section headers */
+    font-family: var(--font-pixel);
+    font-size: 0.75rem;
+    color: var(--gold);
+    text-shadow: var(--glow-gold);
+    letter-spacing: 2px;
+}
+/* .section-title-pixel (VT323) đã định nghĩa ở trên — dùng cho VN headers */
+
+/* Feature card title variants */
+.feature-title-en {
+    font-family: var(--font-pixel);
+    font-size: 0.55rem;
+    color: var(--gold);
+    margin-bottom: var(--space-sm);
+    letter-spacing: 1px;
+}
+/* .feature-title (VT323) dùng cho VN titles */
+
+/* Slot label variants */
+.slot-label-en {
+    /* ASCII slots: CPU, RAM, GPU, MAINBOARD */
+    font-family: var(--font-pixel);
+    font-size: 0.45rem;
+    color: var(--gold);
+    width: 120px;
+    letter-spacing: 1px;
+}
+/* .slot-label (VT323) dùng cho VN slots: NGUỒN PSU, TẢN NHIỆT... */
+
+/* Sidebar panel labels (Build PC page) */
+.panel-label-en {
+    font-family: var(--font-pixel);
+    font-size: 0.42rem;
+    color: var(--gold);
+    letter-spacing: 1px;
+}
+.panel-label-vn {
+    font-family: var(--font-pixel-vn) !important;
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 1px;
+}
+
+/* btn-vn: no-op now (base .btn-ut đã dùng VT323), giữ lại cho legacy */
+.btn-ut.btn-vn {
+    font-family: var(--font-pixel-vn) !important;
+    font-size: 1rem !important;
+    letter-spacing: 1px;
+}
+
+/* btn-en: dùng Press Start 2P cho ASCII-only button content */
+.btn-ut.btn-en {
+    font-family: var(--font-pixel) !important;
+    font-size: 0.65rem !important;
+    letter-spacing: 2px;
+}
+
+/* .text-vn-mono: Share Tech Mono cho Vietnamese text khi VT323 thiếu glyph (Ổ, Í, Ẵ...) */
+.text-vn-mono {
+    font-family: 'Share Tech Mono', 'Noto Sans Mono', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+}

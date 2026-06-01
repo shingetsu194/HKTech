@@ -1,0 +1,258 @@
+@{
+    ViewData["Title"] = "Trang chủ";
+    ViewData["Description"] = "HKTech - Tự build PC thông minh với Compatibility Guard, Bottleneck Analyzer & FPS Estimator real-time.";
+}
+
+<!-- ============================================================
+     HERO SECTION
+     ============================================================ -->
+<section class="hero-section">
+    <div class="container-hk">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7 hero-content">
+                <div class="hero-eyebrow">★ DETERMINATION MODE ACTIVATED ★</div>
+                <h1 class="hero-title">
+                    <span class="en">BUILD PC</span><br/>
+                    <span class="vn">CỦA BẠN.</span><br/>
+                    <span class="en" style="color: var(--red-soul); text-shadow: var(--glow-red);">SMART.</span>
+                    <span class="vn"> NHANH. CHUẨN.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    * Kiểm tra tương thích tự động. Phân tích bottleneck real-time.
+                    Ước tính FPS ngay khi bạn chọn linh kiện.
+                </p>
+                <div class="hero-cta">
+                    <a asp-controller="Build" asp-action="Index" class="btn-ut btn-ut-primary btn-vn" id="hero-build-btn">
+                        <i class="bi bi-tools"></i> TỰ BUILD PC
+                    </a>
+                    <a asp-controller="Recommend" asp-action="Index" class="btn-ut btn-ut-outline btn-vn" id="hero-recommend-btn">
+                        <i class="bi bi-stars"></i> GỢI Ý CHO TÔI
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-5 hero-visual">
+                <!-- Undertale Pixel Art PC -->
+                <div class="pixel-pc-wrap">
+                    <svg class="pixel-pc-svg" width="160" height="176"
+                         viewBox="0 0 160 176" shape-rendering="crispEdges"
+                         xmlns="http://www.w3.org/2000/svg"
+                         title="Your dream PC awaits!">
+
+                        <!-- ═══ MONITOR BEZEL ═══ -->
+                        <!-- Top bar -->
+                        <rect x="16" y="8"  width="128" height="8" fill="#2D2D2D"/>
+                        <!-- Left side -->
+                        <rect x="16" y="8"  width="8"   height="80" fill="#2D2D2D"/>
+                        <!-- Right side -->
+                        <rect x="136" y="8" width="8"   height="80" fill="#2D2D2D"/>
+                        <!-- Bottom bar -->
+                        <rect x="16" y="80" width="128" height="8"  fill="#2D2D2D"/>
+                        <!-- Bezel highlight (top-left corner shine) -->
+                        <rect x="16" y="8"  width="128" height="2"  fill="#444444"/>
+                        <rect x="16" y="8"  width="2"   height="80" fill="#444444"/>
+
+                        <!-- ═══ SCREEN (dark blue-black) ═══ -->
+                        <rect x="24" y="16" width="112" height="64" fill="#080D18"/>
+                        <!-- Screen subtle gradient overlay (no hard scanlines that cut heart) -->
+                        <rect x="24" y="16" width="112" height="64" fill="url(#screenGrad)" opacity="0.3"/>
+                        <!-- Screen corner shine -->
+                        <rect x="24" y="16" width="12" height="4" fill="#1A2840" opacity="0.6"/>
+                        <rect x="24" y="16" width="4"  height="12" fill="#1A2840" opacity="0.4"/>
+
+                        <defs>
+                            <linearGradient id="screenGrad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%"   stop-color="#112244" stop-opacity="1"/>
+                                <stop offset="100%" stop-color="#000000" stop-opacity="1"/>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- ═══════════════════════════════════════
+                             HEART — Undertale red soul ❤
+                             8-col × 6-row pixel grid, 8px/unit
+                             Centered in screen at x=80, y=46
+                             Col 0=x48, 1=56, 2=64, 3=72, 4=80, 5=88, 6=96, 7=104
+                             ═══════════════════════════════════════ -->
+                        <g class="pixel-heart-group">
+                            <!-- Row 0 (y=22): bumps at col1-2 and col5-6, gap at col3-4 (2 units) -->
+                            <rect x="56" y="22" width="16" height="8" fill="#FF4444"/>
+                            <rect x="88" y="22" width="16" height="8" fill="#FF4444"/>
+                            <!-- Row 1 (y=30): full width col0-7 -->
+                            <rect x="48" y="30" width="64" height="8" fill="#FF4444"/>
+                            <!-- Row 2 (y=38): full width col0-7 -->
+                            <rect x="48" y="38" width="64" height="8" fill="#FF4444"/>
+                            <!-- Row 3 (y=46): col1-6 (6 units = 48px) -->
+                            <rect x="56" y="46" width="48" height="8" fill="#FF4444"/>
+                            <!-- Row 4 (y=54): col2-5 (4 units = 32px) -->
+                            <rect x="64" y="54" width="32" height="8" fill="#FF4444"/>
+                            <!-- Row 5 (y=62): col3-4 (2 units = 16px) — tip -->
+                            <rect x="72" y="62" width="16" height="8" fill="#FF4444"/>
+
+                            <!-- Highlights (lighter pixels top-left of each bump) -->
+                            <rect x="56" y="22" width="8" height="4" fill="#FF9999"/>
+                            <rect x="88" y="22" width="8" height="4" fill="#FF9999"/>
+                            <rect x="48" y="30" width="8" height="4" fill="#FF7777" opacity="0.5"/>
+                        </g>
+
+                        <!-- ═══ STAND NECK ═══ -->
+                        <rect x="72" y="88" width="16" height="16" fill="#383838"/>
+
+                        <!-- ═══ STAND BASE ═══ -->
+                        <rect x="48" y="104" width="64" height="8"  fill="#404040"/>
+                        <rect x="44" y="104" width="4"  height="8"  fill="#333333"/>
+                        <rect x="112" y="104" width="4" height="8"  fill="#333333"/>
+
+                        <!-- ═══ KEYBOARD ═══ -->
+                        <!-- Keyboard body -->
+                        <rect x="8"   y="120" width="144" height="24" fill="#1E1E1E"/>
+                        <!-- Keyboard top highlight -->
+                        <rect x="8"   y="120" width="144" height="2"  fill="#333333"/>
+                        <!-- Key row 1 -->
+                        <rect x="16"  y="124" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="30"  y="124" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="44"  y="124" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="58"  y="124" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="72"  y="124" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="86"  y="124" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="100" y="124" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="114" y="124" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="128" y="124" width="16" height="6" fill="#2E2E2E"/>
+                        <!-- Key row 2 (spacebar area) -->
+                        <rect x="16"  y="134" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="30"  y="134" width="10" height="6" fill="#2E2E2E"/>
+                        <!-- Spacebar (gold tinted - Undertale!) -->
+                        <rect x="44"  y="134" width="72" height="6" fill="#3A3010"/>
+                        <rect x="44"  y="134" width="72" height="2" fill="#554818"/>
+                        <rect x="120" y="134" width="10" height="6" fill="#2E2E2E"/>
+                        <rect x="134" y="134" width="10" height="6" fill="#2E2E2E"/>
+                    </svg>
+
+                    <!-- Glow rings behind PC -->
+                    <div class="pc-glow-ring pc-glow-gold"></div>
+                    <div class="pc-glow-ring pc-glow-red"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     SMART FEATURES HIGHLIGHT
+     ============================================================ -->
+<section class="py-5" style="background: var(--bg-cave); border-bottom: 1px solid #222;">
+    <div class="container-hk">
+        <div class="section-header">
+            <h2 class="section-title-en">SMART BUILD INTELLIGENCE ⭐</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card" id="feature-compatibility">
+                <span class="feature-icon">🛡️</span>
+                <div class="feature-title-en">COMPATIBILITY GUARD</div>
+                <p class="feature-desc">
+                    Cảnh báo ngay khi socket CPU không khớp mainboard, RAM sai type, hay nguồn thiếu watt. Không bao giờ mua nhầm nữa.
+                </p>
+            </div>
+            <div class="feature-card" id="feature-bottleneck">
+                <span class="feature-icon">📊</span>
+                <div class="feature-title-en">BOTTLENECK ANALYZER</div>
+                <p class="feature-desc">
+                    Phân tích % bottleneck giữa CPU và GPU. Hiển thị thanh trực quan và gợi ý nâng cấp tối ưu để không "kìm hãm" nhau.
+                </p>
+            </div>
+            <div class="feature-card" id="feature-fps">
+                <span class="feature-icon">🎮</span>
+                <div class="feature-title-en">FPS ESTIMATOR</div>
+                <p class="feature-desc">
+                    Ước tính FPS ở 1080p / 1440p / 4K cho các game: Valorant, CS2, GTA V, Cyberpunk 2077... Biết trước máy chạy mượt không.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     DANH MỤC LINH KIỆN
+     ============================================================ -->
+<section class="py-5">
+    <div class="container-hk">
+        <div class="section-header">
+            <h2 class="section-title-pixel">DANH MỤC LINH KIỆN</h2>
+            <div class="section-line"></div>
+            <a asp-controller="Product" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-products-btn">
+                XEM TẤT CẢ →
+            </a>
+        </div>
+        <div class="row g-3">
+            @{
+                var categories = new[]
+                {
+                    new { Icon = "🧠", Name = "CPU",        Slug = "cpu",        Count = "..." },
+                    new { Icon = "🎮", Name = "GPU / VGA",  Slug = "gpu",        Count = "..." },
+                    new { Icon = "🧩", Name = "Mainboard",  Slug = "mainboard",  Count = "..." },
+                    new { Icon = "💾", Name = "RAM",        Slug = "ram",        Count = "..." },
+                    new { Icon = "⚡", Name = "Nguồn PSU",  Slug = "psu",        Count = "..." },
+                    new { Icon = "🗄️", Name = "Case / Vỏ", Slug = "case",       Count = "..." },
+                };
+            }
+            @foreach (var cat in categories)
+            {
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a asp-controller="Product" asp-action="Index" asp-route-category="@cat.Slug"
+                       class="d-block text-center text-decoration-none p-3 feature-card" id="cat-@cat.Slug">
+                        <div style="font-size:2rem;">@cat.Icon</div>
+                        <div class="feature-title mt-2">@cat.Name</div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     SẢN PHẨM NỔI BẬT (Placeholder — sẽ load từ DB sau)
+     ============================================================ -->
+<section class="py-5" style="background: var(--bg-cave);">
+    <div class="container-hk">
+        <div class="section-header">
+            <h2 class="section-title-pixel">LINH KIỆN NỔI BẬT</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="products-grid" id="featured-products-grid">
+            @* Placeholder cards — sẽ render từ ViewBag/Model sau Phase 2 *@
+            @for (int i = 0; i < 4; i++)
+            {
+                <div class="product-card">
+                    <div class="card-img-wrap skeleton" style="height:200px;"></div>
+                    <div class="card-body-hk">
+                        <div class="skeleton" style="height:16px; width:80%; margin-bottom:8px;"></div>
+                        <div class="skeleton" style="height:12px; width:50%;"></div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="dialog-box mt-4" style="max-width:500px;">
+            Dữ liệu sản phẩm sẽ được tải từ database sau khi hoàn thiện Phase 2.
+            Bây giờ hãy thử trang <strong style="color:var(--gold);">Tự Build PC</strong>!
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     CALL TO ACTION
+     ============================================================ -->
+<section class="py-5 text-center" style="border-top: var(--border-gold); background: var(--bg-void);">
+    <div class="container-hk">
+        <div class="text-vn-mono mb-3" style="font-size:0.95rem; text-shadow: var(--glow-gold);">
+            ★ ĐÃ SẴN SÀNG? ★
+        </div>
+        <h2 class="text-pixel-vn text-white mb-4" style="font-size:2rem;">
+            Bắt đầu xây dựng bộ PC trong mơ của bạn ngay hôm nay
+        </h2>
+        <a asp-controller="Build" asp-action="Index" class="btn-ut btn-ut-primary btn-vn me-3" id="cta-build-btn">
+            <i class="bi bi-tools"></i> BUILD PC NGAY
+        </a>
+        <a asp-controller="Account" asp-action="Register" class="btn-ut btn-ut-outline btn-vn" id="cta-register-btn">
+            <i class="bi bi-person-plus"></i> TẠO TÀI KHOẢN
+        </a>
+    </div>
+</section>
