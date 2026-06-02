@@ -5,6 +5,7 @@
 
 using HKTech.Data;
 using HKTech.Models;
+using HKTech.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // --- MVC ---
 builder.Services.AddControllersWithViews();
+
+// --- CartService (Session-based) ---
+builder.Services.AddScoped<CartService>();
 
 // --- EF Core + SQL Server ---
 builder.Services.AddDbContext<ApplicationDbContext>(options =>

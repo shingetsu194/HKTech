@@ -1,0 +1,239 @@
+@using HKTech.Services
+@model List<CartItem>
+
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    var total     = (decimal)ViewBag.Total;
+    var itemCount = (int)ViewBag.ItemCount;
+}
+
+@section Styles {
+<style>
+    .cart-table { width: 100%; border-collapse: collapse; }
+    .cart-table th {
+        font-family: var(--font-pixel);
+        font-size: 0.45rem;
+        color: var(--gold);
+        padding: 10px 12px;
+        border-bottom: 2px solid var(--gold-dim);
+        text-align: left;
+        letter-spacing: 1px;
+    }
+    .cart-table td {
+        padding: 12px;
+        border-bottom: 1px solid #1E1E1E;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        vertical-align: middle;
+    }
+    .cart-img { width: 64px; height: 64px; object-fit: contain; background: #111; padding: 4px; }
+    .cart-name { color: var(--text-primary); font-size: 0.85rem; }
+    .cart-price { color: var(--gold); font-family: var(--font-pixel); font-size: 0.42rem; white-space: nowrap; }
+    .qty-wrap { display: flex; align-items: center; gap: 8px; }
+    .qty-btn {
+        width: 28px; height: 28px;
+        background: var(--bg-surface); border: 1px solid #333;
+        color: var(--text-primary); cursor: pointer; font-size: 1rem;
+        display: flex; align-items: center; justify-content: center;
+        transition: all var(--transition-fast);
+    }
+    .qty-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .qty-input {
+        width: 44px; text-align: center;
+        background: var(--bg-void); border: 1px solid #333;
+        color: var(--text-primary); font-family: var(--font-mono);
+        font-size: 0.85rem; padding: 4px;
+    }
+    .cart-summary {
+        background: var(--bg-surface);
+        border: var(--border-gold);
+        padding: var(--space-lg);
+        position: sticky; top: 80px;
+    }
+    .summary-row {
+        display: flex; justify-content: space-between;
+        font-family: var(--font-mono); font-size: 0.82rem;
+        color: var(--text-secondary); padding: 6px 0;
+        border-bottom: 1px solid #1E1E1E;
+    }
+    .summary-total {
+        font-family: var(--font-pixel); font-size: 0.9rem;
+        color: var(--gold); text-shadow: var(--glow-gold);
+        margin-top: 12px;
+    }
+    .cart-layout { display: grid; grid-template-columns: 1fr 320px; gap: var(--space-xl); align-items: start; }
+    @@media (max-width: 900px) { .cart-layout { grid-template-columns: 1fr; } }
+</style>
+}
+
+<div class="container-hk" style="padding-top: var(--space-xl);">
+    <div class="section-header">
+        <h1 class="section-title-pixel">🛒 CART</h1>
+        <div class="section-line"></div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <!-- Empty cart -->
+        <div class="dialog-box text-center" style="padding: 48px; margin-top: 24px;">
+            <div style="font-size: 3rem; margin-bottom: 16px;">🛒</div>
+            <div class="text-pixel-vn text-gold mb-3" style="font-size: 1.2rem;">Giỏ hàng đang trống!</div>
+            <p class="text-mono text-muted-hk mb-4">Hãy khám phá linh kiện hoặc tự build cấu hình PC của bạn.</p>
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="/Product" class="btn-ut btn-ut-primary btn-en">SHOP NOW</a>
+                <a href="/Build" class="btn-ut btn-ut-outline btn-en">BUILD PC</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="cart-layout mt-4">
+            <!-- LEFT: Cart Items Table -->
+            <div>
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">PRODUCT</th>
+                            <th>PRICE</th>
+                            <th>QTY</th>
+                            <th>SUBTOTAL</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartBody">
+                        @foreach (var item in Model)
+                        {
+                            <tr id="row-@item.ProductId">
+                                <td style="width:76px;">
+                                    <img class="cart-img" src="@item.ImageUrl" alt="@item.Name"
+                                         onerror="this.src='/images/placeholder.png'" />
+                                </td>
+                                <td>
+                                    <div class="cart-name">@item.Name</div>
+                                    <div style="font-size:0.75rem; color:var(--text-muted);">@item.Slug.ToUpper()</div>
+                                </td>
+                                <td>
+                                    <span class="cart-price">@item.Price.ToString("N0") ₫</span>
+                                </td>
+                                <td>
+                                    <div class="qty-wrap">
+                                        <button class="qty-btn" onclick="changeQty(@item.ProductId, -1)">−</button>
+                                        <input class="qty-input" type="number" min="1" max="99"
+                                               value="@item.Quantity" id="qty-@item.ProductId"
+                                               onchange="setQty(@item.ProductId, this.value)" />
+                                        <button class="qty-btn" onclick="changeQty(@item.ProductId, 1)">+</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="cart-price" id="sub-@item.ProductId">
+                                        @item.Subtotal.ToString("N0") ₫
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn-ut btn-ut-ghost btn-en"
+                                            onclick="removeItem(@item.ProductId)"
+                                            style="font-size:0.38rem; padding:6px 10px;">✕</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <!-- Cart Actions -->
+                <div class="d-flex gap-3 mt-4">
+                    <a href="/Product" class="btn-ut btn-ut-ghost btn-en">← CONTINUE</a>
+                    <form asp-action="Clear" asp-controller="Cart" method="post" style="margin:0;">
+                        <button type="submit" class="btn-ut btn-ut-ghost btn-en"
+                                onclick="return confirm('Xóa toàn bộ giỏ hàng?')">CLEAR ALL</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT: Order Summary -->
+            <div class="cart-summary">
+                <div class="panel-label-en mb-3">📋 ORDER SUMMARY</div>
+
+                <div class="summary-row">
+                    <span>Items (@itemCount)</span>
+                    <span id="summarySubtotal">@total.ToString("N0") ₫</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span style="color:var(--green-kindness);">FREE</span>
+                </div>
+
+                <div class="summary-total" id="summaryTotal">
+                    @total.ToString("N0") ₫
+                </div>
+                <div class="text-mono" style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">
+                    Tổng thanh toán (VNĐ)
+                </div>
+
+                <a href="/Order/Checkout" class="btn-ut btn-ut-primary btn-en mt-4"
+                   style="width:100%; text-align:center; display:block; padding:14px;">
+                    CHECKOUT →
+                </a>
+                <a href="/Build" class="btn-ut btn-ut-outline btn-en mt-2"
+                   style="width:100%; text-align:center; display:block;">
+                    BUILD MORE
+                </a>
+
+                @if (TempData["CartMsg"] != null)
+                {
+                    <div class="dialog-box mt-3" style="font-size:0.8rem;">
+                        @TempData["CartMsg"]
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    const PRICE_FORMATTER = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+
+    async function changeQty(productId, delta) {
+        const input = document.getElementById(`qty-${productId}`);
+        const newQty = Math.max(1, parseInt(input.value) + delta);
+        input.value = newQty;
+        await updateQty(productId, newQty);
+    }
+
+    async function setQty(productId, value) {
+        const qty = Math.max(1, parseInt(value) || 1);
+        document.getElementById(`qty-${productId}`).value = qty;
+        await updateQty(productId, qty);
+    }
+
+    async function updateQty(productId, quantity) {
+        const res  = await fetch('/Cart/Update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `productId=${productId}&quantity=${quantity}`
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById(`sub-${productId}`).textContent = data.lineTotal;
+            document.getElementById('summarySubtotal').textContent  = data.cartTotal;
+            document.getElementById('summaryTotal').textContent     = data.cartTotal;
+        }
+    }
+
+    async function removeItem(productId) {
+        const res  = await fetch('/Cart/Remove', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `productId=${productId}`
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById(`row-${productId}`)?.remove();
+            document.getElementById('summarySubtotal').textContent = data.cartTotal;
+            document.getElementById('summaryTotal').textContent    = data.cartTotal;
+            if (data.cartCount === 0) location.reload();
+        }
+    }
+</script>
+}

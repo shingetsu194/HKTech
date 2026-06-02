@@ -109,7 +109,7 @@ body {
 
 .navbar-brand-hk {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     gap: var(--space-sm);
     text-decoration: none;
     padding: var(--space-md) var(--space-lg);
@@ -126,23 +126,21 @@ body {
 
 .navbar-brand-hk .brand-sub {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: var(--text-muted);
     letter-spacing: 3px;
-    line-height: 1.2;
+    line-height: 1;
+    align-self: flex-end;
+    padding-bottom: 1px;
 }
 
 .heart-icon {
-    color: var(--red-soul);
-    font-size: 1.5rem;
     animation: heartbeat 1.5s ease-in-out infinite;
-    text-shadow: var(--glow-red);
-    /* Stretch to full brand block height, emoji centered inside */
-    align-self: stretch;
+    filter: drop-shadow(0 0 6px #FF4444) drop-shadow(0 0 12px #FF2222);
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1;
+    flex-shrink: 0;
 }
 
 @keyframes heartbeat {

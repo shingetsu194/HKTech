@@ -248,14 +248,24 @@
                 </div>
             </div>
 
-            <!-- Add to Cart button -->
-            <div class="mt-4 d-flex gap-3" id="build-actions">
+            <!-- Build Action Buttons -->
+            <div class="mt-4 d-flex gap-3 flex-wrap" id="build-actions">
                 <button class="btn-ut btn-ut-primary btn-en" id="btn-add-all-to-cart" onclick="addBuildToCart()" style="padding: 12px 20px;">
-                    <i class="bi bi-cart-plus"></i> ADD TO CART
+                    ADD TO CART
+                </button>
+                <button class="btn-ut btn-ut-outline btn-en" onclick="toggleSavePanel()" id="btn-save-build">
+                    SAVE BUILD
                 </button>
                 <button class="btn-ut btn-ut-ghost btn-en" onclick="clearBuild()" id="btn-clear-build">
-                    <i class="bi bi-trash"></i> CLEAR
+                    CLEAR
                 </button>
+            </div>
+            <!-- Save Build Panel -->
+            <div id="saveBuildPanel" style="display:none; margin-top:12px;" class="d-flex gap-2">
+                <input type="text" class="form-control-hk" id="buildNameInput"
+                       placeholder="Build name..." style="flex:1; font-size:0.75rem;"/>
+                <button class="btn-ut btn-ut-primary btn-en" onclick="saveBuild()">SAVE</button>
+                <button class="btn-ut btn-ut-ghost btn-en" onclick="toggleSavePanel()">✕</button>
             </div>
         </div>
 
@@ -336,30 +346,53 @@
 </div>
 
 @section Scripts {
+@{
+    var initBuild = ViewBag.CurrentBuild as Dictionary<string, HKTech.Controllers.BuildSlotItem>;
+}
 <script>
     // ============================================================
-    // BUILD STATE
+    // BUILD STATE — restored from server session
     // ============================================================
+    const serverBuild = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+        initBuild ?? new Dictionary<string, HKTech.Controllers.BuildSlotItem>()));
+
     const buildState = {
         cpu: null, mainboard: null, ram: null, gpu: null,
         storage: null, psu: null, case: null, cooling: null
     };
 
     let currentSlot = null;
+    let allProducts  = [];   // products loaded for current slot
     const PRICE_FORMATTER = new Intl.NumberFormat('vi-VN', { style:'currency', currency:'VND' });
+
+    // ============================================================
+    // RESTORE SESSION STATE ON PAGE LOAD
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        for (const [slot, item] of Object.entries(serverBuild)) {
+            if (item && buildState.hasOwnProperty(slot)) {
+                buildState[slot] = item;
+                updateSlotUI(slot, item);
+            }
+        }
+        updateTotals();
+        runCompatibilityCheck();
+        runBottleneckAnalysis();
+        runFpsEstimate();
+    });
 
     // ============================================================
     // OPEN / CLOSE SELECT PANEL
     // ============================================================
     function openSelectPanel(slotKey, slotLabel) {
         currentSlot = slotKey;
-        document.getElementById('panelTitle').textContent = `CHỌN ${slotLabel}`;
+        document.getElementById('panelTitle').textContent = `CHOOSE ${slotLabel}`;
         document.getElementById('selectPanel').classList.add('active');
         document.getElementById('productSearch').value = '';
+        document.getElementById('productList').innerHTML =
+            '<div class="text-mono text-muted-hk">Loading...</div>';
         document.getElementById('selectPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // TODO Phase 2: fetch /api/products/category/{slotKey} via AJAX
-        // loadProductsForSlot(slotKey);
+        loadProductsForSlot(slotKey);
     }
 
     function closeSelectPanel() {
@@ -367,31 +400,79 @@
         currentSlot = null;
     }
 
+    // ============================================================
+    // LOAD PRODUCTS FROM API
+    // ============================================================
+    async function loadProductsForSlot(slot) {
+        try {
+            const res  = await fetch(`/Build/GetProducts?slot=${slot}`);
+            const data = await res.json();
+            if (!data.success) throw new Error();
+            allProducts = data.products;
+            renderProducts(allProducts);
+        } catch {
+            document.getElementById('productList').innerHTML =
+                '<div class="text-mono text-muted-hk">* Lỗi tải dữ liệu. Thử lại sau.</div>';
+        }
+    }
+
+    function renderProducts(list) {
+        const selected = buildState[currentSlot];
+        const html = list.length === 0
+            ? '<div class="text-mono text-muted-hk">* Chưa có linh kiện trong danh mục này.</div>'
+            : list.map(p => `
+                <div class="mini-product-item ${selected?.productId === p.id ? 'selected' : ''}"
+                     onclick="selectProduct(${JSON.stringify(p).replace(/"/g, '&quot;')})"
+                     id="mini-${p.id}">
+                    <img class="mini-product-img" src="${p.imageUrl}" alt="${p.name}" loading="lazy"
+                         onerror="this.src='/images/placeholder.png'"/>
+                    <div>
+                        <div class="mini-product-name">${p.name}</div>
+                        <div class="mini-product-price">${p.priceFormatted}</div>
+                    </div>
+                </div>`).join('');
+        document.getElementById('productList').innerHTML = html;
+    }
+
     function filterProducts(query) {
-        // TODO Phase 2: filter rendered product list
+        const q = query.toLowerCase();
+        renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(q)));
     }
 
     // ============================================================
-    // SELECT A PRODUCT INTO A SLOT
+    // SELECT A PRODUCT INTO A SLOT  (calls server session)
     // ============================================================
-    function selectProduct(product) {
+    async function selectProduct(product) {
         if (!currentSlot) return;
-        buildState[currentSlot] = product;
-        updateSlotUI(currentSlot, product);
-        updateTotals();
-        closeSelectPanel();
+        try {
+            const res  = await fetch('/Build/SelectProduct', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `slot=${encodeURIComponent(currentSlot)}&productId=${product.id}`
+            });
+            const data = await res.json();
+            if (!data.success) { alert(data.message); return; }
 
-        // Trigger real-time checks
-        runCompatibilityCheck();
-        runBottleneckAnalysis();
-        runFpsEstimate();
+            buildState[currentSlot] = product;
+            updateSlotUI(currentSlot, product);
+            updateTotals();
+            closeSelectPanel();
+            runCompatibilityCheck();
+            runBottleneckAnalysis();
+            runFpsEstimate();
+        } catch { alert('* Lỗi kết nối máy chủ.'); }
     }
 
-    function clearSlot(slotKey) {
+    async function clearSlot(slotKey) {
         buildState[slotKey] = null;
+        await fetch('/Build/RemoveSlot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `slot=${encodeURIComponent(slotKey)}`
+        });
         const el = document.getElementById(`slot-${slotKey}`);
         el.classList.remove('filled', 'error');
-        document.getElementById(`selected-${slotKey}`).textContent = `Chọn linh kiện...`;
+        document.getElementById(`selected-${slotKey}`).textContent = 'Chọn linh kiện...';
         document.getElementById(`selected-${slotKey}`).className = 'slot-selected text-muted-hk';
         document.getElementById(`price-${slotKey}`).textContent = '—';
         document.getElementById(`btn-clear-${slotKey}`).style.display = 'none';
@@ -539,31 +620,93 @@
     }
 
     // ============================================================
-    // ADD BUILD TO CART
+    // ADD BUILD TO CART  (calls /Cart/AddBuild)
     // ============================================================
-    function addBuildToCart() {
-        const selected = Object.entries(buildState).filter(([,v]) => v !== null);
-        if (selected.length === 0) {
-            alert('* Vui lòng chọn ít nhất một linh kiện trước!');
-            return;
+    async function addBuildToCart() {
+        const productIds = Object.values(buildState)
+            .filter(v => v !== null)
+            .map(p => p.id ?? p.productId);
+        if (productIds.length === 0) {
+            showToast('* Vui lòng chọn ít nhất 1 linh kiện!', 'warn'); return;
         }
-        // TODO Phase 3: POST /Build/AddToCart với danh sách ProductId
-        const productIds = selected.map(([,p]) => p.id);
-        console.log('Adding to cart:', productIds);
-        alert('* Tính năng giỏ hàng sẽ hoàn thiện sau Phase 3. Stay determined!');
+        try {
+            const res  = await fetch('/Cart/AddBuild', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productIds)
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`✅ ${data.message}`, 'ok');
+                updateCartBadge(data.cartCount);
+            } else {
+                showToast(`❌ ${data.message}`, 'error');
+            }
+        } catch { showToast('* Lỗi kết nối.', 'error'); }
     }
 
-    function clearBuild() {
+    // ============================================================
+    // SAVE BUILD (calls /Build/SaveBuild)
+    // ============================================================
+    function toggleSavePanel() {
+        const panel = document.getElementById('saveBuildPanel');
+        panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    async function saveBuild() {
+        const name = document.getElementById('buildNameInput').value.trim() || 'My Build';
+        try {
+            const res  = await fetch('/Build/SaveBuild', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `buildName=${encodeURIComponent(name)}`
+            });
+            const data = await res.json();
+            if (data.success) {
+                showToast(`✅ ${data.message}`, 'ok');
+                toggleSavePanel();
+            } else {
+                showToast(`⚠️ ${data.message}`, 'warn');
+                if (data.message.includes('đăng nhập'))
+                    setTimeout(() => window.location.href = '/Account/Login', 1500);
+            }
+        } catch { showToast('* Lỗi kết nối.', 'error'); }
+    }
+
+    async function clearBuild() {
+        await fetch('/Build/ClearAll', { method: 'POST' });
         Object.keys(buildState).forEach(k => { buildState[k] = null; });
         document.querySelectorAll('.build-slot').forEach(el => el.classList.remove('filled','error'));
-        document.querySelectorAll('[id^="selected-"]').forEach(el => { el.textContent = 'Chọn linh kiện...'; el.className = 'slot-selected text-muted-hk'; });
+        document.querySelectorAll('[id^="selected-"]').forEach(el => {
+            el.textContent = 'Chọn linh kiện...'; el.className = 'slot-selected text-muted-hk';
+        });
         document.querySelectorAll('[id^="price-"]').forEach(el => el.textContent = '—');
         document.querySelectorAll('[id^="btn-clear-"]').forEach(el => el.style.display = 'none');
         updateTotals();
-        document.getElementById('fpsTableWrap').innerHTML = '<div class="text-mono" style="font-size:0.75rem;color:var(--text-muted);">* Chọn CPU + GPU để xem ước tính FPS</div>';
+        document.getElementById('fpsTableWrap').innerHTML =
+            '<div class="text-mono" style="font-size:0.75rem;color:var(--text-muted);">* Chọn CPU + GPU để xem ước tính FPS</div>';
         document.getElementById('buildBadge').style.display = 'none';
         document.getElementById('bottleneckLabel').textContent = '—';
         document.getElementById('bottleneckHint').textContent = '* Chọn CPU & GPU để xem phân tích';
+    }
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function updateCartBadge(count) {
+        const badge = document.getElementById('cartCountBadge');
+        if (badge) { badge.textContent = count; badge.style.display = count > 0 ? 'inline' : 'none'; }
+    }
+
+    function showToast(message, type = 'ok') {
+        const colors = { ok: 'var(--green-kindness)', warn: 'var(--gold)', error: 'var(--red-soul)' };
+        const toast = document.createElement('div');
+        toast.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;
+            background:var(--bg-card);border:2px solid ${colors[type]};font-family:var(--font-mono);
+            font-size:0.85rem;color:${colors[type]};animation:slideDown 0.3s ease;`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
     }
 </script>
 }

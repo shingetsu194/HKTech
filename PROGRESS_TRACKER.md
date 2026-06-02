@@ -1,7 +1,7 @@
 ================================================================
    HKTECH PC BUILDER — WEEKLY PROGRESS TRACKER
    Môn: Lập trình Web | Thời gian: 8 tuần
-   Tạo ngày: 2026-06-01 | Cập nhật: 2026-06-01
+   Tạo ngày: 2026-06-01 | Cập nhật: 2026-06-02
 ================================================================
 
 LEGEND:
@@ -41,6 +41,8 @@ Bắt đầu : 2026-06-01
   [x] Pixel-style border và animation effects
   [x] Responsive (mobile menu)
   [x] Tinh chỉnh font chữ to hơn, dễ nhìn hơn
+  [x] Pixel SVG hearts (navbar, footer brand, footer bottom)
+  [x] Navbar: LOG IN gold button, bỏ ĐĂNG KÝ
 
   VIEWS TĨNH
   [x] Home/Index.cshtml — Hero banner + PC nổi bật + Linh kiện mới
@@ -53,8 +55,8 @@ Bắt đầu : 2026-06-01
   [x] Seed ~30 sản phẩm mẫu với benchmark data
 
 Ghi chú tuần này:
-  - ___________________________________________
-  - ___________________________________________
+  - Slogan mới: "YOU HAVE DETERMINATION. WE HAVE THE PARTS."
+  - Pixel art SVG heart thay thế ♥ text toàn bộ giao diện
 
 ================================================================
 TUẦN 6-7 — PHASE 2: Models + Database + CRUD + Auth
@@ -82,37 +84,46 @@ Status  : [x] HOÀN THÀNH
   [x] Validation (server-side + client-side)
 
 Ghi chú tuần này:
-  - ___________________________________________
-  - ___________________________________________
+  - Phase 2 hoàn tất bởi teammate, merge vào master
+  - DB instance: LAPTOP-O833CQCQ\SQLEXPRESS (máy teammate)
 
 ================================================================
 TUẦN 7 — PHASE 3: Core Features (Build PC + Recommend + Cart)
 ================================================================
-Status  : [/] ĐANG THỰC HIỆN
+Status  : [x] HOÀN THÀNH (2026-06-02)
 
   BUILD PC
-  [ ] BuildController — Hiển thị slot builder
-  [ ] Chọn linh kiện từng slot (CPU, GPU, RAM, MB, PSU, Case)
-  [ ] Lưu cấu hình tạm thời (Session)
-  [ ] Nút "Thêm toàn bộ vào giỏ hàng"
-  [ ] Lưu build của user đã đăng nhập
+  [x] BuildController — Session-based slot management
+  [x] GET /Build/GetProducts?slot=xxx — load sản phẩm từ DB
+  [x] POST /Build/SelectProduct — lưu slot vào Session
+  [x] POST /Build/RemoveSlot — xóa slot khỏi Session
+  [x] POST /Build/ClearAll — xóa toàn bộ build
+  [x] POST /Build/SaveBuild — lưu build cho user đã đăng nhập
+  [x] Build/Index.cshtml — AJAX kết nối API thật, restore từ Session
+  [x] SAVE BUILD panel inline + toast notifications
 
   RECOMMEND PC
-  [ ] RecommendController
-  [ ] Form: Budget + Mục đích sử dụng
-  [ ] Thuật toán query combo linh kiện tối ưu từ DB
-  [ ] Hiển thị top 3 gợi ý cấu hình
+  [x] RecommendController — thuật toán query combo từ DB
+  [x] Phân bổ budget theo useCase (gaming/esports/workstation/streaming/office)
+  [x] Tạo 3 combo: BUDGET (×0.75) / BALANCED (×1.00) / PERFORMANCE (×1.25)
+  [x] Tính bottleneck % CPU↔GPU từ BenchmarkScore
+  [x] Socket compatibility filter (CPU ↔ Mainboard)
+  [x] RecommendCombo ViewModel với BadgeColor
 
   GIỎ HÀNG & ĐẶT HÀNG
-  [ ] CartService (Session-based)
-  [ ] CartController: Xem, Thêm, Xóa, Cập nhật
-  [ ] OrderController: Thanh toán + Tạo Order/OrderDetail
-  [ ] Trang xác nhận đơn hàng
-  [ ] Lịch sử đơn hàng của user
+  [x] CartService — Session-based CRUD
+  [x] CartController: Index, Add, Remove, Update, Clear, AddBuild
+  [x] CartService đăng ký Scoped DI trong Program.cs
+  [x] Cart/Index.cshtml — bảng items, AJAX qty update, remove, summary
+  [x] OrderController — Checkout (GET+POST), Confirm, History, Cancel
+  [x] Order/Checkout.cshtml — form giao hàng + cart summary sidebar
+  [x] Order/Confirm.cshtml — xác nhận đơn hàng + danh sách item
+  [x] Order/History.cshtml — lịch sử + cancel đơn Pending
 
 Ghi chú tuần này:
-  - ___________________________________________
-  - ___________________________________________
+  - CartService.AddBuildToCartAsync() cho phép add cả build vào cart 1 click
+  - OrderController lấy giá sản phẩm mới nhất từ DB lúc tạo Order (tránh price drift)
+  - Order.Cancel() chỉ cho phép hủy khi Status == Pending
 
 ================================================================
 TUẦN 7-8 — PHASE 4: Smart Build Intelligence ⭐
@@ -122,28 +133,28 @@ Status  : [ ] CHƯA BẮT ĐẦU
   API ENDPOINTS
   [ ] GET /api/compatibility — Kiểm tra tương thích (JSON)
   [ ] GET /api/performance — Bottleneck + FPS estimate (JSON)
-  [ ] GET /api/products/category/{slug} — Filter sản phẩm
+  [x] GET /Build/GetProducts?slot={slug} — Filter sản phẩm theo danh mục (DONE Phase 3)
 
   COMPATIBILITY GUARD
-  [ ] Socket CPU vs Mainboard
+  [ ] Socket CPU vs Mainboard (real-time AJAX)
   [ ] RAM type (DDR4/DDR5) vs Mainboard
   [ ] PSU wattage vs Tổng TDP
   [ ] Case form factor vs Mainboard size
 
   BOTTLENECK ANALYZER
-  [ ] Công thức tính bottleneck từ BenchmarkScore
-  [ ] Animated progress bar CPU↔GPU
+  [ ] Công thức tính bottleneck từ BenchmarkScore (real API)
+  [x] Animated progress bar CPU↔GPU (client-side, dùng BenchmarkScore)
   [ ] Gợi ý nâng cấp tự động
 
   FPS PERFORMANCE ESTIMATOR
   [ ] Seed benchmark data cho ~25 CPU + ~25 GPU
-  [ ] Bảng FPS cho 10 game phổ biến
-  [ ] Badge phân loại build
+  [ ] Bảng FPS cho 10 game phổ biến (real data)
+  [x] Badge phân loại build (client-side placeholder)
 
   JAVASCRIPT REAL-TIME
-  [ ] Event listener khi thay đổi linh kiện
-  [ ] AJAX gọi API + cập nhật UI không reload
-  [ ] Animate số tiền tổng
+  [x] Event listener khi thay đổi linh kiện
+  [x] AJAX gọi API + cập nhật UI không reload
+  [x] Animate số tiền tổng (bump effect)
 
 Ghi chú tuần này:
   - ___________________________________________
@@ -164,8 +175,11 @@ Status  : [ ] CHƯA BẮT ĐẦU
   [ ] SEO: title tags, meta description tất cả trang
   [ ] Responsive mobile hoàn chỉnh
   [ ] Loading skeleton animations
-  [ ] Toast notifications (thành công/lỗi)
+  [x] Toast notifications (thành công/lỗi) — Build & Cart
   [ ] 404 page custom (Undertale style)
+
+  RECOMMEND VIEW
+  [ ] Recommend/Index.cshtml — hiển thị 3 combo từ controller
 
   DEMO PREP
   [ ] Viết script demo (kịch bản bảo vệ)
@@ -181,21 +195,21 @@ Ghi chú tuần này:
 BUGS & ISSUES TRACKING
 ================================================================
 
-Date       | Bug Description                  | Status
------------|----------------------------------|--------
-           |                                  |
-           |                                  |
-           |                                  |
+Date       | Bug Description                              | Status
+-----------|----------------------------------------------|----------
+2026-06-02 | Build .exe locked khi app đang chạy          | Expected (dotnet watch)
+           |                                              |
+           |                                              |
 
 ================================================================
 TỔNG KẾT TIẾN ĐỘ
 ================================================================
 
-Phase 1 : [100%] ██████████
-Phase 2 : [100%] ██████████
-Phase 3 : [ 10%] █░░░░░░░░░
-Phase 4 : [  0%] ░░░░░░░░░░
-Phase 5 : [  0%] ░░░░░░░░░░
-OVERALL : [ 42%] ████░░░░░░  (Phase 2 hoàn tất, bắt đầu Phase 3)
+Phase 1 : [100%] ██████████  (Setup + Giao diện Undertale theme)
+Phase 2 : [100%] ██████████  (DB + Auth + Admin CRUD)
+Phase 3 : [100%] ██████████  (Build + Recommend + Cart + Order)
+Phase 4 : [ 20%] ██░░░░░░░░  (Client-side done, API endpoints còn)
+Phase 5 : [  0%] ░░░░░░░░░░  (Chưa bắt đầu)
+OVERALL : [ 70%] ███████░░░  (Phase 3 hoàn tất!)
 
 Cập nhật lần cuối: 2026-06-02
