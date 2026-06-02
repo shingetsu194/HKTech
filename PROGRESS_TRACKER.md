@@ -25,31 +25,32 @@ Kết quả : Phân tích yêu cầu, chọn tech stack (.NET 10 + SQL Server)
 Note    : Đã xác định tính năng độc đáo "Smart Build Intelligence"
 
 ================================================================
-TUẦN 5-6 — PHASE 1: Project Setup + Giao diện (ĐANG LÀM)
+TUẦN 5-6 — PHASE 1: Project Setup + Giao diện
 ================================================================
-Status  : [/] ĐANG THỰC HIỆN
+Status  : [x] HOÀN THÀNH
 Bắt đầu : 2026-06-01
 
   SETUP
-  [/] Khởi tạo ASP.NET Core MVC project (.NET 10)
-  [ ] Cài NuGet packages (EF Core, Identity, ImageSharp)
-  [ ] Cấu hình appsettings.json (connection string SQL Server)
+  [x] Khởi tạo ASP.NET Core MVC project (.NET 10)
+  [x] Cài NuGet packages (EF Core, Identity, ImageSharp)
+  [x] Cấu hình appsettings.json (connection string SQL Server)
 
   LAYOUT & DESIGN (Undertale Theme)
-  [ ] _Layout.cshtml: Header + Navigation + Footer
-  [ ] CSS Design System (Press Start 2P font, gold/dark/red)
-  [ ] Pixel-style border và animation effects
-  [ ] Responsive (mobile menu)
+  [x] _Layout.cshtml: Header + Navigation + Footer
+  [x] CSS Design System (Press Start 2P font, gold/dark/red)
+  [x] Pixel-style border và animation effects
+  [x] Responsive (mobile menu)
+  [x] Tinh chỉnh font chữ to hơn, dễ nhìn hơn
 
   VIEWS TĨNH
-  [ ] Home/Index.cshtml — Hero banner + PC nổi bật + Linh kiện mới
-  [ ] Product/Index.cshtml — Danh sách linh kiện (có filter)
-  [ ] Build/Index.cshtml — Slot-based PC builder UI
-  [ ] Recommend/Index.cshtml — Form chọn nhu cầu/budget
+  [x] Home/Index.cshtml — Hero banner + PC nổi bật + Linh kiện mới
+  [x] Product/Index.cshtml — Danh sách linh kiện (có filter)
+  [x] Build/Index.cshtml — Slot-based PC builder UI
+  [x] Recommend/Index.cshtml — Form chọn nhu cầu/budget
 
   SEED DATA PLACEHOLDER
-  [ ] Seed 6 danh mục (CPU, GPU, RAM, PSU, Case, Mainboard)
-  [ ] Seed ~30 sản phẩm mẫu với benchmark data
+  [x] Seed 6 danh mục (CPU, GPU, RAM, PSU, Case, Mainboard)
+  [x] Seed ~30 sản phẩm mẫu với benchmark data
 
 Ghi chú tuần này:
   - ___________________________________________
@@ -58,26 +59,27 @@ Ghi chú tuần này:
 ================================================================
 TUẦN 6-7 — PHASE 2: Models + Database + CRUD + Auth
 ================================================================
-Status  : [ ] CHƯA BẮT ĐẦU
+Status  : [x] HOÀN THÀNH
 
   DATABASE & EF CORE
-  [ ] Tạo ApplicationDbContext
-  [ ] Models: Category, Product, ProductImage
-  [ ] Models: Order, OrderDetail, PcBuild, PcBuildItem
-  [ ] Code-First Migration + Update Database
-  [ ] Seed data thật vào DB
+  [x] Tạo ApplicationDbContext
+  [x] Models: Category, Product, ProductImage
+  [x] Models: Order, OrderDetail, PcBuild, PcBuildItem
+  [x] Code-First Migration + Update Database
+  [x] Seed data thật vào DB (KATO\MSSQLSERVER01)
 
   IDENTITY & AUTH
-  [ ] ApplicationUser (extend IdentityUser)
-  [ ] Đăng ký / Đăng nhập / Đăng xuất
-  [ ] Phân quyền: Admin vs Customer
-  [ ] Trang Profile user
+  [x] ApplicationUser (extend IdentityUser)
+  [x] Đăng ký / Đăng nhập / Đăng xuất
+  [x] Phân quyền: Admin vs Customer
+  [x] Trang Profile user
+  [x] Đăng nhập Admin phong cách Undertale Battle Screen
 
   CRUD ADMIN
-  [ ] Area Admin setup
-  [ ] ProductController CRUD + upload nhiều ảnh
-  [ ] CategoryController CRUD
-  [ ] Validation (server-side + client-side)
+  [x] Area Admin setup (Giao diện Dark Dashboard)
+  [x] ProductController CRUD + upload nhiều ảnh
+  [x] CategoryController CRUD
+  [x] Validation (server-side + client-side)
 
 Ghi chú tuần này:
   - ___________________________________________
@@ -86,7 +88,7 @@ Ghi chú tuần này:
 ================================================================
 TUẦN 7 — PHASE 3: Core Features (Build PC + Recommend + Cart)
 ================================================================
-Status  : [ ] CHƯA BẮT ĐẦU
+Status  : [/] ĐANG THỰC HIỆN
 
   BUILD PC
   [ ] BuildController — Hiển thị slot builder
@@ -189,11 +191,11 @@ Date       | Bug Description                  | Status
 TỔNG KẾT TIẾN ĐỘ
 ================================================================
 
-Phase 1 : [  0%] ░░░░░░░░░░
-Phase 2 : [  0%] ░░░░░░░░░░
-Phase 3 : [  0%] ░░░░░░░░░░
+Phase 1 : [100%] ██████████
+Phase 2 : [100%] ██████████
+Phase 3 : [ 10%] █░░░░░░░░░
 Phase 4 : [  0%] ░░░░░░░░░░
 Phase 5 : [  0%] ░░░░░░░░░░
-OVERALL : [  5%] ░░░░░░░░░░  (Lên kế hoạch xong)
+OVERALL : [ 42%] ████░░░░░░  (Phase 2 hoàn tất, bắt đầu Phase 3)
 
-Cập nhật lần cuối: 2026-06-01
+Cập nhật lần cuối: 2026-06-02

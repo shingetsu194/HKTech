@@ -1,3 +1,4 @@
+@model List<HKTech.Models.Product>
 @{
     ViewData["Title"] = "Trang chủ";
     ViewData["Description"] = "HKTech - Tự build PC thông minh với Compatibility Guard, Bottleneck Analyzer & FPS Estimator real-time.";
@@ -209,31 +210,70 @@
 </section>
 
 <!-- ============================================================
-     SẢN PHẨM NỔI BẬT (Placeholder — sẽ load từ DB sau)
+     SẢN PHẨM NỔI BẬT
      ============================================================ -->
 <section class="py-5" style="background: var(--bg-cave);">
     <div class="container-hk">
         <div class="section-header">
             <h2 class="section-title-pixel">LINH KIỆN NỔI BẬT</h2>
             <div class="section-line"></div>
+            <a asp-controller="Product" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-featured-btn">
+                XEM TẤT CẢ →
+            </a>
         </div>
-        <div class="products-grid" id="featured-products-grid">
-            @* Placeholder cards — sẽ render từ ViewBag/Model sau Phase 2 *@
-            @for (int i = 0; i < 4; i++)
-            {
-                <div class="product-card">
-                    <div class="card-img-wrap skeleton" style="height:200px;"></div>
-                    <div class="card-body-hk">
-                        <div class="skeleton" style="height:16px; width:80%; margin-bottom:8px;"></div>
-                        <div class="skeleton" style="height:12px; width:50%;"></div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="products-grid" id="featured-products-grid">
+                @foreach (var p in Model)
+                {
+                    <div class="product-card" id="featured-card-@p.Id">
+                        <div class="card-img-wrap" style="height:200px; background:#111; display:flex; align-items:center; justify-content:center;">
+                            @if (p.PrimaryImageUrl != null)
+                            {
+                                <img src="@p.PrimaryImageUrl" alt="@p.Name"
+                                     style="width:100%; height:100%; object-fit:contain; padding:12px;" />
+                            }
+                            else
+                            {
+                                <span style="font-size:3rem;">@p.Category.Icon</span>
+                            }
+                        </div>
+                        <div class="card-body-hk">
+                            <div class="text-mono" style="font-size:0.7rem; color:var(--text-muted); margin-bottom:4px;">
+                                @p.Category.Icon @p.Category.Name
+                            </div>
+                            <div style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-primary); margin-bottom:8px; line-height:1.4;">
+                                @p.Name
+                            </div>
+                            <div class="text-pixel" style="font-size:0.6rem; color:var(--gold); text-shadow:var(--glow-gold);">
+                                @p.Price.ToString("N0")₫
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"
+                               class="btn-ut btn-ut-outline btn-en" style="font-size:0.7rem; padding:6px 12px;"
+                               id="btn-featured-detail-@p.Id">
+                                CHI TIẾT
+                            </a>
+                            <a asp-controller="Build" asp-action="Index"
+                               class="btn-ut btn-ut-primary btn-en" style="font-size:0.7rem; padding:6px 12px;"
+                               id="btn-featured-build-@p.Id">
+                                + BUILD
+                            </a>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
-        <div class="dialog-box mt-4" style="max-width:500px;">
-            Dữ liệu sản phẩm sẽ được tải từ database sau khi hoàn thiện Phase 2.
-            Bây giờ hãy thử trang <strong style="color:var(--gold);">Tự Build PC</strong>!
-        </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="dialog-box mt-2" style="max-width:500px;">
+                * Chưa có sản phẩm nào. Admin hãy thêm sản phẩm qua
+                <a asp-controller="Account" asp-action="AdminLogin"
+                   style="color:var(--gold);">Admin Panel</a>.
+            </div>
+        }
     </div>
 </section>
 

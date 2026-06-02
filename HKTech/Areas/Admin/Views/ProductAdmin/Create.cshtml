@@ -1,0 +1,154 @@
+@model HKTech.Models.ViewModels.ProductFormViewModel
+@{
+    bool isEdit = Model.Id > 0;
+    ViewData["Title"] = isEdit ? "Sửa sản phẩm" : "Thêm sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<a asp-area="Admin" asp-controller="ProductAdmin" asp-action="Index"
+   class="btn-ut btn-ut-ghost btn-en mb-4" style="font-size:0.75rem;">
+    ← QUAY LẠI
+</a>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <span class="text-pixel-vn text-gold" style="font-size:1rem;">
+            @(isEdit ? "✏️ SỬA SẢN PHẨM" : "➕ THÊM SẢN PHẨM")
+        </span>
+    </div>
+    <div class="admin-card-body">
+        <form asp-area="Admin" asp-controller="ProductAdmin"
+              asp-action="@(isEdit ? "Edit" : "Create")"
+              asp-route-id="@(isEdit ? Model.Id : 0)"
+              method="post" enctype="multipart/form-data" class="form-hk">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-4">
+                <!-- Tên -->
+                <div class="col-md-8">
+                    <label asp-for="Name" class="form-label">TÊN SẢN PHẨM *</label>
+                    <input asp-for="Name" class="form-control-hk" placeholder="VD: Intel Core i5-14600K" />
+                    <span asp-validation-for="Name" class="text-danger" style="font-size:0.8rem;"></span>
+                </div>
+
+                <!-- Danh mục -->
+                <div class="col-md-4">
+                    <label asp-for="CategoryId" class="form-label">DANH MỤC *</label>
+                    <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-control-hk">
+                        <option value="">-- Chọn danh mục --</option>
+                    </select>
+                    <span asp-validation-for="CategoryId" class="text-danger" style="font-size:0.8rem;"></span>
+                </div>
+
+                <!-- Giá -->
+                <div class="col-md-4">
+                    <label asp-for="Price" class="form-label">GIÁ (VNĐ) *</label>
+                    <input asp-for="Price" type="number" class="form-control-hk" placeholder="VD: 5990000" />
+                    <span asp-validation-for="Price" class="text-danger" style="font-size:0.8rem;"></span>
+                </div>
+
+                <!-- Tồn kho -->
+                <div class="col-md-4">
+                    <label asp-for="StockQuantity" class="form-label">TỒN KHO</label>
+                    <input asp-for="StockQuantity" type="number" class="form-control-hk" />
+                </div>
+
+                <!-- Trạng thái -->
+                <div class="col-md-4 d-flex align-items-end gap-2 pb-1">
+                    <input asp-for="IsActive" type="checkbox" id="isActive" />
+                    <label asp-for="IsActive" class="text-mono" style="cursor:pointer;">Đang bán (hiện trên shop)</label>
+                </div>
+
+                <!-- Mô tả -->
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label">MÔ TẢ</label>
+                    <textarea asp-for="Description" class="form-control-hk" rows="3"
+                              placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+                </div>
+
+                <!-- Smart Build fields -->
+                <div class="col-12">
+                    <div class="admin-card-header mb-3" style="margin: 0 -16px; padding: 8px 16px;">
+                        <span class="text-pixel" style="font-size:0.4rem; color:var(--gold);">⭐ SMART BUILD INTELLIGENCE</span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="TdpWatt" class="form-label">TDP (Watt)</label>
+                    <input asp-for="TdpWatt" type="number" class="form-control-hk" placeholder="VD: 125" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="BenchmarkScore" class="form-label">BENCHMARK SCORE (0-100)</label>
+                    <input asp-for="BenchmarkScore" type="number" class="form-control-hk" placeholder="VD: 78" min="0" max="100" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="Socket" class="form-label">SOCKET</label>
+                    <input asp-for="Socket" class="form-control-hk" placeholder="LGA1700 / AM5" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="RamType" class="form-label">RAM TYPE</label>
+                    <select asp-for="RamType" class="form-control-hk">
+                        <option value="">—</option>
+                        <option value="DDR4">DDR4</option>
+                        <option value="DDR5">DDR5</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="FormFactor" class="form-label">FORM FACTOR</label>
+                    <select asp-for="FormFactor" class="form-control-hk">
+                        <option value="">—</option>
+                        <option value="ATX">ATX</option>
+                        <option value="mATX">mATX</option>
+                        <option value="ITX">ITX</option>
+                    </select>
+                </div>
+
+                <!-- Ảnh -->
+                <div class="col-12">
+                    <label class="form-label">ẢNH SẢN PHẨM</label>
+                    <input name="ImageFiles" type="file" class="form-control-hk"
+                           accept="image/*" multiple style="padding:8px;" />
+                    <div class="text-mono mt-1" style="font-size:0.75rem;color:var(--text-muted);">
+                        * Hỗ trợ JPG, PNG, WebP. Ảnh đầu tiên sẽ là ảnh đại diện.
+                    </div>
+                </div>
+
+                @* Hiện ảnh cũ khi edit *@
+                @if (isEdit && Model.ExistingImages.Any())
+                {
+                    <div class="col-12">
+                        <div class="form-label">ẢNH HIỆN TẠI</div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            @foreach (var img in Model.ExistingImages)
+                            {
+                                <div style="position:relative;">
+                                    <img src="@img.ImageUrl" style="width:80px;height:80px;object-fit:contain;background:#111;border:1px solid #333;" />
+                                    @if (img.IsPrimary)
+                                    {
+                                        <span style="position:absolute;bottom:0;left:0;right:0;background:rgba(255,215,0,0.8);font-size:0.6rem;text-align:center;color:#000;">CHÍNH</span>
+                                    }
+                                    <label style="display:block;text-align:center;margin-top:2px;font-size:0.7rem;cursor:pointer;color:var(--red-soul);">
+                                        <input type="checkbox" name="DeleteImageIds" value="@img.Id" /> Xóa
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="col-12 mt-2">
+                    <button type="submit" class="btn-ut btn-ut-primary btn-vn me-2"
+                            style="padding:12px 28px;" id="btn-form-submit">
+                        @(isEdit ? "💾 LƯU THAY ĐỔI" : "➕ THÊM SẢN PHẨM")
+                    </button>
+                    <a asp-area="Admin" asp-controller="ProductAdmin" asp-action="Index"
+                       class="btn-ut btn-ut-ghost btn-en">HỦY</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

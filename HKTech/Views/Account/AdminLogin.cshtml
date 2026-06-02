@@ -1,0 +1,79 @@
+@model HKTech.Models.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Admin Login";
+    Layout = "~/Views/Shared/_AdminLoginLayout.cshtml";
+}
+
+<div class="battle-screen">
+
+    <!-- ── Enemy / System Info ── -->
+    <div class="battle-enemy-bar">
+        <div class="enemy-name">💻 HKTECH ADMIN SYSTEM</div>
+        <div class="enemy-hp-wrap">
+            <span class="enemy-hp-label">SECURITY</span>
+            <div class="enemy-hp-bar">
+                <div class="enemy-hp-fill"></div>
+            </div>
+            <span class="enemy-hp-text">MAX</span>
+        </div>
+    </div>
+
+    <!-- ── Dialog Box ── -->
+    <div class="battle-dialog">
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <p>Hệ thống từ chối xác thực.</p>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <div class="battle-error">@error.ErrorMessage</div>
+            }
+        }
+        else
+        {
+            <p>Hệ thống yêu cầu xác thực danh tính.</p>
+            <p>Nhập thông tin quản trị viên để tiếp tục.<span class="dialog-cursor"></span></p>
+        }
+    </div>
+
+    <!-- ── ACT Sub-menu: Credentials Input ── -->
+    <form asp-controller="Account" asp-action="AdminLogin" method="post"
+          asp-route-returnUrl="@ViewData["ReturnUrl"]">
+        @Html.AntiForgeryToken()
+
+        <div class="battle-input-area">
+
+            <div class="battle-input-row">
+                <span class="battle-input-label" style="color:#FFD700;">EMAIL</span>
+                <span class="battle-heart-cursor">♥</span>
+                <input asp-for="Email" class="battle-input"
+                       placeholder="admin@hktech.vn"
+                       autocomplete="email" />
+            </div>
+
+            <div class="battle-input-row">
+                <span class="battle-input-label" style="color:#FFD700;">PASSWORD</span>
+                <span class="battle-heart-cursor" style="opacity:0.3;">♥</span>
+                <input asp-for="Password" class="battle-input"
+                       placeholder="••••••••"
+                       autocomplete="current-password" />
+            </div>
+
+        </div>
+
+        <div style="margin-top:12px;">
+            <button type="submit" class="battle-submit" id="btn-admin-login-submit">
+                ♥ &nbsp; AUTHENTICATE
+            </button>
+        </div>
+    </form>
+
+    <!-- ── Back link ── -->
+    <div class="battle-back">
+        <a asp-controller="Account" asp-action="LoginSelect">← Quay lại</a>
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

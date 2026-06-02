@@ -1,0 +1,65 @@
+@model HKTech.Models.Category
+@{
+    bool isEdit = Model?.Id > 0;
+    ViewData["Title"] = isEdit ? "Sửa danh mục" : "Thêm danh mục";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<a asp-area="Admin" asp-controller="CategoryAdmin" asp-action="Index"
+   class="btn-ut btn-ut-ghost btn-en mb-4" style="font-size:0.75rem;">
+    ← QUAY LẠI
+</a>
+
+<div class="admin-card" style="max-width:600px;">
+    <div class="admin-card-header">
+        <span class="text-pixel-vn text-gold" style="font-size:1rem;">
+            @(isEdit ? "✏️ SỬA DANH MỤC" : "➕ THÊM DANH MỤC")
+        </span>
+    </div>
+    <div class="admin-card-body">
+        <form asp-area="Admin" asp-controller="CategoryAdmin"
+              asp-action="@(isEdit ? "Edit" : "Create")"
+              asp-route-id="@(isEdit ? Model!.Id : 0)"
+              method="post" class="form-hk">
+            @Html.AntiForgeryToken()
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="Name" class="form-label">TÊN DANH MỤC *</label>
+                    <input asp-for="Name" class="form-control-hk" placeholder="VD: CPU" />
+                    <span asp-validation-for="Name" class="text-danger" style="font-size:0.8rem;"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Icon" class="form-label">ICON (Emoji)</label>
+                    <input asp-for="Icon" class="form-control-hk" placeholder="🧠" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Slug" class="form-label">SLUG (URL)</label>
+                    <input asp-for="Slug" class="form-control-hk" placeholder="cpu (để trống = tự tạo)" />
+                    <span asp-validation-for="Slug" class="text-danger" style="font-size:0.8rem;"></span>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="Description" class="form-label">MÔ TẢ</label>
+                    <textarea asp-for="Description" class="form-control-hk" rows="2"
+                              placeholder="Mô tả ngắn về danh mục..."></textarea>
+                </div>
+
+                <div class="col-12 mt-2">
+                    <button type="submit" class="btn-ut btn-ut-primary btn-vn me-2"
+                            style="padding:10px 24px;" id="btn-cat-form-submit">
+                        @(isEdit ? "💾 LƯU" : "➕ THÊM")
+                    </button>
+                    <a asp-area="Admin" asp-controller="CategoryAdmin" asp-action="Index"
+                       class="btn-ut btn-ut-ghost btn-en">HỦY</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

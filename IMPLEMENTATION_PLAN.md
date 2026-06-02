@@ -37,7 +37,7 @@ Tất cả cập nhật REAL-TIME bằng AJAX (không reload trang).
 TIMELINE 5 GIAI ĐOẠN
 ================================================================
 
-PHASE 1 — Tuần 6 (ĐANG LÀM)
+PHASE 1 — Tuần 6 (HOÀN THÀNH)
   Project Setup + Layout Undertale + Giao diện tĩnh
   - Khởi tạo ASP.NET Core MVC project
   - _Layout.cshtml: Header, Nav, Footer (Undertale theme)
@@ -45,7 +45,7 @@ PHASE 1 — Tuần 6 (ĐANG LÀM)
   - Views tĩnh: Home, Product List, Build PC, Recommend
   - Seed data placeholder
 
-PHASE 2 — Tuần 6-7
+PHASE 2 — Tuần 6-7 (HOÀN THÀNH)
   Models + Database + CRUD + Identity
   - Models: Category, Product, ProductImage, Order, PcBuild, ApplicationUser
   - EF Core Code-First Migration + SQL Server
@@ -53,7 +53,7 @@ PHASE 2 — Tuần 6-7
   - Roles: Admin, Customer
   - CRUD Admin: Sản phẩm + Danh mục + Upload ảnh
 
-PHASE 3 — Tuần 7
+PHASE 3 — Tuần 7 (ĐANG LÀM)
   Core Features: Build PC + Recommend + Giỏ hàng
   - Build PC: Chọn linh kiện theo slot
   - Recommend: Lọc combo theo budget/nhu cầu

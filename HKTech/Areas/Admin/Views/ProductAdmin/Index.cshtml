@@ -1,0 +1,150 @@
+@model List<HKTech.Models.Product>
+@{
+    ViewData["Title"] = "Quản lý Sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    int page      = ViewBag.Page;
+    int totalPages = ViewBag.TotalPages;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div class="text-mono" style="color:var(--text-muted);">
+        Tổng: <span class="text-gold">@ViewBag.TotalCount</span> sản phẩm
+    </div>
+    <a asp-area="Admin" asp-controller="ProductAdmin" asp-action="Create"
+       class="btn-ut btn-ut-primary btn-vn" id="btn-create-product">
+        <i class="bi bi-plus-lg"></i> THÊM SẢN PHẨM
+    </a>
+</div>
+
+<!-- Search / Filter -->
+<form method="get" class="d-flex gap-2 mb-4 flex-wrap form-hk">
+    <input type="text" name="search" class="form-control-hk" style="max-width:260px;"
+           placeholder="🔍 Tìm tên sản phẩm..." value="@ViewBag.Search" />
+    <select name="category" class="form-control-hk" style="max-width:200px;">
+        <option value="">-- Tất cả danh mục --</option>
+        @foreach (var cat in (List<HKTech.Models.Category>)ViewBag.Categories)
+        {
+            <option value="@cat.Slug" selected="@(ViewBag.Category == cat.Slug ? "selected" : null)">
+                @cat.Icon @cat.Name
+            </option>
+        }
+    </select>
+    <button type="submit" class="btn-ut btn-ut-outline btn-en">FILTER</button>
+    <a asp-area="Admin" asp-controller="ProductAdmin" asp-action="Index"
+       class="btn-ut btn-ut-ghost btn-en">RESET</a>
+</form>
+
+<!-- Table -->
+<div class="admin-card">
+    <div class="admin-card-body" style="padding:0;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ẢNH</th>
+                    <th>TÊN SẢN PHẨM</th>
+                    <th>DANH MỤC</th>
+                    <th>GIÁ</th>
+                    <th>KHO</th>
+                    <th>TRẠNG THÁI</th>
+                    <th>THAO TÁC</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model)
+                {
+                    <tr>
+                        <td class="text-muted-hk">@p.Id</td>
+                        <td>
+                            @if (p.PrimaryImageUrl != null)
+                            {
+                                <img src="@p.PrimaryImageUrl" style="width:48px;height:48px;object-fit:contain;background:#111;padding:4px;" />
+                            }
+                            else
+                            {
+                                <div style="width:48px;height:48px;background:#111;display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🖥️</div>
+                            }
+                        </td>
+                        <td style="max-width:220px;">
+                            <div style="color:var(--text-primary);font-weight:500;">@p.Name</div>
+                        </td>
+                        <td>
+                            <span style="color:var(--gold);">@p.Category.Icon</span>
+                            @p.Category.Name
+                        </td>
+                        <td class="text-gold">@p.Price.ToString("N0")₫</td>
+                        <td>
+                            <span style="color:@(p.StockQuantity > 5 ? "var(--green-kindness)" : "var(--red-soul)");">
+                                @p.StockQuantity
+                            </span>
+                        </td>
+                        <td>
+                            @if (p.IsActive)
+                            {
+                                <span style="color:var(--green-kindness);font-size:0.8rem;">● Đang bán</span>
+                            }
+                            else
+                            {
+                                <span style="color:var(--text-muted);font-size:0.8rem;">○ Ẩn</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a asp-area="Admin" asp-controller="ProductAdmin" asp-action="Edit" asp-route-id="@p.Id"
+                                   class="btn-ut btn-ut-outline btn-en" style="padding:4px 10px;font-size:0.7rem;" id="btn-edit-@p.Id">
+                                    SỬA
+                                </a>
+                                <form asp-area="Admin" asp-controller="ProductAdmin" asp-action="ToggleActive"
+                                      asp-route-id="@p.Id" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-ut btn-ut-ghost btn-en"
+                                            style="padding:4px 10px;font-size:0.7rem;" id="btn-toggle-@p.Id">
+                                        @(p.IsActive ? "ẨN" : "HIỆN")
+                                    </button>
+                                </form>
+                                <form asp-area="Admin" asp-controller="ProductAdmin" asp-action="Delete"
+                                      asp-route-id="@p.Id" method="post" class="d-inline"
+                                      onsubmit="return confirm('Xóa sản phẩm này?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-ut btn-ut-ghost btn-en"
+                                            style="padding:4px 10px;font-size:0.7rem;color:var(--red-soul);" id="btn-delete-@p.Id">
+                                        XÓA
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+@if (totalPages > 1)
+{
+    <div class="admin-pagination mt-3">
+        @if (page > 1)
+        {
+            <a class="page-btn" asp-area="Admin" asp-controller="ProductAdmin" asp-action="Index"
+               asp-route-page="@(page-1)" asp-route-search="@ViewBag.Search" asp-route-category="@ViewBag.Category">
+                ← TRƯỚC
+            </a>
+        }
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <a class="page-btn @(i == page ? "active" : "")"
+               asp-area="Admin" asp-controller="ProductAdmin" asp-action="Index"
+               asp-route-page="@i" asp-route-search="@ViewBag.Search" asp-route-category="@ViewBag.Category">
+                @i
+            </a>
+        }
+        @if (page < totalPages)
+        {
+            <a class="page-btn" asp-area="Admin" asp-controller="ProductAdmin" asp-action="Index"
+               asp-route-page="@(page+1)" asp-route-search="@ViewBag.Search" asp-route-category="@ViewBag.Category">
+                SAU →
+            </a>
+        }
+    </div>
+}

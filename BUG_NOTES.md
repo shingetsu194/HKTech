@@ -34,12 +34,41 @@ Files đã sửa:
   - Views/Shared/_Layout.cshtml (navbar brand)
 
 ================================================================
+[BUG-002] Form Thêm Sản phẩm không nhận được file ảnh (ImageUrl null)
+================================================================
+Trạng thái : [x] ĐÃ FIX
+Mức độ     : High — Lỗi lưu dữ liệu
+Mô tả      : Input file sử dụng `asp-for="ImageUrl"` gây ra lỗi validation/model binding vì `ImageUrl` trong model là string, nhưng form gửi lên `IFormFile`.
+Giải pháp  : Đổi thành `name="imageUrl"` thay vì dùng `asp-for`, bắt tham số IFormFile ở Controller.
+
+================================================================
+[BUG-003] Mismatch tên hàm bất đồng bộ trong Repository
+================================================================
+Trạng thái : [x] ĐÃ FIX
+Mức độ     : High — Lỗi build CS1061
+Mô tả      : Controller gọi `GetAllProducts()` nhưng Repository implement `GetAllAsync()`.
+Giải pháp  : Đồng bộ hóa Controller sử dụng await và gọi đúng method `GetAllAsync()`.
+
+================================================================
+[BUG-004] Category Dropdown bị trống khi thêm sản phẩm
+================================================================
+Trạng thái : [x] ĐÃ FIX
+Mức độ     : Medium
+Mô tả      : Quên gọi database seeding cho Category ở `Program.cs`.
+Giải pháp  : Thêm Seed Data cho Category khi app startup.
+
+================================================================
+[BUG-005] UI chữ quá nhỏ khó đọc (site.css)
+================================================================
+Trạng thái : [x] ĐÃ FIX
+Mức độ     : Low
+Mô tả      : Font pixel-art nhỏ, khó nhìn đối với navbar, slot label và buttons.
+Giải pháp  : Tăng `font-size` trong `site.css` (nav-link-hk 0.8->1rem, btn-vn 1->1.25rem, etc.)
+
+================================================================
 [PLANNED] Các bug/task cần làm tiếp
 ================================================================
 
-[ ] Phase 2: Kết nối database (connection string SQL Server LocalDB)
-[ ] Phase 2: Tạo Migration lần đầu
-[ ] Phase 2: Seed data 30 sản phẩm mẫu
 [ ] Phase 3: CartController — Session
 [ ] Phase 4: API compatibility/performance endpoints
 [ ] Polish: Responsive mobile — navbar collapse chưa test kỹ

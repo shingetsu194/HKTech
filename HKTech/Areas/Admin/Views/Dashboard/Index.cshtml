@@ -1,0 +1,73 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="stat-icon">🖥️</div>
+            <div class="stat-value">@ViewBag.TotalProducts</div>
+            <div class="stat-label">Sản phẩm</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="stat-icon">📁</div>
+            <div class="stat-value">@ViewBag.TotalCategories</div>
+            <div class="stat-label">Danh mục</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-value">@ViewBag.TotalOrders</div>
+            <div class="stat-label">Đơn hàng</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="admin-stat-card">
+            <div class="stat-icon">👤</div>
+            <div class="stat-value">@ViewBag.TotalUsers</div>
+            <div class="stat-label">Người dùng</div>
+        </div>
+    </div>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <span class="text-pixel-vn text-gold" style="font-size:1rem;">📋 ĐƠN HÀNG GẦN ĐÂY</span>
+    </div>
+    <div class="admin-card-body">
+        @if (ViewBag.RecentOrders?.Count == 0)
+        {
+            <div class="text-mono text-muted-hk text-center py-4">* Chưa có đơn hàng nào</div>
+        }
+        else
+        {
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>Khách hàng</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in ViewBag.RecentOrders)
+                    {
+                        <tr>
+                            <td class="text-gold">#@order.Id</td>
+                            <td>@order.User?.FullName ?? order.User?.Email</td>
+                            <td>@order.TotalPrice.ToString("N0") ₫</td>
+                            <td><span class="badge-status">@order.Status</span></td>
+                            <td class="text-muted-hk">@order.CreatedAt.ToString("dd/MM/yyyy")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

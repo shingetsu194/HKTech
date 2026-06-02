@@ -1,13 +1,51 @@
 // ================================================================
 // HKTECH — Program.cs
-// Phase 1: Session, StaticFiles, MVC routing + Admin Area
-// Phase 2 sẽ bổ sung: EF Core, Identity, DbContext
+// Phase 2: EF Core + Identity + Session + Admin Area
 // ================================================================
+
+using HKTech.Data;
+using HKTech.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // --- MVC ---
 builder.Services.AddControllersWithViews();
+
+// --- EF Core + SQL Server ---
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// --- ASP.NET Core Identity ---
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    // Password policy
+    options.Password.RequireDigit           = true;
+    options.Password.RequiredLength         = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase       = false;
+    options.Password.RequireLowercase       = false;
+
+    // Lockout
+    options.Lockout.DefaultLockoutTimeSpan  = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+
+    // User
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// --- Cookie (Identity redirect paths) ---
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath         = "/Account/Login";
+    options.LogoutPath        = "/Account/Logout";
+    options.AccessDeniedPath  = "/Account/AccessDenied";
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan    = TimeSpan.FromDays(7);
+});
 
 // --- Session (dùng cho giỏ hàng Phase 3) ---
 builder.Services.AddDistributedMemoryCache();
@@ -19,7 +57,7 @@ builder.Services.AddSession(options =>
     options.Cookie.Name        = ".HKTech.Session";
 });
 
-// --- HttpContext (dùng trong _Layout để đọc Session cart count) ---
+// --- HttpContext (đọc Session cart count trong _Layout) ---
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -35,13 +73,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-// --- Session PHẢI đặt trước Authorization ---
+// --- Session PHẢI trước Authentication ---
 app.UseSession();
 
-app.UseAuthentication(); // Phase 2: Identity
+app.UseAuthentication();
 app.UseAuthorization();
 
-// --- Route: Admin Area (Phase 5) ---
+// --- Route: Admin Area ---
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
@@ -50,5 +88,8 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// --- Seed dữ liệu khi app khởi động ---
+await DbSeeder.SeedAsync(app.Services);
 
 app.Run();

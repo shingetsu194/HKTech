@@ -109,7 +109,7 @@ body {
 
 .navbar-brand-hk {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: var(--space-sm);
     text-decoration: none;
     padding: var(--space-md) var(--space-lg);
@@ -129,13 +129,20 @@ body {
     font-size: 0.65rem;
     color: var(--text-muted);
     letter-spacing: 3px;
+    line-height: 1.2;
 }
 
 .heart-icon {
     color: var(--red-soul);
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     animation: heartbeat 1.5s ease-in-out infinite;
     text-shadow: var(--glow-red);
+    /* Stretch to full brand block height, emoji centered inside */
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 @keyframes heartbeat {
@@ -147,7 +154,7 @@ body {
 
 .nav-links .nav-item .nav-link-hk {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: var(--text-secondary);
     text-decoration: none;
     padding: var(--space-md) var(--space-md);
@@ -604,7 +611,7 @@ body {
 .feature-title {
     /* VT323: các title card có thể chứa tiếng Việt */
     font-family: var(--font-pixel-vn);
-    font-size: 1rem;
+    font-size: 1.3rem;
     color: var(--gold);
     margin-bottom: var(--space-sm);
     letter-spacing: 1px;
@@ -704,7 +711,7 @@ body {
 .slot-label {
     /* VT323: slot labels có tiếng Việt (NGUỒN PSU, TẢN NHIỆT...) */
     font-family: var(--font-pixel-vn);
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     color: var(--gold);
     width: 120px;
     letter-spacing: 1px;
@@ -876,7 +883,7 @@ body {
 .slot-label-en {
     /* ASCII slots: CPU, RAM, GPU, MAINBOARD */
     font-family: var(--font-pixel);
-    font-size: 0.45rem;
+    font-size: 0.6rem;
     color: var(--gold);
     width: 120px;
     letter-spacing: 1px;
@@ -900,7 +907,7 @@ body {
 /* btn-vn: no-op now (base .btn-ut đã dùng VT323), giữ lại cho legacy */
 .btn-ut.btn-vn {
     font-family: var(--font-pixel-vn) !important;
-    font-size: 1rem !important;
+    font-size: 1.25rem !important;
     letter-spacing: 1px;
 }
 

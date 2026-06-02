@@ -1,0 +1,62 @@
+@model List<HKTech.Models.Category>
+@{
+    ViewData["Title"] = "Quản lý Danh mục";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="text-mono" style="color:var(--text-muted);">
+        Tổng: <span class="text-gold">@Model.Count</span> danh mục
+    </div>
+    <a asp-area="Admin" asp-controller="CategoryAdmin" asp-action="Create"
+       class="btn-ut btn-ut-primary btn-vn" id="btn-create-category">
+        <i class="bi bi-plus-lg"></i> THÊM DANH MỤC
+    </a>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body" style="padding:0;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>ICON</th>
+                    <th>TÊN</th>
+                    <th>SLUG</th>
+                    <th>SỐ SẢN PHẨM</th>
+                    <th>THAO TÁC</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var cat in Model)
+                {
+                    <tr>
+                        <td class="text-muted-hk">@cat.Id</td>
+                        <td style="font-size:1.4rem;">@cat.Icon</td>
+                        <td style="color:var(--text-primary);">@cat.Name</td>
+                        <td class="text-mono" style="color:var(--text-muted);">@cat.Slug</td>
+                        <td class="text-gold">@cat.Products.Count</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a asp-area="Admin" asp-controller="CategoryAdmin" asp-action="Edit"
+                                   asp-route-id="@cat.Id" class="btn-ut btn-ut-outline btn-en"
+                                   style="padding:4px 10px;font-size:0.7rem;" id="btn-cat-edit-@cat.Id">
+                                    SỬA
+                                </a>
+                                <form asp-area="Admin" asp-controller="CategoryAdmin" asp-action="Delete"
+                                      asp-route-id="@cat.Id" method="post" class="d-inline"
+                                      onsubmit="return confirm('Xóa danh mục @cat.Name?')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-ut btn-ut-ghost btn-en"
+                                            style="padding:4px 10px;font-size:0.7rem;color:var(--red-soul);" id="btn-cat-delete-@cat.Id">
+                                        XÓA
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
