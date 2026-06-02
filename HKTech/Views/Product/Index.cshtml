@@ -202,7 +202,7 @@
                                     CHI TIẾT
                                 </a>
                                 <button class="btn-ut btn-ut-primary btn-en" style="font-size:0.7rem; padding:6px 12px;"
-                                        onclick="addToCartQuick(@p.Id, '@p.Name.Replace("'", "\\'")', @p.Price)"
+                                        onclick="addToCartQuick(@p.Id, '@p.Name.Replace("'", "\\'")')"
                                         id="btn-cart-@p.Id">
                                     + GIỎ
                                 </button>
@@ -259,19 +259,81 @@
 
 @section Scripts {
 <script>
+    // Giá trị filter hiện tại từ server
+    const _cat    = '@Html.Raw(ViewBag.Category   ?? "")';
+    const _search = '@Html.Raw(ViewBag.Search     ?? "")';
+    const _sort   = '@Html.Raw(ViewBag.Sort       ?? "")';
+    const _pMin   = '@Html.Raw(ViewBag.PriceMin?.ToString() ?? "")';
+    const _pMax   = '@Html.Raw(ViewBag.PriceMax?.ToString() ?? "")';
+
+    // Khôi phục giá trị input khi tải trang
+    document.addEventListener('DOMContentLoaded', () => {
+        if (_search) document.getElementById('productSearchInput').value = _search;
+        if (_sort)   document.getElementById('sortSelect').value         = _sort;
+        if (_pMin)   document.getElementById('priceMin').value           = _pMin;
+        if (_pMax)   document.getElementById('priceMax').value           = _pMax;
+    });
+
+    // Build URL giữ nguyên các filter khác
+    function navigate(extra) {
+        const p = new URLSearchParams();
+        const state = { category: _cat, search: _search, sort: _sort, priceMin: _pMin, priceMax: _pMax };
+        Object.assign(state, extra);
+        for (const [k, v] of Object.entries(state))
+            if (v !== null && v !== '' && v !== 'undefined' && v !== '0') p.set(k, v);
+        window.location.href = '/Product?' + p.toString();
+    }
+
+    let _searchTimer;
     function searchProducts(q) {
-        // TODO Phase 2: AJAX search hoặc filter client-side
-        console.log('Search:', q);
+        clearTimeout(_searchTimer);
+        _searchTimer = setTimeout(() => navigate({ search: q, page: 1 }), 420);
     }
+
     function sortProducts(val) {
-        // TODO Phase 2: Re-fetch or sort rendered cards
-        console.log('Sort:', val);
+        navigate({ sort: val, page: 1 });
     }
+
     function applyPriceFilter() {
         const min = document.getElementById('priceMin').value;
         const max = document.getElementById('priceMax').value;
-        // TODO Phase 2
-        console.log('Price filter:', min, max);
+        navigate({ priceMin: min || '', priceMax: max || '', page: 1 });
+    }
+
+    // Thêm nhanh vào giỏ hàng từ trang danh sách
+    async function addToCartQuick(productId, name) {
+        try {
+            const res  = await fetch('/Cart/Add', {
+                method:  'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: `productId=${productId}&quantity=1`,
+            });
+            const data = await res.json();
+            showQuickToast(
+                data.success ? `✅ Đã thêm vào giỏ!` : `❌ ${data.message}`,
+                data.success ? 'ok' : 'error'
+            );
+            if (data.success) {
+                const badge = document.getElementById('cartCountBadge');
+                if (badge) { badge.textContent = data.cartCount; badge.style.display = 'inline'; }
+            }
+        } catch {
+            showQuickToast('❌ Lỗi kết nối máy chủ.', 'error');
+        }
+    }
+
+    function showQuickToast(msg, type = 'ok') {
+        const color = type === 'ok' ? 'var(--green-kindness)' : 'var(--red-soul)';
+        const t = document.createElement('div');
+        t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:10px 18px;
+            background:var(--bg-card);border:2px solid ${color};
+            font-family:var(--font-mono);font-size:0.82rem;color:${color};`;
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2800);
     }
 </script>
 }

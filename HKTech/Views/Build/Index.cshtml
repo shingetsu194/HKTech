@@ -354,7 +354,11 @@
     // BUILD STATE — restored from server session
     // ============================================================
     const serverBuild = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
-        initBuild ?? new Dictionary<string, HKTech.Controllers.BuildSlotItem>()));
+        initBuild ?? new Dictionary<string, HKTech.Controllers.BuildSlotItem>(),
+        new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase
+        }));
 
     const buildState = {
         cpu: null, mainboard: null, ram: null, gpu: null,
@@ -377,8 +381,7 @@
         }
         updateTotals();
         runCompatibilityCheck();
-        runBottleneckAnalysis();
-        runFpsEstimate();
+        runPerformanceAnalysis();
     });
 
     // ============================================================
@@ -458,8 +461,7 @@
             updateTotals();
             closeSelectPanel();
             runCompatibilityCheck();
-            runBottleneckAnalysis();
-            runFpsEstimate();
+            runPerformanceAnalysis();
         } catch { alert('* Lỗi kết nối máy chủ.'); }
     }
 
@@ -478,6 +480,7 @@
         document.getElementById(`btn-clear-${slotKey}`).style.display = 'none';
         updateTotals();
         runCompatibilityCheck();
+        runPerformanceAnalysis();
     }
 
     function updateSlotUI(slotKey, product) {
@@ -508,115 +511,123 @@
     }
 
     // ============================================================
-    // COMPATIBILITY CHECK (Phase 4: gọi API, tạm thời mock)
+    // COMPATIBILITY CHECK — gọi POST /api/compatibility
     // ============================================================
-    function runCompatibilityCheck() {
-        const checks = ['compat-socket', 'compat-ram', 'compat-psu', 'compat-form'];
-        checks.forEach(id => {
+    async function runCompatibilityCheck() {
+        const slots = {};
+        for (const [slot, item] of Object.entries(buildState))
+            if (item) slots[slot] = item.id ?? item.productId;
+
+        if (!Object.keys(slots).length) { resetCompatUI(); return; }
+
+        try {
+            const res  = await fetch('/api/compatibility', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(slots),
+            });
+            const data = await res.json();
+            updateCompatItem('compat-socket', data.socket);
+            updateCompatItem('compat-ram',    data.ram);
+            updateCompatItem('compat-psu',    data.psu);
+            updateCompatItem('compat-form',   data.form);
+        } catch { resetCompatUI(); }
+    }
+
+    function resetCompatUI() {
+        ['compat-socket','compat-ram','compat-psu','compat-form'].forEach(id => {
             const el = document.getElementById(id);
             el.className = 'compat-item';
             el.querySelector('span').textContent = '⬜';
         });
-
-        if (!buildState.cpu && !buildState.mainboard) return;
-
-        // TODO Phase 4: fetch /api/compatibility với các slot đã chọn
-        // Temporary demo: sau khi chọn cả CPU và mainboard, giả sử OK
-        if (buildState.cpu && buildState.mainboard) {
-            setCompatStatus('compat-socket', true, 'Socket: Tương thích ✓');
-        }
-        if (buildState.ram && buildState.mainboard) {
-            setCompatStatus('compat-ram', true, 'DDR5: Tương thích ✓');
-        }
-        if (buildState.psu && (buildState.cpu || buildState.gpu)) {
-            setCompatStatus('compat-psu', true, 'PSU: Đủ công suất ✓');
-        }
-        if (buildState.case && buildState.mainboard) {
-            setCompatStatus('compat-form', true, 'Form Factor: Phù hợp ✓');
-        }
     }
 
-    function setCompatStatus(id, ok, message) {
+    function updateCompatItem(id, result) {
+        if (!result) return;
         const el = document.getElementById(id);
-        el.className = `compat-item ${ok ? 'ok' : 'error'}`;
-        el.innerHTML = `<span>${ok ? '✅' : '❌'}</span> ${message}`;
+        if (result.ok === null || result.ok === undefined) {
+            el.className = 'compat-item';
+            el.innerHTML = `<span>⬜</span> ${result.message}`;
+        } else if (result.ok) {
+            el.className = 'compat-item ok';
+            el.innerHTML = `<span>✅</span> ${result.message}`;
+        } else {
+            el.className = 'compat-item error';
+            el.innerHTML = `<span>❌</span> ${result.message}`;
+        }
     }
 
     // ============================================================
-    // BOTTLENECK ANALYSIS (Phase 4: gọi API)
+    // PERFORMANCE ANALYSIS — gọi POST /api/performance
+    // Cập nhật cả Bottleneck Analyzer + FPS Estimator + Build Badge
     // ============================================================
-    function runBottleneckAnalysis() {
-        if (!buildState.cpu || !buildState.gpu) return;
-        // TODO Phase 4: fetch /api/performance
-        // Demo static
-        const cpuScore = buildState.cpu.benchmarkScore || 50;
-        const gpuScore = buildState.gpu.benchmarkScore || 50;
-        const total = cpuScore + gpuScore;
-        const cpuPct = Math.round((cpuScore / total) * 100);
-        const gpuPct = 100 - cpuPct;
-
-        document.getElementById('barCpu').style.width = cpuPct + '%';
-        document.getElementById('barGpu').style.width = gpuPct + '%';
-
-        const diff = Math.abs(cpuPct - gpuPct);
-        let label, hint;
-        if (diff < 10) {
-            label = '✓ CÂN BẰNG'; hint = '* CPU và GPU cân bằng tốt! Build tối ưu.';
-        } else if (cpuPct < gpuPct) {
-            label = `CPU -${diff}%`;
-            hint = `* CPU đang kìm hãm GPU ${diff}%. Cân nhắc nâng CPU.`;
-        } else {
-            label = `GPU -${diff}%`;
-            hint = `* GPU đang kìm hãm CPU ${diff}%. Cân nhắc nâng GPU.`;
+    async function runPerformanceAnalysis() {
+        if (!buildState.cpu || !buildState.gpu) {
+            document.getElementById('barCpu').style.width = '50%';
+            document.getElementById('barGpu').style.width = '50%';
+            document.getElementById('bottleneckLabel').textContent = '—';
+            document.getElementById('bottleneckHint').textContent  = '* Chọn CPU & GPU để xem phân tích';
+            document.getElementById('fpsTableWrap').innerHTML =
+                '<div class="text-mono" style="font-size:0.75rem;color:var(--text-muted);">* Chọn CPU + GPU để xem ước tính FPS</div>';
+            document.getElementById('buildBadge').style.display = 'none';
+            return;
         }
 
-        document.getElementById('bottleneckLabel').textContent = label;
-        document.getElementById('bottleneckHint').textContent = hint;
+        const cpuId = buildState.cpu.id ?? buildState.cpu.productId;
+        const gpuId = buildState.gpu.id ?? buildState.gpu.productId;
+
+        try {
+            const res  = await fetch('/api/performance', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ cpuId, gpuId }),
+            });
+            const d = await res.json();
+
+            // Bottleneck bar
+            document.getElementById('barCpu').style.width = d.cpuPct + '%';
+            document.getElementById('barGpu').style.width = d.gpuPct + '%';
+            const diff  = d.bottleneck;
+            const label = diff < 10 ? '✓ CÂN BẰNG'
+                        : d.cpuPct < d.gpuPct ? `CPU -${diff}%` : `GPU -${diff}%`;
+            document.getElementById('bottleneckLabel').textContent = label;
+            document.getElementById('bottleneckHint').textContent  = d.bottleneckHint;
+
+            // FPS table
+            renderFpsTable(d.fpsTable);
+
+            // Build badge
+            document.getElementById('buildBadgeText').textContent = `🎮 ${d.badge}`;
+            document.getElementById('buildBadge').style.display   = 'block';
+        } catch {
+            document.getElementById('bottleneckHint').textContent = '* Lỗi kết nối API.';
+        }
     }
 
-    // ============================================================
-    // FPS ESTIMATOR (Phase 4: gọi API)
-    // ============================================================
-    function runFpsEstimate() {
-        if (!buildState.cpu || !buildState.gpu) return;
-        // TODO Phase 4: fetch /api/performance — real data
-        // Demo placeholder table
-        const games = [
-            { name: 'Valorant',   fps1080: 280, fps1440: 200, fps4k: 120 },
-            { name: 'CS2',        fps1080: 240, fps1440: 160, fps4k: 90  },
-            { name: 'GTA V',      fps1080: 140, fps1440: 100, fps4k: 60  },
-            { name: 'Cyberpunk',  fps1080: 80,  fps1440: 55,  fps4k: 30  },
-            { name: 'Minecraft',  fps1080: 300, fps1440: 280, fps4k: 200 },
-        ];
-
-        const fpsClass = fps => fps >= 120 ? 'fps-good' : fps >= 60 ? 'fps-ok' : 'fps-bad';
-
-        const html = `
+    function renderFpsTable(rows) {
+        if (!rows || !rows.length) return;
+        const cls = fps => fps >= 120 ? 'fps-good' : fps >= 60 ? 'fps-ok' : 'fps-bad';
+        document.getElementById('fpsTableWrap').innerHTML = `
             <table class="fps-table">
                 <thead>
                     <tr>
                         <th style="text-align:left">GAME</th>
-                        <th>1080p</th>
-                        <th>1440p</th>
-                        <th>4K</th>
+                        <th>1080p</th><th>1440p</th><th>4K</th>
                     </tr>
                 </thead>
                 <tbody>
-                    ${games.map(g => `
+                    ${rows.map(r => `
                         <tr>
-                            <td>${g.name}</td>
-                            <td class="${fpsClass(g.fps1080)}">${g.fps1080}</td>
-                            <td class="${fpsClass(g.fps1440)}">${g.fps1440}</td>
-                            <td class="${fpsClass(g.fps4k)}">${g.fps4k}</td>
-                        </tr>
-                    `).join('')}
+                            <td>${r.game}</td>
+                            <td class="${cls(r.fps1080)}">${r.fps1080}</td>
+                            <td class="${cls(r.fps1440)}">${r.fps1440}</td>
+                            <td class="${cls(r.fps4k)}">${r.fps4k}</td>
+                        </tr>`).join('')}
                 </tbody>
             </table>
             <div class="text-mono mt-1" style="font-size:0.65rem;color:var(--text-muted);">
-                * Ước tính, thực tế có thể chênh ±15%
+                * Ước tính dựa trên benchmark score, thực tế có thể chênh ±15%
             </div>`;
-        document.getElementById('fpsTableWrap').innerHTML = html;
-        document.getElementById('buildBadge').style.display = 'block';
     }
 
     // ============================================================

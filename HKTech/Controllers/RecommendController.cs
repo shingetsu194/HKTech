@@ -116,6 +116,12 @@ namespace HKTech.Controllers
                 var pcCase  = Pick("case",    scaledAlloc["case"]);
                 var cooling = Pick("cooling", scaledAlloc["cooling"]);
 
+                // Đảm bảo cấu hình luôn có đủ bo mạch chủ, RAM và nguồn
+                if (mb == null || ram == null || psu == null) continue;
+
+                // Gaming/Esports bắt buộc phải có GPU
+                if ((useCase == "gaming" || useCase == "esports") && gpu == null) continue;
+
                 var items = new[] { cpu, mb, ram, gpu, storage, psu, pcCase, cooling }
                     .Where(p => p != null).Cast<Product>().ToList();
 

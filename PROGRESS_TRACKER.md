@@ -88,7 +88,7 @@ Ghi chú tuần này:
 ================================================================
 TUẦN 7 — PHASE 3: Core Features (Build PC + Recommend + Cart)
 ================================================================
-Status  : [/] ĐANG THỰC HIỆN
+Status  : [x] HOÀN THÀNH
 
   BUILD PC
   [x] BuildController — Hiển thị slot builder
@@ -99,9 +99,9 @@ Status  : [/] ĐANG THỰC HIỆN
 
   RECOMMEND PC
   [x] RecommendController
-  [/] Form: Budget + Mục đích sử dụng (Đã xong Backend, chờ View)
+  [x] Form: Budget + Mục đích sử dụng
   [x] Thuật toán query combo linh kiện tối ưu từ DB
-  [ ] Hiển thị top 3 gợi ý cấu hình (Recommend View)
+  [x] Hiển thị top 3 gợi ý cấu hình (Budget / Balanced / Performance)
 
   GIỎ HÀNG & ĐẶT HÀNG
   [x] CartService (Session-based)
@@ -110,44 +110,50 @@ Status  : [/] ĐANG THỰC HIỆN
   [x] Trang xác nhận đơn hàng
   [x] Lịch sử đơn hàng của user
 
+  BUG FIX & POLISH (thêm vào trong quá trình)
+  [x] Cart badge navbar đọc đúng từ CartService (không còn luôn = 0)
+  [x] Product page: addToCartQuick, search/sort/filter hoạt động thật
+  [x] Recommend View: form submit thật tới controller, render combo cards
+  [x] Connection string về đúng instance KATO\MSSQLSERVER01
+
 Ghi chú tuần này:
-  - Đã fix UI Layout, Slogan, và tích hợp AJAX cho Build PC, Cart, Order.
-  - Sẵn sàng update View cuối cùng: Recommend.
+  - Phase 3 hoàn chỉnh 100%. Tất cả luồng Build → Cart → Order → History hoạt động.
+  - Recommend Engine: 3 combo (Budget/Balanced/Performance) với bottleneck, thêm vào giỏ 1 click.
 
 ================================================================
 TUẦN 7-8 — PHASE 4: Smart Build Intelligence ⭐
 ================================================================
-Status  : [ ] CHƯA BẮT ĐẦU
+Status  : [x] HOÀN THÀNH
 
   API ENDPOINTS
-  [ ] GET /api/compatibility — Kiểm tra tương thích (JSON)
-  [ ] GET /api/performance — Bottleneck + FPS estimate (JSON)
-  [ ] GET /api/products/category/{slug} — Filter sản phẩm
+  [x] POST /api/compatibility — Socket, RAM type, PSU wattage, Form factor
+  [x] POST /api/performance  — Bottleneck % + FPS 10 game
+  [-] GET /api/products/category/{slug} — Không cần (dùng /Build/GetProducts)
 
   COMPATIBILITY GUARD
-  [ ] Socket CPU vs Mainboard
-  [ ] RAM type (DDR4/DDR5) vs Mainboard
-  [ ] PSU wattage vs Tổng TDP
-  [ ] Case form factor vs Mainboard size
+  [x] Socket CPU vs Mainboard (LGA1700, AM5...)
+  [x] RAM type (DDR4/DDR5) vs Mainboard
+  [x] PSU wattage vs Tổng TDP + 20% headroom (yêu cầu có CPU/GPU mới check)
+  [x] Case form factor vs Mainboard size (ATX/mATX/ITX)
 
   BOTTLENECK ANALYZER
-  [ ] Công thức tính bottleneck từ BenchmarkScore
-  [ ] Animated progress bar CPU↔GPU
-  [ ] Gợi ý nâng cấp tự động
+  [x] Công thức tính bottleneck từ BenchmarkScore thật trong DB
+  [x] Animated progress bar CPU↔GPU (CSS transition 0.6s)
+  [x] Gợi ý nâng cấp tự động theo mức chênh lệch
 
   FPS PERFORMANCE ESTIMATOR
-  [ ] Seed benchmark data cho ~25 CPU + ~25 GPU
-  [ ] Bảng FPS cho 10 game phổ biến
-  [ ] Badge phân loại build
+  [x] Seed 41 sản phẩm: 8 CPU + 8 GPU + RAM + MB + PSU + Case + Storage + Cooling
+  [x] Bảng FPS 10 game (Valorant, CS2, GTA V, Cyberpunk, Elden Ring...)
+  [x] Badge phân loại build (BUDGET / MID-RANGE / HIGH-END / ENTHUSIAST)
 
   JAVASCRIPT REAL-TIME
-  [ ] Event listener khi thay đổi linh kiện
-  [ ] AJAX gọi API + cập nhật UI không reload
-  [ ] Animate số tiền tổng
+  [x] Event listener sau mỗi selectProduct / clearSlot
+  [x] AJAX gọi /api/compatibility + /api/performance không reload
+  [x] Animate tổng tiền (bump animation CSS)
 
 Ghi chú tuần này:
-  - ___________________________________________
-  - ___________________________________________
+  - Smart Build Intelligence hoàn chỉnh: Compatibility Guard + Bottleneck + FPS real-time.
+  - Seed 41 sản phẩm vào DB với đầy đủ BenchmarkScore, Socket, RamType, FormFactor, TdpWatt.
 
 ================================================================
 TUẦN 8 — PHASE 5: Admin Dashboard + Polish + Demo
@@ -181,11 +187,18 @@ Ghi chú tuần này:
 BUGS & ISSUES TRACKING
 ================================================================
 
-Date       | Bug Description                  | Status
------------|----------------------------------|--------
-           |                                  |
-           |                                  |
-           |                                  |
+Date       | Bug Description                                      | Status
+-----------|------------------------------------------------------|--------
+2026-06-03 | Meta tag trùng + sai cú pháp Razor (_Layout)         | [x] Fixed
+2026-06-03 | serverBuild PascalCase → undefined khi reload trang  | [x] Fixed
+2026-06-03 | Cart Remove thiếu AJAX header → trả HTML thay JSON   | [x] Fixed
+2026-06-03 | Detail.cshtml không tồn tại → crash khi click CHI TIẾT| [x] Fixed
+2026-06-03 | Admin Dashboard Razor ?? thiếu @()                   | [x] Fixed
+2026-06-03 | PSU báo OK khi chưa chọn CPU/GPU                    | [x] Fixed
+2026-06-03 | Recommend gaming không yêu cầu GPU                   | [x] Fixed
+2026-06-03 | Ghost product checkout (sản phẩm bị xóa)            | [x] Fixed
+2026-06-03 | Admin login sign-in customer rồi sign-out ngay       | [x] Fixed
+2026-06-03 | Cancel đơn hàng thiếu CSRF protection                | [x] Fixed
 
 ================================================================
 TỔNG KẾT TIẾN ĐỘ
@@ -193,9 +206,11 @@ TỔNG KẾT TIẾN ĐỘ
 
 Phase 1 : [100%] ██████████
 Phase 2 : [100%] ██████████
-Phase 3 : [ 10%] █░░░░░░░░░
-Phase 4 : [  0%] ░░░░░░░░░░
+Phase 3 : [100%] ██████████
+Phase 4 : [100%] ██████████
 Phase 5 : [  0%] ░░░░░░░░░░
-OVERALL : [ 42%] ████░░░░░░  (Phase 2 hoàn tất, bắt đầu Phase 3)
+OVERALL : [ 80%] ████████░░  (Phase 4 hoàn tất + 10 bug fixes, bắt đầu Phase 5)
+
+Cập nhật lần cuối: 2026-06-03
 
 Cập nhật lần cuối: 2026-06-02

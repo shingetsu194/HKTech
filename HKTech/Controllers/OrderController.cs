@@ -60,29 +60,38 @@ namespace HKTech.Controllers
             if (!cartItems.Any())
                 return RedirectToAction("Index", "Cart");
 
-            // Lấy thông tin sản phẩm từ DB để lấy giá mới nhất
+            // Lấy thông tin sản phẩm từ DB — chỉ lấy sản phẩm còn hoạt động
             var productIds = cartItems.Select(c => c.ProductId).ToList();
             var products   = await _db.Products
-                .Where(p => productIds.Contains(p.Id))
+                .Where(p => productIds.Contains(p.Id) && p.IsActive)
                 .ToDictionaryAsync(p => p.Id);
 
-            // Tạo Order
+            // Lọc ra các item có sản phẩm đã bị xóa hoặc inactive
+            var validItems = cartItems.Where(c => products.ContainsKey(c.ProductId)).ToList();
+            if (!validItems.Any())
+            {
+                TempData["Error"] = "Tất cả sản phẩm trong giỏ hàng không còn được bán. Vui lòng kiểm tra lại giỏ hàng.";
+                return RedirectToAction("Index", "Cart");
+            }
+            var removedCount = cartItems.Count - validItems.Count;
+
+            // Tạo Order chỉ với sản phẩm hợp lệ
             var order = new Order
             {
                 UserId          = user.Id,
-                TotalPrice      = cartItems.Sum(c => c.Quantity * (products.ContainsKey(c.ProductId)
-                                    ? products[c.ProductId].Price : c.Price)),
+                TotalPrice      = validItems.Sum(c => c.Quantity * products[c.ProductId].Price),
                 Status          = OrderStatus.Pending,
                 ShippingAddress = shippingAddress,
                 CreatedAt       = DateTime.UtcNow,
-                OrderDetails    = cartItems.Select(c => new OrderDetail
+                OrderDetails    = validItems.Select(c => new OrderDetail
                 {
                     ProductId = c.ProductId,
                     Quantity  = c.Quantity,
-                    UnitPrice = products.ContainsKey(c.ProductId)
-                                ? products[c.ProductId].Price : c.Price,
+                    UnitPrice = products[c.ProductId].Price,
                 }).ToList()
             };
+            if (removedCount > 0)
+                TempData["Warn"] = $"⚠ {removedCount} sản phẩm đã ngừng bán đã được xóa khỏi đơn hàng.";
 
             _db.Orders.Add(order);
             await _db.SaveChangesAsync();
@@ -133,6 +142,7 @@ namespace HKTech.Controllers
         // POST /Order/Cancel/{id} — Huỷ đơn hàng (chỉ khi Pending)
         // ================================================================
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Cancel(int id)
         {
             var user  = await _userManager.GetUserAsync(User);

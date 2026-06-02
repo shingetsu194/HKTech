@@ -83,6 +83,9 @@ app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// --- Route: API (attribute routing cho ApiController) ---
+app.MapControllers();
+
 // --- Route: Admin Area ---
 app.MapControllerRoute(
     name: "areas",

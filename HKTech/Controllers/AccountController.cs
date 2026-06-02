@@ -78,28 +78,32 @@ public class AccountController : Controller
         ViewData["ReturnUrl"] = returnUrl;
         if (!ModelState.IsValid) return View(vm);
 
+        // Kiểm tra user tồn tại và đúng password trước — không sign in vội
+        var user = await _userManager.FindByEmailAsync(vm.Email);
+        if (user == null || !await _userManager.CheckPasswordAsync(user, vm.Password))
+        {
+            ModelState.AddModelError("", "Email hoặc mật khẩu không đúng.");
+            return View(vm);
+        }
+
+        // Kiểm tra role Admin trước khi cấp cookie
+        if (!await _userManager.IsInRoleAsync(user, "Admin"))
+        {
+            ModelState.AddModelError("", "Tài khoản này không có quyền Admin.");
+            return View(vm);
+        }
+
+        // Đã xác nhận là Admin — sign in với đầy đủ lockout support
         var result = await _signInManager.PasswordSignInAsync(
             vm.Email, vm.Password, vm.RememberMe, lockoutOnFailure: true);
 
         if (result.Succeeded)
         {
-            // Kiểm tra đúng role Admin
-            var user = await _userManager.FindByEmailAsync(vm.Email);
-            if (user != null && await _userManager.IsInRoleAsync(user, "Admin"))
-            {
-                TempData["Success"] = "💀 Xin chào Admin! STAY DETERMINED.";
-                return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
-            }
-            // Không phải Admin → đăng xuất và báo lỗi
-            await _signInManager.SignOutAsync();
-            ModelState.AddModelError("", "Tài khoản này không có quyền Admin.");
-            return View(vm);
+            TempData["Success"] = "💀 Xin chào Admin! STAY DETERMINED.";
+            return RedirectToAction("Index", "Dashboard", new { area = "Admin" });
         }
-
         if (result.IsLockedOut)
             ModelState.AddModelError("", "Tài khoản tạm khóa do đăng nhập sai nhiều lần.");
-        else
-            ModelState.AddModelError("", "Email hoặc mật khẩu không đúng.");
 
         return View(vm);
     }

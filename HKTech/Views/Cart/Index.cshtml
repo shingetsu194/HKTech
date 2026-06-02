@@ -224,7 +224,10 @@
     async function removeItem(productId) {
         const res  = await fetch('/Cart/Remove', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
             body: `productId=${productId}`
         });
         const data = await res.json();

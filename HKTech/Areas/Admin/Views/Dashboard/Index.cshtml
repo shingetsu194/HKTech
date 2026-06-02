@@ -60,7 +60,7 @@
                     {
                         <tr>
                             <td class="text-gold">#@order.Id</td>
-                            <td>@order.User?.FullName ?? order.User?.Email</td>
+                            <td>@(order.User?.FullName ?? order.User?.Email)</td>
                             <td>@order.TotalPrice.ToString("N0") ₫</td>
                             <td><span class="badge-status">@order.Status</span></td>
                             <td class="text-muted-hk">@order.CreatedAt.ToString("dd/MM/yyyy")</td>

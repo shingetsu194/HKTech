@@ -50,7 +50,7 @@
                         <span class="badge-ut" style="border-color:@statusColor; color:@statusColor; font-size:0.38rem;">
                             @order.Status.ToUpper()
                         </span>
-                        @if (order.Status == "Pending")
+                        @if (order.Status == HKTech.Models.OrderStatus.Pending)
                         {
                             <button class="btn-ut btn-ut-ghost btn-en"
                                     onclick="cancelOrder(@order.Id, this)"
@@ -105,7 +105,11 @@
 <script>
     async function cancelOrder(orderId, btn) {
         if (!confirm('Bạn có chắc muốn huỷ đơn hàng #' + orderId + '?')) return;
-        const res  = await fetch(`/Order/Cancel/${orderId}`, { method: 'POST' });
+        const token = document.querySelector('meta[name="aft"]')?.content ?? '';
+        const res   = await fetch(`/Order/Cancel/${orderId}`, {
+            method: 'POST',
+            headers: { 'RequestVerificationToken': token },
+        });
         const data = await res.json();
         if (data.success) {
             location.reload();
