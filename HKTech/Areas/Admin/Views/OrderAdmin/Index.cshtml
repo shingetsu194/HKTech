@@ -1,0 +1,124 @@
+@using HKTech.Models
+@model List<Order>
+@{
+    ViewData["Title"] = "Quản lý Đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    string? currentStatus = ViewBag.Status;
+    string StatusColor(string s) => s switch
+    {
+        OrderStatus.Pending   => "#FFD700",
+        OrderStatus.Confirmed => "#4488FF",
+        OrderStatus.Shipping  => "#44AAFF",
+        OrderStatus.Delivered => "#44CC44",
+        OrderStatus.Cancelled => "#FF4444",
+        _                     => "#888888",
+    };
+}
+
+<!-- Filter Bar -->
+<div class="d-flex gap-2 mb-4 flex-wrap align-items-center">
+    <a href="?@(ViewBag.Search != null ? $"search={ViewBag.Search}&" : "")"
+       class="btn-ut @(currentStatus == null ? "btn-ut-primary" : "btn-ut-ghost") btn-en"
+       style="font-size:0.42rem; padding:5px 12px;">
+        TẤT CẢ (@ViewBag.Total)
+    </a>
+    @foreach (var (label, st, count) in new[]
+    {
+        ("CHỜ XỬ LÝ", OrderStatus.Pending,   (int)ViewBag.CountPending),
+        ("ĐÃ XÁC NHẬN", OrderStatus.Confirmed, (int)ViewBag.CountConfirmed),
+        ("ĐANG GIAO",  OrderStatus.Shipping,  (int)ViewBag.CountShipping),
+        ("ĐÃ GIAO",    OrderStatus.Delivered, (int)ViewBag.CountDelivered),
+        ("ĐÃ HỦY",     OrderStatus.Cancelled, (int)ViewBag.CountCancelled),
+    })
+    {
+        <a href="?status=@st@(ViewBag.Search != null ? $"&search={ViewBag.Search}" : "")"
+           class="btn-ut btn-en @(currentStatus == st ? "btn-ut-primary" : "btn-ut-ghost")"
+           style="font-size:0.42rem; padding:5px 12px; border-color:@StatusColor(st);">
+            @label (@count)
+        </a>
+    }
+
+    <!-- Search -->
+    <form method="get" class="d-flex gap-2 ms-auto" style="min-width:260px;">
+        @if (currentStatus != null)
+        {
+            <input type="hidden" name="status" value="@currentStatus" />
+        }
+        <input type="text" name="search" value="@ViewBag.Search" placeholder="Tên / email / #ID..."
+               class="form-control-hk" style="font-size:0.8rem; flex:1;" />
+        <button type="submit" class="btn-ut btn-ut-outline btn-en" style="font-size:0.42rem; padding:5px 12px;">
+            TÌM
+        </button>
+    </form>
+</div>
+
+<div class="admin-card">
+    <div class="admin-card-body" style="padding:0;">
+        @if (!Model.Any())
+        {
+            <div class="text-mono text-muted-hk text-center py-4">* Không có đơn hàng nào.</div>
+        }
+        else
+        {
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>#ID</th>
+                        <th>KHÁCH HÀNG</th>
+                        <th>SẢN PHẨM</th>
+                        <th>TỔNG TIỀN</th>
+                        <th>TRẠNG THÁI</th>
+                        <th>NGÀY ĐẶT</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var o in Model)
+                    {
+                        <tr>
+                            <td class="text-gold">#@o.Id</td>
+                            <td>
+                                <div style="font-size:0.85rem; color:var(--text-primary);">
+                                    @(o.User?.FullName ?? "—")
+                                </div>
+                                <div style="font-size:0.72rem; color:var(--text-muted);">@o.User?.Email</div>
+                            </td>
+                            <td>@o.OrderDetails.Count sản phẩm</td>
+                            <td style="color:var(--gold); font-family:var(--font-pixel); font-size:0.42rem; white-space:nowrap;">
+                                @o.TotalPrice.ToString("N0") ₫
+                            </td>
+                            <td>
+                                <span class="badge-status"
+                                      style="border-color:@StatusColor(o.Status); color:@StatusColor(o.Status);">
+                                    @o.Status.ToUpper()
+                                </span>
+                            </td>
+                            <td style="color:var(--text-muted); font-size:0.78rem; white-space:nowrap;">
+                                @o.CreatedAt.ToLocalTime().ToString("dd/MM/yy HH:mm")
+                            </td>
+                            <td>
+                                <a asp-area="Admin" asp-controller="OrderAdmin" asp-action="Detail"
+                                   asp-route-id="@o.Id"
+                                   class="btn-ut btn-ut-outline btn-en"
+                                   style="font-size:0.38rem; padding:4px 10px;">CHI TIẾT</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            @if ((int)ViewBag.TotalPages > 1)
+            {
+                <div class="admin-pagination p-3">
+                    @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                    {
+                        <a href="?page=@i@(currentStatus != null ? $"&status={currentStatus}" : "")@(ViewBag.Search != null ? $"&search={ViewBag.Search}" : "")"
+                           class="page-btn @(i == (int)ViewBag.Page ? "active" : "")">@i</a>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>

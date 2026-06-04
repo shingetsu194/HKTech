@@ -916,6 +916,97 @@ body {
     letter-spacing: 2px;
 }
 
+/* ── Page Transitions ─────────────────────────────────────── */
+#pg-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    pointer-events: none;
+    background: #000;
+    opacity: 1;
+}
+
+/* FADE — Home, Account, Profile */
+#pg-overlay.pg-a-fade { transition: opacity 0.4s ease; }
+#pg-overlay.pg-a-fade.pg-loaded  { opacity: 0; }
+#pg-overlay.pg-a-fade.pg-leaving { opacity: 1; pointer-events: all; transition: opacity 0.28s ease; }
+
+/* GOLD FADE — Order (SAVE point) */
+#pg-overlay.pg-a-gold {
+    background: radial-gradient(ellipse at center, #120e00 0%, #000 65%);
+    transition: opacity 0.5s ease;
+}
+#pg-overlay.pg-a-gold.pg-loaded  { opacity: 0; }
+#pg-overlay.pg-a-gold.pg-leaving { opacity: 1; pointer-events: all; transition: opacity 0.28s ease; }
+
+/* SLIDE UP — Products (overlay rises off-screen) */
+#pg-overlay.pg-a-slide-up { transition: transform 0.5s cubic-bezier(0.76,0,0.24,1); }
+#pg-overlay.pg-a-slide-up.pg-loaded  { transform: translateY(-100%); }
+#pg-overlay.pg-a-slide-up.pg-leaving { transform: translateY(0); pointer-events: all;
+                                        transition: transform 0.28s ease-in; }
+
+/* SLIDE DOWN — Build (overlay falls off-screen) */
+#pg-overlay.pg-a-slide-down { transition: transform 0.5s cubic-bezier(0.76,0,0.24,1); }
+#pg-overlay.pg-a-slide-down.pg-loaded  { transform: translateY(100%); }
+#pg-overlay.pg-a-slide-down.pg-leaving { transform: translateY(0); pointer-events: all;
+                                          transition: transform 0.28s ease-in; }
+
+/* SLIDE LEFT — Recommend, Register */
+#pg-overlay.pg-a-slide-left { transition: transform 0.5s cubic-bezier(0.76,0,0.24,1); }
+#pg-overlay.pg-a-slide-left.pg-loaded  { transform: translateX(-100%); }
+#pg-overlay.pg-a-slide-left.pg-leaving { transform: translateX(0); pointer-events: all;
+                                          transition: transform 0.28s ease-in; }
+
+/* SLIDE RIGHT — Cart */
+#pg-overlay.pg-a-slide-right { transition: transform 0.5s cubic-bezier(0.76,0,0.24,1); }
+#pg-overlay.pg-a-slide-right.pg-loaded  { transform: translateX(100%); }
+#pg-overlay.pg-a-slide-right.pg-leaving { transform: translateX(0); pointer-events: all;
+                                           transition: transform 0.28s ease-in; }
+
+/* SPLIT — Login (2 halves split apart like battle box) */
+#pg-overlay.pg-a-split { background: transparent; }
+#pg-overlay.pg-a-split::before,
+#pg-overlay.pg-a-split::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 50%;
+    background: #000;
+    transition: transform 0.55s cubic-bezier(0.76,0,0.24,1);
+}
+#pg-overlay.pg-a-split::before { top: 0; }
+#pg-overlay.pg-a-split::after  { bottom: 0; }
+#pg-overlay.pg-a-split.pg-loaded::before { transform: translateY(-100%); }
+#pg-overlay.pg-a-split.pg-loaded::after  { transform: translateY(100%);  }
+#pg-overlay.pg-a-split.pg-leaving { pointer-events: all; }
+#pg-overlay.pg-a-split.pg-leaving::before,
+#pg-overlay.pg-a-split.pg-leaving::after { transform: translateY(0); transition: transform 0.28s ease-in; }
+
+/* WIPE — Admin (dark-red sweep) */
+#pg-overlay.pg-a-wipe {
+    background: linear-gradient(90deg, #1a0000 0%, #0d0000 40%, #000 100%);
+    transition: transform 0.5s cubic-bezier(0.76,0,0.24,1);
+}
+#pg-overlay.pg-a-wipe.pg-loaded  { transform: translateX(100%); }
+#pg-overlay.pg-a-wipe.pg-leaving { transform: translateX(0); pointer-events: all;
+                                    transition: transform 0.28s ease-in; }
+
+/* GLITCH — 404 */
+#pg-overlay.pg-a-glitch { transition: opacity 0.3s ease; }
+#pg-overlay.pg-a-glitch.pg-loaded  { animation: pgGlitch 0.65s ease forwards; }
+#pg-overlay.pg-a-glitch.pg-leaving { opacity: 1; pointer-events: all; }
+
+@keyframes pgGlitch {
+    0%   { opacity: 1; transform: none; clip-path: none; }
+    10%  { clip-path: inset(20% 0 30% 0); transform: skewX(-8deg) translateX(-6px); }
+    22%  { clip-path: inset(65% 0 5% 0);  transform: skewX(8deg)  translateX(6px); opacity: .8; }
+    35%  { clip-path: none; transform: skewX(-3deg); opacity: .7; }
+    50%  { clip-path: inset(10% 0 75% 0); transform: translateX(-10px); opacity: .5; }
+    65%  { clip-path: inset(72% 0 5% 0);  transform: translateX(8px);  opacity: .3; }
+    82%  { clip-path: none; transform: skewX(2deg); opacity: .12; }
+    100% { opacity: 0; transform: none; clip-path: none; }
+}
+
 /* .text-vn-mono: Share Tech Mono cho Vietnamese text khi VT323 thiếu glyph (Ổ, Í, Ẵ...) */
 .text-vn-mono {
     font-family: 'Share Tech Mono', 'Noto Sans Mono', monospace;

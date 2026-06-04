@@ -1,0 +1,95 @@
+@using HKTech.Models
+@model List<ApplicationUser>
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    var userRoles = ViewBag.UserRoles as Dictionary<string, IList<string>>;
+}
+
+<!-- Search -->
+<form method="get" class="d-flex gap-2 mb-4" style="max-width:400px;">
+    <input type="text" name="search" value="@ViewBag.Search"
+           placeholder="Tên hoặc email..." class="form-control-hk" style="font-size:0.82rem; flex:1;" />
+    <button type="submit" class="btn-ut btn-ut-outline btn-en" style="font-size:0.42rem; padding:5px 12px;">
+        TÌM
+    </button>
+</form>
+
+<div class="admin-card">
+    <div class="admin-card-header d-flex justify-content-between">
+        <span class="text-pixel-vn text-gold">👥 Danh sách người dùng</span>
+        <span class="text-mono" style="font-size:0.78rem; color:var(--text-muted);">
+            Tổng: @ViewBag.Total tài khoản
+        </span>
+    </div>
+    <div class="admin-card-body" style="padding:0;">
+        @if (!Model.Any())
+        {
+            <div class="text-mono text-muted-hk text-center py-4">* Không tìm thấy người dùng.</div>
+        }
+        else
+        {
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>HỌ TÊN</th>
+                        <th>EMAIL</th>
+                        <th>SĐT</th>
+                        <th>ROLE</th>
+                        <th>TRẠNG THÁI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model)
+                    {
+                        var roles = userRoles?.GetValueOrDefault(u.Id) ?? new List<string>();
+                        var isAdmin = roles.Contains("Admin");
+                        <tr>
+                            <td style="color:var(--text-primary);">
+                                @(u.FullName ?? "—")
+                            </td>
+                            <td style="font-size:0.78rem;">@u.Email</td>
+                            <td style="font-size:0.78rem; color:var(--text-muted);">
+                                @(u.PhoneNumber ?? "—")
+                            </td>
+                            <td>
+                                @foreach (var role in roles)
+                                {
+                                    <span class="badge-status"
+                                          style="@(role == "Admin" ? "border-color:var(--red-soul);color:var(--red-soul);" : "border-color:var(--green-kindness);color:var(--green-kindness);" )">
+                                        @role
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @if (u.LockoutEnd.HasValue && u.LockoutEnd > DateTimeOffset.UtcNow)
+                                {
+                                    <span class="badge-status" style="border-color:var(--red-soul); color:var(--red-soul);">
+                                        🔒 Bị khóa
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge-status" style="border-color:var(--green-kindness); color:var(--green-kindness);">
+                                        ✓ Hoạt động
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            @if ((int)ViewBag.TotalPages > 1)
+            {
+                <div class="admin-pagination p-3">
+                    @for (int i = 1; i <= (int)ViewBag.TotalPages; i++)
+                    {
+                        <a href="?page=@i@(ViewBag.Search != null ? $"&search={ViewBag.Search}" : "")"
+                           class="page-btn @(i == (int)ViewBag.Page ? "active" : "")">@i</a>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>

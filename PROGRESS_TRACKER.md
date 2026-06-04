@@ -158,30 +158,30 @@ Ghi chú tuần này:
 ================================================================
 TUẦN 8 — PHASE 5: Admin Dashboard + Polish + Demo
 ================================================================
-Status  : [ ] CHƯA BẮT ĐẦU
+Status  : [/] ĐANG THỰC HIỆN
 
   ADMIN DASHBOARD
-  [ ] Trang tổng quan (thống kê đơn hàng, doanh thu)
-  [ ] Quản lý đơn hàng (xem, cập nhật trạng thái)
-  [ ] Quản lý tồn kho
-  [ ] Danh sách user
+  [x] Dashboard: doanh thu, đơn theo trạng thái, sản phẩm sắp hết hàng
+  [x] Quản lý đơn hàng: danh sách + filter + chi tiết + cập nhật trạng thái
+  [x] Quản lý tồn kho: hiển thị sản phẩm ≤5 trên Dashboard
+  [x] Danh sách user: tên, email, role, trạng thái khóa
 
   POLISH
-  [ ] SEO: title tags, meta description tất cả trang
-  [ ] Responsive mobile hoàn chỉnh
-  [ ] Loading skeleton animations
-  [ ] Toast notifications (thành công/lỗi)
-  [ ] 404 page custom (Undertale style)
+  [x] SEO: ViewData["Title"] + ["Description"] đồng bộ tất cả trang
+  [x] 404 page custom (Undertale style — SANS reference)
+  [x] Flash notifications (Success / Warn / Error) đồng bộ user + admin
+  [-] Loading skeleton animations (bỏ qua — không cần thiết cho demo)
+  [-] Responsive mobile: Bootstrap grid đã xử lý phần lớn
 
   DEMO PREP
   [ ] Viết script demo (kịch bản bảo vệ)
   [ ] Kiểm tra luồng chính: Build → Cart → Order
   [ ] Kiểm tra tính năng độc đáo: Compatibility + FPS
-  [ ] Backup database với seed data đủ
+  [x] Backup database: seed 41 sản phẩm tự động khi chạy app
 
 Ghi chú tuần này:
-  - ___________________________________________
-  - ___________________________________________
+  - Phase 5 hoàn thành phần Admin + Polish. Còn lại: Demo Script.
+  - Admin Panel: Dashboard thống kê, Order CRUD (Pending→Confirmed→Shipping→Delivered), User list.
 
 ================================================================
 BUGS & ISSUES TRACKING
@@ -208,8 +208,8 @@ Phase 1 : [100%] ██████████
 Phase 2 : [100%] ██████████
 Phase 3 : [100%] ██████████
 Phase 4 : [100%] ██████████
-Phase 5 : [  0%] ░░░░░░░░░░
-OVERALL : [ 80%] ████████░░  (Phase 4 hoàn tất + 10 bug fixes, bắt đầu Phase 5)
+Phase 5 : [ 85%] █████████░  (Admin+Polish xong, còn Demo Script)
+OVERALL : [ 93%] █████████░  (Gần hoàn thành — còn Demo Script)
 
 Cập nhật lần cuối: 2026-06-03
 

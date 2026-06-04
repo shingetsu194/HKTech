@@ -1,6 +1,8 @@
 using HKTech.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace HKTech.Data;
 
@@ -56,11 +58,21 @@ public static class DbSeeder
             await db.SaveChangesAsync();
         }
 
-        // ── 4. Products (chỉ seed khi chưa có sản phẩm nào) ─────────────
-        if (await db.Products.AnyAsync()) return;
-
-        // Lấy CategoryId từ DB (có thể đã tồn tại từ trước)
+        // ── 4. Products ───────────────────────────────────────────────────
+        // Lấy CategoryId từ DB
         var cat = await db.Categories.ToDictionaryAsync(c => c.Slug);
+
+        // Nếu có scraped_products.json → luôn chạy (chỉ thêm sản phẩm mới, bỏ qua trùng)
+        var jsonPath = Path.Combine(Directory.GetCurrentDirectory(), "scraped_products.json");
+        if (File.Exists(jsonPath))
+        {
+            Console.WriteLine("[Seeder] Tìm thấy scraped_products.json — đồng bộ sản phẩm từ phongvu.vn");
+            await SeedFromScrapedJson(db, cat, jsonPath);
+            return;
+        }
+
+        // Fallback: seed mẫu cứng — chỉ khi chưa có sản phẩm nào
+        if (await db.Products.AnyAsync()) return;
 
         // ── BenchmarkScore scale: 0–3000 ──────────────────────────────────
         // Budget CPU ~300-500 | Mid ~700-1000 | High ~1100-1600 | Flagship ~1800-2500
@@ -376,5 +388,81 @@ public static class DbSeeder
 
         db.Products.AddRange(products);
         await db.SaveChangesAsync();
+    }
+
+    // ── Seed từ scraped_products.json (dữ liệu thật từ phongvu.vn) ───────────
+    private static async Task SeedFromScrapedJson(
+        ApplicationDbContext db,
+        Dictionary<string, Category> catMap,
+        string jsonPath)
+    {
+        var json    = await File.ReadAllTextAsync(jsonPath);
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var items   = JsonSerializer.Deserialize<List<ScrapedProductDto>>(json, options);
+        if (items == null || items.Count == 0) return;
+
+        // Lấy danh sách tên sản phẩm đã có để tránh trùng lặp
+        var existingNames = (await db.Products.Select(p => p.Name).ToListAsync()).ToHashSet();
+
+        var newProducts = new List<Product>();
+
+        foreach (var item in items)
+        {
+            if (!catMap.TryGetValue(item.CategorySlug ?? "", out var category)) continue;
+            if (string.IsNullOrWhiteSpace(item.Name)) continue;
+            if (existingNames.Contains(item.Name)) continue; // bỏ qua nếu đã có
+
+            var product = new Product
+            {
+                Name           = item.Name,
+                Description    = item.Name,
+                Price          = item.Price,
+                CategoryId     = category.Id,
+                Socket         = item.Socket,
+                RamType        = item.RamType,
+                FormFactor     = item.FormFactor,
+                TdpWatt        = item.TdpWatt,
+                BenchmarkScore = item.BenchmarkScore,
+                StockQuantity  = item.StockQuantity > 0 ? item.StockQuantity : 15,
+                IsActive       = item.IsActive,
+            };
+
+            if (!string.IsNullOrEmpty(item.ImageFile))
+            {
+                product.Images = new List<ProductImage>
+                {
+                    new() { ImageUrl = $"/images/products/{item.ImageFile}", IsPrimary = true }
+                };
+            }
+
+            newProducts.Add(product);
+        }
+
+        if (newProducts.Count == 0)
+        {
+            Console.WriteLine("[Seeder] Không có sản phẩm mới để thêm.");
+            return;
+        }
+
+        db.Products.AddRange(newProducts);
+        await db.SaveChangesAsync();
+
+        Console.WriteLine($"[Seeder] Đã thêm {newProducts.Count} sản phẩm mới (bỏ qua {existingNames.Count} đã có).");
+    }
+
+    // DTO khớp với JSON output của scraper.py
+    private class ScrapedProductDto
+    {
+        public string?  Name           { get; set; }
+        public decimal  Price          { get; set; }
+        public string?  CategorySlug   { get; set; }
+        public string?  ImageFile      { get; set; }
+        public string?  Socket         { get; set; }
+        public string?  RamType        { get; set; }
+        public string?  FormFactor     { get; set; }
+        public int      TdpWatt        { get; set; }
+        public int      BenchmarkScore { get; set; }
+        public int      StockQuantity  { get; set; }
+        public bool     IsActive       { get; set; }
     }
 }

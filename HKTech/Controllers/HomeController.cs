@@ -27,6 +27,9 @@ public class HomeController : Controller
 
     public IActionResult Privacy() => View();
 
+    [Route("/Home/Error404")]
+    public IActionResult Error404() => View("~/Views/Shared/Error404.cshtml");
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
         => View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

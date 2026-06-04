@@ -19,6 +19,7 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    <div id="pg-overlay"></div>
     <div class="site-wrapper">
 
         <!-- ====================================================
@@ -126,12 +127,21 @@
              ==================================================== -->
         @{
             var success = TempData["Success"] as string;
+            var warn    = TempData["Warn"]    as string;
             var error   = TempData["Error"]   as string;
         }
         @if (success != null)
         {
             <div class="container-hk mt-2">
                 <div class="alert-ut alert-ut-success">@success
+                    <button onclick="this.parentElement.remove()" style="float:right;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">✕</button>
+                </div>
+            </div>
+        }
+        @if (warn != null)
+        {
+            <div class="container-hk mt-2">
+                <div class="alert-ut" style="border-color:var(--gold); color:var(--gold);">@warn
                     <button onclick="this.parentElement.remove()" style="float:right;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">✕</button>
                 </div>
             </div>
@@ -239,5 +249,56 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+    (function () {
+        var ov = document.getElementById('pg-overlay');
+
+        function getAnim(path) {
+            path = (path || '/').toLowerCase().replace(/\/$/, '') || '/';
+            if (path === '/' || path === '/home/index' || path === '/home') return 'pg-a-fade';
+            if (path.startsWith('/product'))                               return 'pg-a-slide-up';
+            if (path.startsWith('/build'))                                 return 'pg-a-slide-down';
+            if (path.startsWith('/recommend'))                             return 'pg-a-slide-left';
+            if (path.startsWith('/cart'))                                   return 'pg-a-slide-right';
+            if (path.startsWith('/order'))                                 return 'pg-a-gold';
+            if (path.startsWith('/account/login'))                         return 'pg-a-split';
+            if (path.startsWith('/account'))                               return 'pg-a-fade';
+            if (path.startsWith('/home/error') || path.startsWith('/error')) return 'pg-a-glitch';
+            return 'pg-a-fade';
+        }
+
+        // Set animation for this page + reveal
+        ov.classList.add(getAnim(location.pathname));
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () { ov.classList.add('pg-loaded'); });
+        });
+
+        function leave(go) {
+            ov.classList.remove('pg-loaded');
+            ov.classList.add('pg-leaving');
+            setTimeout(go, 320);
+        }
+
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest('a[href]');
+            if (!a) return;
+            var href = a.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('mailto:') ||
+                href.startsWith('javascript:') || a.target === '_blank' ||
+                a.hasAttribute('download')) return;
+            try { if (new URL(href, location.href).origin !== location.origin) return; }
+            catch (_) { return; }
+            e.preventDefault();
+            leave(function () { location.href = href; });
+        });
+
+        document.addEventListener('submit', function (e) {
+            if (e.target.dataset.noTransition) return;
+            e.preventDefault();
+            var f = e.target;
+            leave(function () { f.submit(); });
+        });
+    })();
+    </script>
 </body>
 </html>
