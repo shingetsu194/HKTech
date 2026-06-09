@@ -145,8 +145,8 @@
         <!-- PRODUCT MAIN -->
         <div>
             <!-- Toolbar -->
-            <div class="product-toolbar">
-                <div class="search-bar form-hk">
+            <div class="product-toolbar" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <div class="search-bar form-hk" style="flex:1; min-width:180px;">
                     <input type="text" class="form-control-hk" placeholder="🔍 Tìm linh kiện..."
                            id="productSearchInput" oninput="searchProducts(this.value)" />
                 </div>
@@ -156,6 +156,9 @@
                     <option value="price-desc">Giá: Cao → Thấp</option>
                     <option value="name-asc">Tên: A → Z</option>
                 </select>
+                <div class="product-count-label" id="productCountLabel">
+                    Found <strong>@(Model?.Count ?? 0)</strong> products
+                </div>
             </div>
 
             <!-- Product Grid — bind từ Model (Phase 2) -->
@@ -164,7 +167,7 @@
                 {
                     @foreach (var p in (List<HKTech.Models.Product>)Model)
                     {
-                        <div class="product-card" id="product-card-@p.Id">
+                        <div class="product-card" id="product-card-@p.Id" data-cat="@p.Category.Slug.ToLower()">
                             <div class="card-img-wrap" style="height:200px; background:#111; display:flex; align-items:center; justify-content:center;">
                                 @if (p.PrimaryImageUrl != null)
                                 {
@@ -186,13 +189,17 @@
                                 <div class="card-price text-pixel" style="font-size:0.6rem; color:var(--gold); text-shadow:var(--glow-gold);">
                                     @p.Price.ToString("N0")₫
                                 </div>
+                                @if (p.BenchmarkScore > 0)
+                                {
+                                    <div class="bench-badge">⚡ SCORE: @p.BenchmarkScore</div>
+                                }
                                 @if (p.StockQuantity <= 0)
                                 {
-                                    <div style="font-size:0.7rem; color:var(--red-soul); margin-top:4px;">● Hết hàng</div>
+                                    <div class="stock-out">● Hết hàng</div>
                                 }
                                 else if (p.StockQuantity <= 5)
                                 {
-                                    <div style="font-size:0.7rem; color:var(--gold); margin-top:4px;">⚠ Còn @p.StockQuantity cái</div>
+                                    <div class="stock-low">⚠ Còn @p.StockQuantity cái</div>
                                 }
                             </div>
                             <div class="card-actions">

@@ -1014,3 +1014,143 @@ body {
     text-transform: uppercase;
     color: var(--gold);
 }
+
+/* ============================================================
+   UI/UX POLISH PACK — Phase 5+
+   ============================================================ */
+
+/* --- Product Card: Category-Coloured Top Border --- */
+.product-card[data-cat="cpu"]       { border-top-color: #FF6B6B; }
+.product-card[data-cat="gpu"]       { border-top-color: #4ECDC4; }
+.product-card[data-cat="ram"]       { border-top-color: #45B7D1; }
+.product-card[data-cat="mainboard"] { border-top-color: #96CEB4; }
+.product-card[data-cat="psu"]       { border-top-color: #FECA57; }
+.product-card[data-cat="case"]      { border-top-color: #BB44FF; }
+.product-card[data-cat="storage"]   { border-top-color: #54A0FF; }
+.product-card[data-cat="cooling"]   { border-top-color: #00DDDD; }
+
+/* --- Product Card: Richer Image Container --- */
+.product-card .card-img-wrap {
+    background: radial-gradient(ellipse at 50% 30%, #272727, #0D0D0D) !important;
+}
+/* Blend image into card body at the bottom */
+.product-card .card-img-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 52px;
+    background: linear-gradient(to top, var(--bg-card), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+/* Deeper glow on hover */
+.product-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.7),
+                0 0 0 1px rgba(255,215,0,0.18),
+                inset 0 0 24px rgba(255,215,0,0.04);
+}
+
+/* --- Benchmark Score Mini-Badge --- */
+.bench-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(68,136,255,0.10);
+    border: 1px solid rgba(68,136,255,0.25);
+    color: var(--blue-patience);
+    font-family: var(--font-pixel);
+    font-size: 0.38rem;
+    padding: 2px 6px;
+    margin-top: 6px;
+    letter-spacing: 1px;
+}
+
+/* --- Stock Badges --- */
+@keyframes lowStockPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.55; }
+}
+.stock-low {
+    animation: lowStockPulse 1.6s ease-in-out infinite;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--gold);
+    margin-top: 4px;
+}
+.stock-out {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--red-soul);
+    margin-top: 4px;
+}
+
+/* --- Recommend: Tier-based Combo Cards --- */
+.combo-card.tier-budget {
+    border-left: 4px solid var(--green-kindness);
+    border-top: 3px solid var(--green-kindness);
+}
+.combo-card.tier-budget .combo-header { background: rgba(68,204,68,0.04); }
+
+.combo-card.tier-balanced {
+    border-left: 4px solid var(--gold);
+    border-top: 3px solid var(--gold);
+}
+.combo-card.tier-balanced .combo-header { background: rgba(255,215,0,0.04); }
+
+.combo-card.tier-performance {
+    border-left: 4px solid var(--red-soul);
+    border-top: 3px solid var(--red-soul);
+}
+.combo-card.tier-performance .combo-header { background: rgba(255,68,68,0.04); }
+
+/* --- Cart Table: Row Hover --- */
+.cart-table tbody tr { transition: background var(--transition-fast); }
+.cart-table tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+/* --- Product Count Label in Toolbar --- */
+.product-count-label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+.product-count-label strong { color: var(--gold); font-weight: normal; }
+
+/* --- Build Slot: Filled glow enhancement --- */
+.build-slot.filled {
+    background: rgba(68,204,68,0.04);
+}
+
+/* --- Feature Icon: Grow on hover --- */
+.feature-icon { transition: transform 0.25s ease, filter 0.25s ease; }
+.feature-card:hover .feature-icon {
+    transform: scale(1.25) rotate(-3deg);
+    filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));
+}
+
+/* --- Button: Active press micro-animation --- */
+.btn-ut:active { transform: translateY(1px) scale(0.98) !important; }
+
+/* --- Cart Badge: Pulse when items added --- */
+@keyframes cartBadgePop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); box-shadow: 0 0 6px var(--red-soul); }
+    100% { transform: scale(1); }
+}
+.cart-badge.pop { animation: cartBadgePop 0.4s ease-out forwards; }
+
+/* --- Dialog Box: no-prefix variant for empty states --- */
+.dialog-box.no-prefix::before { display: none; }
+
+/* --- Home: Section header subtle left accent --- */
+.section-header::before {
+    content: '▶';
+    font-family: var(--font-pixel);
+    font-size: 0.4rem;
+    color: var(--red-soul);
+    animation: heartbeat 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+    align-self: center;
+}

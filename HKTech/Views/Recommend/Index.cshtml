@@ -158,7 +158,13 @@
 
             @foreach (var combo in combos!)
             {
-                <div class="combo-card">
+                var tierClass = combo.Badge?.ToUpper() switch {
+                    "BUDGET"      => "tier-budget",
+                    "BALANCED"    => "tier-balanced",
+                    "PERFORMANCE" => "tier-performance",
+                    _             => ""
+                };
+                <div class="combo-card @tierClass">
                     <!-- Header -->
                     <div class="combo-header">
                         <div style="display:flex; align-items:center; gap:12px;">

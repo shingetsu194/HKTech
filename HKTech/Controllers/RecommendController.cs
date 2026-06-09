@@ -258,7 +258,7 @@ namespace HKTech.Controllers
 
             return pct.ToDictionary(
                 kvp => kvp.Key,
-                kvp => Math.Round(budget * (decimal)kvp.Value, -3)); // làm tròn 1000đ
+                kvp => Math.Round(budget * (decimal)kvp.Value / 1000m, 0) * 1000m); // làm tròn 1000đ
         }
 
         private static Dictionary<string, decimal> ScaleBudget(
