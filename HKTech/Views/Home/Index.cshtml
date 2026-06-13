@@ -1,7 +1,7 @@
 @model List<HKTech.Models.Product>
 @{
-    ViewData["Title"] = "Trang chủ";
-    ViewData["Description"] = "HKTech - Tự build PC thông minh với Compatibility Guard, Bottleneck Analyzer & FPS Estimator real-time.";
+    ViewData["Title"] = "Home";
+    ViewData["Description"] = "HKTech - Smart PC building with Compatibility Guard, Bottleneck Analyzer & FPS Estimator real-time.";
 }
 
 <!-- ============================================================
@@ -19,15 +19,15 @@
                     <span class="en"> THE PARTS.</span>
                 </h1>
                 <p class="hero-subtitle">
-                    * Build PC thông minh. Kiểm tra tương thích tự động.
-                    Bottleneck analyzer &amp; FPS estimator real-time.
+                    * Smart PC building. Auto-compatibility check.
+                    Real-time bottleneck analyzer &amp; FPS estimator.
                 </p>
                 <div class="hero-cta">
                     <a asp-controller="Build" asp-action="Index" class="btn-ut btn-ut-primary btn-vn" id="hero-build-btn">
-                        <i class="bi bi-tools"></i> TỰ BUILD PC
+                        <i class="bi bi-tools"></i> BUILD PC
                     </a>
                     <a asp-controller="Recommend" asp-action="Index" class="btn-ut btn-ut-outline btn-vn" id="hero-recommend-btn">
-                        <i class="bi bi-stars"></i> GỢI Ý CHO TÔI
+                        <i class="bi bi-stars"></i> RECOMMEND ME
                     </a>
                 </div>
             </div>
@@ -150,21 +150,21 @@
                 <span class="feature-icon">🛡️</span>
                 <div class="feature-title-en">COMPATIBILITY GUARD</div>
                 <p class="feature-desc">
-                    Cảnh báo ngay khi socket CPU không khớp mainboard, RAM sai type, hay nguồn thiếu watt. Không bao giờ mua nhầm nữa.
+                    Warns instantly when CPU socket mismatches motherboard, RAM type is wrong, or PSU lacks wattage. Never buy the wrong parts again.
                 </p>
             </div>
             <div class="feature-card" id="feature-bottleneck">
                 <span class="feature-icon">📊</span>
                 <div class="feature-title-en">BOTTLENECK ANALYZER</div>
                 <p class="feature-desc">
-                    Phân tích % bottleneck giữa CPU và GPU. Hiển thị thanh trực quan và gợi ý nâng cấp tối ưu để không "kìm hãm" nhau.
+                    Analyzes bottleneck % between CPU and GPU. Shows visual bars and suggests optimal upgrades so they don't 'hold back' each other.
                 </p>
             </div>
             <div class="feature-card" id="feature-fps">
                 <span class="feature-icon">🎮</span>
                 <div class="feature-title-en">FPS ESTIMATOR</div>
                 <p class="feature-desc">
-                    Ước tính FPS ở 1080p / 1440p / 4K cho các game: Valorant, CS2, GTA V, Cyberpunk 2077... Biết trước máy chạy mượt không.
+                    Estimates FPS at 1080p / 1440p / 4K for games: Valorant, CS2, GTA V, Cyberpunk 2077... Know if your rig will run smooth beforehand.
                 </p>
             </div>
         </div>
@@ -177,10 +177,10 @@
 <section class="py-5">
     <div class="container-hk">
         <div class="section-header">
-            <h2 class="section-title-pixel">DANH MỤC LINH KIỆN</h2>
+            <h2 class="section-title-pixel">COMPONENT CATEGORIES</h2>
             <div class="section-line"></div>
             <a asp-controller="Product" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-products-btn">
-                XEM TẤT CẢ →
+                SEE ALL →
             </a>
         </div>
         <div class="row g-3">
@@ -191,8 +191,8 @@
                     new { Icon = "🎮", Name = "GPU / VGA",  Slug = "gpu",        Count = "..." },
                     new { Icon = "🧩", Name = "Mainboard",  Slug = "mainboard",  Count = "..." },
                     new { Icon = "💾", Name = "RAM",        Slug = "ram",        Count = "..." },
-                    new { Icon = "⚡", Name = "Nguồn PSU",  Slug = "psu",        Count = "..." },
-                    new { Icon = "🗄️", Name = "Case / Vỏ", Slug = "case",       Count = "..." },
+                    new { Icon = "⚡", Name = "Power Supply",Slug = "psu",        Count = "..." },
+                    new { Icon = "🗄️", Name = "Case",       Slug = "case",       Count = "..." },
                 };
             }
             @foreach (var cat in categories)
@@ -215,10 +215,10 @@
 <section class="py-5" style="background: var(--bg-cave);">
     <div class="container-hk">
         <div class="section-header">
-            <h2 class="section-title-pixel">LINH KIỆN NỔI BẬT</h2>
+            <h2 class="section-title-pixel">FEATURED COMPONENTS</h2>
             <div class="section-line"></div>
             <a asp-controller="Product" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-featured-btn">
-                XEM TẤT CẢ →
+                SEE ALL →
             </a>
         </div>
 
@@ -254,7 +254,7 @@
                             <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"
                                class="btn-ut btn-ut-outline btn-en" style="font-size:0.7rem; padding:6px 12px;"
                                id="btn-featured-detail-@p.Id">
-                                CHI TIẾT
+                                DETAILS
                             </a>
                             <a asp-controller="Build" asp-action="Index"
                                class="btn-ut btn-ut-primary btn-en" style="font-size:0.7rem; padding:6px 12px;"
@@ -269,7 +269,7 @@
         else
         {
             <div class="dialog-box mt-2" style="max-width:500px;">
-                * Chưa có sản phẩm nào. Admin hãy thêm sản phẩm qua
+                * No products available yet. Admin should add products via
                 <a asp-controller="Account" asp-action="AdminLogin"
                    style="color:var(--gold);">Admin Panel</a>.
             </div>
@@ -283,16 +283,16 @@
 <section class="py-5 text-center" style="border-top: var(--border-gold); background: var(--bg-void);">
     <div class="container-hk">
         <div class="text-vn-mono mb-3" style="font-size:0.95rem; text-shadow: var(--glow-gold);">
-            ★ ĐÃ SẴN SÀNG? ★
+            ★ ARE YOU READY? ★
         </div>
         <h2 class="text-pixel-vn text-white mb-4" style="font-size:2rem;">
-            Bắt đầu xây dựng bộ PC trong mơ của bạn ngay hôm nay
+            Start building your dream PC today
         </h2>
         <a asp-controller="Build" asp-action="Index" class="btn-ut btn-ut-primary btn-vn me-3" id="cta-build-btn">
-            <i class="bi bi-tools"></i> BUILD PC NGAY
+            <i class="bi bi-tools"></i> START BUILDING
         </a>
         <a asp-controller="Account" asp-action="Register" class="btn-ut btn-ut-outline btn-vn" id="cta-register-btn">
-            <i class="bi bi-person-plus"></i> TẠO TÀI KHOẢN
+            <i class="bi bi-person-plus"></i> CREATE ACCOUNT
         </a>
     </div>
 </section>

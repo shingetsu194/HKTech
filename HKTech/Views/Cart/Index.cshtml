@@ -2,7 +2,7 @@
 @model List<CartItem>
 
 @{
-    ViewData["Title"] = "Giỏ hàng";
+    ViewData["Title"] = "Shopping Cart";
     var total     = (decimal)ViewBag.Total;
     var itemCount = (int)ViewBag.ItemCount;
 }
@@ -78,8 +78,8 @@
         <!-- Empty cart -->
         <div class="dialog-box text-center" style="padding: 48px; margin-top: 24px;">
             <div style="font-size: 3rem; margin-bottom: 16px;">🛒</div>
-            <div class="text-pixel-vn text-gold mb-3" style="font-size: 1.2rem;">Giỏ hàng đang trống!</div>
-            <p class="text-mono text-muted-hk mb-4">Hãy khám phá linh kiện hoặc tự build cấu hình PC của bạn.</p>
+            <div class="text-pixel-vn text-gold mb-3" style="font-size: 1.2rem;">Your cart is empty!</div>
+            <p class="text-mono text-muted-hk mb-4">Explore components or build your own PC.</p>
             <div class="d-flex gap-3 justify-content-center">
                 <a href="/Product" class="btn-ut btn-ut-primary btn-en">SHOP NOW</a>
                 <a href="/Build" class="btn-ut btn-ut-outline btn-en">BUILD PC</a>
@@ -145,7 +145,7 @@
                     <a href="/Product" class="btn-ut btn-ut-ghost btn-en">← CONTINUE</a>
                     <form asp-action="Clear" asp-controller="Cart" method="post" style="margin:0;">
                         <button type="submit" class="btn-ut btn-ut-ghost btn-en"
-                                onclick="return confirm('Xóa toàn bộ giỏ hàng?')">CLEAR ALL</button>
+                                onclick="return confirm('Clear entire cart?')">CLEAR ALL</button>
                     </form>
                 </div>
             </div>
@@ -167,7 +167,7 @@
                     @total.ToString("N0") ₫
                 </div>
                 <div class="text-mono" style="font-size:0.7rem; color:var(--text-muted); margin-top:4px;">
-                    Tổng thanh toán (VNĐ)
+                    Total Payment (VND)
                 </div>
 
                 <a href="/Order/Checkout" class="btn-ut btn-ut-primary btn-en mt-4"

@@ -21,7 +21,7 @@ public class ProductController : Controller
         var query = _db.Products
             .Include(p => p.Category)
             .Include(p => p.Images)
-            .Where(p => p.IsActive)
+            .Where(p => p.IsActive && p.Category.Slug != "prebuild")
             .AsQueryable();
 
         // Filter

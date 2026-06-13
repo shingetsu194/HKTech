@@ -1,6 +1,6 @@
 @{
-    ViewData["Title"] = "Tự Build PC";
-    ViewData["Description"] = "Tự chọn linh kiện từng slot, kiểm tra tương thích real-time và xem FPS ước tính ngay lập tức.";
+    ViewData["Title"] = "Build PC";
+    ViewData["Description"] = "Pick parts for each slot, check compatibility real-time, and get instant FPS estimation.";
 }
 
 @section Styles {
@@ -173,12 +173,12 @@
 
     <!-- Page Header -->
     <div class="section-header">
-        <h1 class="section-title-pixel">⚙️ TỰ BUILD PC</h1>
+        <h1 class="section-title-pixel">⚙️ BUILD YOUR PC</h1>
         <div class="section-line"></div>
     </div>
 
     <div class="dialog-box mb-4">
-        Chọn linh kiện cho từng slot. Hệ thống sẽ <span class="text-gold">tự động kiểm tra tương thích</span> và <span style="color:var(--green-kindness);">ước tính FPS</span> real-time.
+        Select parts for each slot. The system will <span class="text-gold">auto-check compatibility</span> and <span style="color:var(--green-kindness);">estimate FPS</span> in real-time.
     </div>
 
     <div class="build-page-grid">
@@ -188,14 +188,14 @@
             @{
                 var slots = new[]
                 {
-                    new { Key = "cpu",       Icon = "🧠", Label = "CPU",          IsVn = false, Placeholder = "Chọn bộ vi xử lý..." },
-                    new { Key = "mainboard", Icon = "🧩", Label = "MAINBOARD",    IsVn = false, Placeholder = "Chọn bo mạch chủ..." },
-                    new { Key = "ram",       Icon = "💾", Label = "RAM",          IsVn = false, Placeholder = "Chọn bộ nhớ RAM..." },
-                    new { Key = "gpu",       Icon = "🎮", Label = "GPU / VGA",    IsVn = false, Placeholder = "Chọn card đồ họạ..." },
-                    new { Key = "storage",   Icon = "💿", Label = "Ổ CỨNG / SSD", IsVn = true,  Placeholder = "Chọn thiết bị lưu trữ..." },
-                    new { Key = "psu",       Icon = "⚡",  Label = "NGUỒN PSU",    IsVn = true,  Placeholder = "Chọn bộ nguồn..." },
-                    new { Key = "case",      Icon = "🗄️",  Label = "CASE / VỎ",   IsVn = true,  Placeholder = "Chọn vỏ máy..." },
-                    new { Key = "cooling",   Icon = "❄️",  Label = "TẢN NHIỆT",   IsVn = true,  Placeholder = "Chọn tản nhiệt CPU..." },
+                    new { Key = "cpu",       Icon = "🧠", Label = "CPU",          IsVn = false, Placeholder = "Choose processor..." },
+                    new { Key = "mainboard", Icon = "🧩", Label = "MAINBOARD",    IsVn = false, Placeholder = "Choose motherboard..." },
+                    new { Key = "ram",       Icon = "💾", Label = "RAM",          IsVn = false, Placeholder = "Choose RAM..." },
+                    new { Key = "gpu",       Icon = "🎮", Label = "GPU",          IsVn = false, Placeholder = "Choose graphics card..." },
+                    new { Key = "storage",   Icon = "💿", Label = "STORAGE",      IsVn = false,  Placeholder = "Choose storage..." },
+                    new { Key = "psu",       Icon = "⚡",  Label = "POWER SUPPLY", IsVn = false,  Placeholder = "Choose power supply..." },
+                    new { Key = "case",      Icon = "🗄️",  Label = "CASE",        IsVn = false,  Placeholder = "Choose PC case..." },
+                    new { Key = "cooling",   Icon = "❄️",  Label = "COOLING",     IsVn = false,  Placeholder = "Choose CPU cooler..." },
                 };
             }
             <div id="build-slots">
@@ -216,7 +216,7 @@
                         <button class="btn-ut btn-ut-outline btn-vn"
                                 onclick="openSelectPanel('@slot.Key', '@slot.Label')"
                                 id="btn-select-@slot.Key">
-                            CHỌN
+                            CHOOSE
                         </button>
                         <button class="btn-ut btn-ut-ghost btn-vn"
                                 onclick="clearSlot('@slot.Key')"
@@ -231,19 +231,19 @@
             <!-- Product Select Panel (appears below slots) -->
             <div class="select-panel" id="selectPanel">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="text-pixel-vn text-gold" style="font-size:1.1rem;" id="panelTitle">CHỌN LINH KIỆN</div>
-                    <button class="btn-ut btn-ut-ghost btn-vn" onclick="closeSelectPanel()">✕ ĐÓNG</button>
+                    <div class="text-pixel-vn text-gold" style="font-size:1.1rem;" id="panelTitle">CHOOSE COMPONENT</div>
+                    <button class="btn-ut btn-ut-ghost btn-en" onclick="closeSelectPanel()">✕ CLOSE</button>
                 </div>
                 <!-- Search -->
                 <div class="form-hk mb-3">
                     <input type="text" class="form-control-hk" id="productSearch"
-                           placeholder="Tìm kiếm linh kiện..." oninput="filterProducts(this.value)" />
+                           placeholder="Search components..." oninput="filterProducts(this.value)" />
                 </div>
                 <!-- Product Grid -->
                 <div class="mini-product-list" id="productList">
                     <div class="text-mono text-muted-hk">
-                        * Dữ liệu sẽ tải từ database sau Phase 2.<br/>
-                        Hiện tại hệ thống đang được cấu hình...
+                        * Data will load from the database.<br/>
+                        System is currently being configured...
                     </div>
                 </div>
             </div>
@@ -273,10 +273,10 @@
         <div class="total-panel" id="totalPanel">
 
             <!-- Total Price -->
-            <div class="text-vn-mono mb-1" style="font-size:0.85rem;">TỔNG CHI PHÍ BUILD</div>
+            <div class="text-vn-mono mb-1" style="font-size:0.85rem;">TOTAL BUILD COST</div>
             <div class="total-price" id="totalPrice">0 ₫</div>
             <div class="text-mono mt-1" style="font-size:0.75rem; color:var(--text-muted);">
-                <span id="slotsFilled">0</span>/8 linh kiện đã chọn
+                <span id="slotsFilled">0</span>/8 parts selected
             </div>
 
             <!-- ===============================================
@@ -318,7 +318,7 @@
                     <div class="bottleneck-center" id="bottleneckLabel">—</div>
                 </div>
                 <div class="text-mono mt-1" style="font-size:0.75rem; color:var(--text-muted);" id="bottleneckHint">
-                    * Chọn CPU & GPU để xem phân tích
+                    * Select CPU & GPU to see analysis
                 </div>
             </div>
 
@@ -331,7 +331,7 @@
                 </div>
                 <div id="fpsTableWrap">
                     <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted);">
-                        * Chọn CPU + GPU để xem ước tính FPS
+                        * Select CPU + GPU to see FPS estimation
                     </div>
                 </div>
             </div>
@@ -415,14 +415,14 @@
             renderProducts(allProducts);
         } catch {
             document.getElementById('productList').innerHTML =
-                '<div class="text-mono text-muted-hk">* Lỗi tải dữ liệu. Thử lại sau.</div>';
+                '<div class="text-mono text-muted-hk">* Error loading data. Try again later.</div>';
         }
     }
 
     function renderProducts(list) {
         const selected = buildState[currentSlot];
         const html = list.length === 0
-            ? '<div class="text-mono text-muted-hk">* Chưa có linh kiện trong danh mục này.</div>'
+            ? '<div class="text-mono text-muted-hk">* No components in this category yet.</div>'
             : list.map(p => `
                 <div class="mini-product-item ${selected?.productId === p.id ? 'selected' : ''}"
                      onclick="selectProduct(${JSON.stringify(p).replace(/"/g, '&quot;')})"
@@ -462,7 +462,7 @@
             closeSelectPanel();
             runCompatibilityCheck();
             runPerformanceAnalysis();
-        } catch { alert('* Lỗi kết nối máy chủ.'); }
+        } catch { alert('* Server connection error.'); }
     }
 
     async function clearSlot(slotKey) {
@@ -474,7 +474,7 @@
         });
         const el = document.getElementById(`slot-${slotKey}`);
         el.classList.remove('filled', 'error');
-        document.getElementById(`selected-${slotKey}`).textContent = 'Chọn linh kiện...';
+        document.getElementById(`selected-${slotKey}`).textContent = 'Select part...';
         document.getElementById(`selected-${slotKey}`).className = 'slot-selected text-muted-hk';
         document.getElementById(`price-${slotKey}`).textContent = '—';
         document.getElementById(`btn-clear-${slotKey}`).style.display = 'none';
@@ -566,9 +566,9 @@
             document.getElementById('barCpu').style.width = '50%';
             document.getElementById('barGpu').style.width = '50%';
             document.getElementById('bottleneckLabel').textContent = '—';
-            document.getElementById('bottleneckHint').textContent  = '* Chọn CPU & GPU để xem phân tích';
+            document.getElementById('bottleneckHint').textContent  = '* Select CPU & GPU to see analysis';
             document.getElementById('fpsTableWrap').innerHTML =
-                '<div class="text-mono" style="font-size:0.75rem;color:var(--text-muted);">* Chọn CPU + GPU để xem ước tính FPS</div>';
+                '<div class="text-mono" style="font-size:0.75rem;color:var(--text-muted);">* Select CPU + GPU to see FPS estimation</div>';
             document.getElementById('buildBadge').style.display = 'none';
             return;
         }
@@ -588,7 +588,7 @@
             document.getElementById('barCpu').style.width = d.cpuPct + '%';
             document.getElementById('barGpu').style.width = d.gpuPct + '%';
             const diff  = d.bottleneck;
-            const label = diff < 10 ? '✓ CÂN BẰNG'
+            const label = diff < 10 ? '✓ BALANCED'
                         : d.cpuPct < d.gpuPct ? `CPU -${diff}%` : `GPU -${diff}%`;
             document.getElementById('bottleneckLabel').textContent = label;
             document.getElementById('bottleneckHint').textContent  = d.bottleneckHint;
@@ -600,7 +600,7 @@
             document.getElementById('buildBadgeText').textContent = `🎮 ${d.badge}`;
             document.getElementById('buildBadge').style.display   = 'block';
         } catch {
-            document.getElementById('bottleneckHint').textContent = '* Lỗi kết nối API.';
+            document.getElementById('bottleneckHint').textContent = '* API connection error.';
         }
     }
 
@@ -626,7 +626,7 @@
                 </tbody>
             </table>
             <div class="text-mono mt-1" style="font-size:0.65rem;color:var(--text-muted);">
-                * Ước tính dựa trên benchmark score, thực tế có thể chênh ±15%
+                * Estimate based on benchmark score, actual FPS may vary ±15%
             </div>`;
     }
 
@@ -638,7 +638,7 @@
             .filter(v => v !== null)
             .map(p => p.id ?? p.productId);
         if (productIds.length === 0) {
-            showToast('* Vui lòng chọn ít nhất 1 linh kiện!', 'warn'); return;
+            showToast('* Please select at least 1 part!', 'warn'); return;
         }
         try {
             const res  = await fetch('/Cart/AddBuild', {
@@ -653,7 +653,7 @@
             } else {
                 showToast(`❌ ${data.message}`, 'error');
             }
-        } catch { showToast('* Lỗi kết nối.', 'error'); }
+        } catch { showToast('* Connection error.', 'error'); }
     }
 
     // ============================================================
@@ -681,7 +681,7 @@
                 if (data.message.includes('đăng nhập'))
                     setTimeout(() => window.location.href = '/Account/Login', 1500);
             }
-        } catch { showToast('* Lỗi kết nối.', 'error'); }
+        } catch { showToast('* Connection error.', 'error'); }
     }
 
     async function clearBuild() {
@@ -689,16 +689,16 @@
         Object.keys(buildState).forEach(k => { buildState[k] = null; });
         document.querySelectorAll('.build-slot').forEach(el => el.classList.remove('filled','error'));
         document.querySelectorAll('[id^="selected-"]').forEach(el => {
-            el.textContent = 'Chọn linh kiện...'; el.className = 'slot-selected text-muted-hk';
+            el.textContent = 'Select part...'; el.className = 'slot-selected text-muted-hk';
         });
         document.querySelectorAll('[id^="price-"]').forEach(el => el.textContent = '—');
         document.querySelectorAll('[id^="btn-clear-"]').forEach(el => el.style.display = 'none');
         updateTotals();
         document.getElementById('fpsTableWrap').innerHTML =
-            '<div class="text-mono" style="font-size:0.75rem;color:var(--text-muted);">* Chọn CPU + GPU để xem ước tính FPS</div>';
+            '<div class="text-mono" style="font-size:0.75rem;color:var(--text-muted);">* Select CPU + GPU to see FPS estimation</div>';
         document.getElementById('buildBadge').style.display = 'none';
         document.getElementById('bottleneckLabel').textContent = '—';
-        document.getElementById('bottleneckHint').textContent = '* Chọn CPU & GPU để xem phân tích';
+        document.getElementById('bottleneckHint').textContent = '* Select CPU & GPU to see analysis';
     }
 
     // ============================================================

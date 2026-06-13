@@ -53,8 +53,20 @@ public static class DbSeeder
                 new Category { Name = "PSU / Nguồn", Slug = "psu",       Icon = "⚡", Description = "Nguồn máy tính 80+ Gold/Bronze" },
                 new Category { Name = "Case / Vỏ",  Slug = "case",      Icon = "🗄️", Description = "Vỏ case ATX, mATX, ITX" },
                 new Category { Name = "Ổ cứng",     Slug = "storage",   Icon = "💿", Description = "SSD NVMe, SATA và HDD" },
-                new Category { Name = "Tản nhiệt",  Slug = "cooling",   Icon = "❄️", Description = "Tản nhiệt khí và tản nhiệt nước AIO" }
+                new Category { Name = "Tản nhiệt",  Slug = "cooling",   Icon = "❄️", Description = "Tản nhiệt khí và tản nhiệt nước AIO" },
+                new Category { Name = "PC Build Sẵn", Slug = "prebuild", Icon = "🖥️", Description = "PC nguyên chiếc gaming từ các shop uy tín" }
             );
+            await db.SaveChangesAsync();
+        }
+
+        // Ensure 'prebuild' category exists even if categories were already seeded earlier
+        if (!await db.Categories.AnyAsync(c => c.Slug == "prebuild"))
+        {
+            db.Categories.Add(new Category
+            {
+                Name = "PC Build Sẵn", Slug = "prebuild",
+                Icon = "🖥️", Description = "PC nguyên chiếc gaming từ các shop uy tín"
+            });
             await db.SaveChangesAsync();
         }
 
@@ -68,8 +80,19 @@ public static class DbSeeder
         {
             Console.WriteLine("[Seeder] Tìm thấy scraped_products.json — đồng bộ sản phẩm từ phongvu.vn");
             await SeedFromScrapedJson(db, cat, jsonPath);
-            return;
         }
+
+        // Always read prebuilts JSON (independent of components)
+        var prebuiltsPath = Path.Combine(Directory.GetCurrentDirectory(), "scraped_prebuilts.json");
+        if (File.Exists(prebuiltsPath))
+        {
+            Console.WriteLine("[Seeder] Tìm thấy scraped_prebuilts.json — đồng bộ PC build sẵn");
+            // Refresh cat map to include 'prebuild' which may have just been added
+            cat = await db.Categories.ToDictionaryAsync(c => c.Slug);
+            await SeedFromScrapedJson(db, cat, prebuiltsPath);
+        }
+
+        if (File.Exists(jsonPath) || File.Exists(prebuiltsPath)) return;
 
         // Fallback: seed mẫu cứng — chỉ khi chưa có sản phẩm nào
         if (await db.Products.AnyAsync()) return;
@@ -415,7 +438,7 @@ public static class DbSeeder
             var product = new Product
             {
                 Name           = item.Name,
-                Description    = item.Name,
+                Description    = !string.IsNullOrEmpty(item.Description) ? item.Description : item.Name,
                 Price          = item.Price,
                 CategoryId     = category.Id,
                 Socket         = item.Socket,
@@ -429,9 +452,10 @@ public static class DbSeeder
 
             if (!string.IsNullOrEmpty(item.ImageFile))
             {
+                var imgFolder = item.CategorySlug == "prebuild" ? "prebuilts" : "products";
                 product.Images = new List<ProductImage>
                 {
-                    new() { ImageUrl = $"/images/products/{item.ImageFile}", IsPrimary = true }
+                    new() { ImageUrl = $"/images/{imgFolder}/{item.ImageFile}", IsPrimary = true }
                 };
             }
 
@@ -457,6 +481,7 @@ public static class DbSeeder
         public decimal  Price          { get; set; }
         public string?  CategorySlug   { get; set; }
         public string?  ImageFile      { get; set; }
+        public string?  Description    { get; set; }  // pipe-separated specs for prebuilts
         public string?  Socket         { get; set; }
         public string?  RamType        { get; set; }
         public string?  FormFactor     { get; set; }

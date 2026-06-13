@@ -1,7 +1,7 @@
 @model List<HKTech.Models.Order>
 
 @{
-    ViewData["Title"] = "Lịch sử đơn hàng";
+    ViewData["Title"] = "Order History";
 }
 
 <div class="container-hk" style="padding-top: var(--space-xl);">
@@ -14,7 +14,7 @@
     {
         <div class="dialog-box text-center mt-4" style="padding: 48px;">
             <div style="font-size: 3rem; margin-bottom: 16px;">📦</div>
-            <div class="text-pixel-vn text-gold mb-3" style="font-size: 1.1rem;">Chưa có đơn hàng nào!</div>
+            <div class="text-pixel-vn text-gold mb-3" style="font-size: 1.1rem;">No orders yet!</div>
             <a href="/Product" class="btn-ut btn-ut-primary btn-en">SHOP NOW</a>
         </div>
     }
@@ -75,7 +75,7 @@
                     @if (order.OrderDetails.Count > 3)
                     {
                         <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted);">
-                            + @(order.OrderDetails.Count - 3) sản phẩm khác...
+                            + @(order.OrderDetails.Count - 3) other items...
                         </div>
                     }
                 </div>
@@ -104,7 +104,7 @@
 @section Scripts {
 <script>
     async function cancelOrder(orderId, btn) {
-        if (!confirm('Bạn có chắc muốn huỷ đơn hàng #' + orderId + '?')) return;
+        if (!confirm('Are you sure you want to cancel order #' + orderId + '?')) return;
         const token = document.querySelector('meta[name="aft"]')?.content ?? '';
         const res   = await fetch(`/Order/Cancel/${orderId}`, {
             method: 'POST',

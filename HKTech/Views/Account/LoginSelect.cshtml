@@ -1,21 +1,21 @@
-﻿@{
-    ViewData["Title"] = "Đăng nhập";
+@{
+    ViewData["Title"] = "Login";
 }
 
 <div class="container-hk" style="max-width:680px; padding: var(--space-xl) 0;">
 
     <div class="section-header">
-        <h1 class="section-title-pixel">⚔️ ĐĂNG NHẬP</h1>
+        <h1 class="section-title-pixel">⚔️ LOGIN</h1>
         <div class="section-line"></div>
     </div>
 
     <div class="dialog-box mb-5">
-        * Chào mừng đến với HKTech PC Builder! Hãy chọn cách đăng nhập phù hợp.
+        * Welcome to HKTech PC Builder! Please select your login method.
     </div>
 
     <div class="row g-4">
 
-        <!-- Khách hàng -->
+        <!-- Customer -->
         <div class="col-md-6">
             <a asp-controller="Account" asp-action="Login"
                class="login-select-card" id="login-select-customer" style="text-decoration:none;">
@@ -81,9 +81,9 @@
     </div>
 
     <div class="text-center mt-5 text-mono" style="font-size:0.85rem; color:var(--text-muted);">
-        Chưa có tài khoản?
+        Don't have an account?
         <a asp-controller="Account" asp-action="Register"
-           class="text-gold text-decoration-none">Đăng ký ngay →</a>
+           class="text-gold text-decoration-none">Register now →</a>
     </div>
 </div>
 

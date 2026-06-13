@@ -1,17 +1,17 @@
 @model HKTech.Models.ViewModels.RegisterViewModel
 @{
-    ViewData["Title"] = "Đăng ký";
+    ViewData["Title"] = "Register";
 }
 
 <div class="container-hk" style="max-width:520px; padding: var(--space-xl) 0;">
 
     <div class="section-header">
-        <h1 class="section-title-pixel">⭐ ĐĂNG KÝ</h1>
+        <h1 class="section-title-pixel">⭐ REGISTER</h1>
         <div class="section-line"></div>
     </div>
 
     <div class="dialog-box mb-4">
-        * Tạo tài khoản HKTech để lưu build PC, theo dõi đơn hàng và nhận gợi ý cấu hình cá nhân hóa!
+        * Create an HKTech account to save PC builds, track your orders, and get personalized recommendations!
     </div>
 
     <div style="background: var(--bg-surface); border: var(--border-gold); padding: var(--space-xl);">
@@ -26,8 +26,8 @@
             }
 
             <div class="mb-3">
-                <label asp-for="FullName" class="form-label">👤 HỌ VÀ TÊN</label>
-                <input asp-for="FullName" class="form-control-hk" placeholder="Nguyễn Văn A" autocomplete="name" />
+                <label asp-for="FullName" class="form-label">👤 FULL NAME</label>
+                <input asp-for="FullName" class="form-control-hk" placeholder="John Doe" autocomplete="name" />
                 <span asp-validation-for="FullName" class="text-danger" style="font-size:0.8rem;"></span>
             </div>
 
@@ -38,27 +38,27 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="Password" class="form-label">🔐 MẬT KHẨU</label>
-                <input asp-for="Password" class="form-control-hk" placeholder="Tối thiểu 6 ký tự" autocomplete="new-password" />
+                <label asp-for="Password" class="form-label">🔐 PASSWORD</label>
+                <input asp-for="Password" class="form-control-hk" placeholder="Minimum 6 characters" autocomplete="new-password" />
                 <span asp-validation-for="Password" class="text-danger" style="font-size:0.8rem;"></span>
             </div>
 
             <div class="mb-4">
-                <label asp-for="ConfirmPassword" class="form-label">🔒 XÁC NHẬN MẬT KHẨU</label>
-                <input asp-for="ConfirmPassword" class="form-control-hk" placeholder="Nhập lại mật khẩu" autocomplete="new-password" />
+                <label asp-for="ConfirmPassword" class="form-label">🔒 CONFIRM PASSWORD</label>
+                <input asp-for="ConfirmPassword" class="form-control-hk" placeholder="Re-enter password" autocomplete="new-password" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger" style="font-size:0.8rem;"></span>
             </div>
 
             <button type="submit" class="btn-ut btn-ut-primary btn-vn w-100" id="btn-register-submit"
                     style="padding:12px; font-size:1rem;">
-                ★ TẠO TÀI KHOẢN
+                ★ CREATE ACCOUNT
             </button>
         </form>
 
         <div class="text-center mt-4 text-mono" style="font-size:0.85rem; color:var(--text-muted);">
-            Đã có tài khoản?
+            Already have an account?
             <a asp-controller="Account" asp-action="Login"
-               class="text-gold text-decoration-none">Đăng nhập →</a>
+               class="text-gold text-decoration-none">Login →</a>
         </div>
     </div>
 </div>

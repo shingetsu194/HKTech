@@ -50,28 +50,33 @@
                 <ul class="nav-links" id="mainNav">
                     <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Home" asp-action="Index">
-                            <i class="bi bi-house-fill"></i> TRANG CHỦ
+                            <i class="bi bi-house-fill"></i> HOME
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Product" asp-action="Index">
-                            <i class="bi bi-cpu"></i> LINH KIỆN
+                            <i class="bi bi-cpu"></i> COMPONENTS
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Build" asp-action="Index">
-                            <i class="bi bi-tools"></i> TỰ BUILD PC
+                            <i class="bi bi-tools"></i> BUILD PC
                             <span class="save-badge">NEW</span>
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link-hk" asp-controller="Prebuilt" asp-action="Index">
+                            <i class="bi bi-pc-display"></i> PREBUILTS
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Recommend" asp-action="Index">
-                            <i class="bi bi-stars"></i> GỢI Ý CẤU HÌNH
+                            <i class="bi bi-stars"></i> RECOMMENDATIONS
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link-hk position-relative" asp-controller="Cart" asp-action="Index">
-                            <i class="bi bi-cart3"></i> GIỎ HÀNG
+                            <i class="bi bi-cart3"></i> CART
                             @{
                                 var cartCount = _cartSvc.GetItemCount();
                             }
@@ -99,7 +104,7 @@
                             <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="nav-link-hk border-0 bg-transparent" style="cursor:pointer">
-                                    <i class="bi bi-box-arrow-right"></i> ĐĂNG XUẤT
+                                    <i class="bi bi-box-arrow-right"></i> LOGOUT
                                 </button>
                             </form>
                         </li>
@@ -180,35 +185,35 @@
                             </svg>HKTech PC Builder
                         </div>
                         <div class="footer-tagline mt-2">
-                            * Nơi mọi linh kiện tìm thấy DETERMINATION của mình.
+                            * Where every component fills you with DETERMINATION.
                         </div>
                     </div>
                     <div class="col-md-2 mb-4">
-                        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem; letter-spacing:2px;">KHÁM PHÁ</div>
+                        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem; letter-spacing:2px;">EXPLORE</div>
                         <ul class="list-unstyled">
-                            <li><a asp-controller="Product" asp-action="Index" class="text-muted-hk text-mono text-decoration-none hover-gold" style="font-size:0.85rem;">Linh kiện</a></li>
-                            <li><a asp-controller="Build" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Tự Build PC</a></li>
-                            <li><a asp-controller="Recommend" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Gợi ý cấu hình</a></li>
+                            <li><a asp-controller="Product" asp-action="Index" class="text-muted-hk text-mono text-decoration-none hover-gold" style="font-size:0.85rem;">Components</a></li>
+                            <li><a asp-controller="Build" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Build PC</a></li>
+                            <li><a asp-controller="Recommend" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Recommendations</a></li>
                         </ul>
                     </div>
                     <div class="col-md-2 mb-4">
-                        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem; letter-spacing:2px;">TÀI KHOẢN</div>
+                        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem; letter-spacing:2px;">ACCOUNT</div>
                         <ul class="list-unstyled">
-                            <li><a asp-controller="Account" asp-action="Register" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Đăng ký</a></li>
-                            <li><a asp-controller="Account" asp-action="Login" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Đăng nhập</a></li>
-                            <li><a asp-controller="Order" asp-action="History" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Đơn hàng</a></li>
+                            <li><a asp-controller="Account" asp-action="Register" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Register</a></li>
+                            <li><a asp-controller="Account" asp-action="Login" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Login</a></li>
+                            <li><a asp-controller="Order" asp-action="History" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Orders</a></li>
                         </ul>
                     </div>
                     <div class="col-md-4 mb-4">
                         <div class="text-pixel text-gold mb-2" style="font-size:0.5rem; letter-spacing:1px;">SMART BUILD ⭐</div>
                         <div class="footer-tagline">
-                            Kiểm tra tương thích real-time, phân tích bottleneck & ước tính FPS ngay khi bạn chọn linh kiện.
+                            Real-time compatibility check, bottleneck analysis & FPS estimation as you pick parts.
                         </div>
                     </div>
                 </div>
 
                 <div class="footer-bottom">
-                    <span>© 2026 HKTech — Đồ án Lập trình Web | HUTECH</span>
+                    <span>© 2026 HKTech — Web Development Project | HUTECH</span>
                     <span class="save-point-text">★ SAVE POINT ★</span>
                     <span>Made with
                         <svg width="12" height="9" viewBox="0 0 8 6" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle; margin:0 2px;">

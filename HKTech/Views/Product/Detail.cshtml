@@ -43,7 +43,7 @@
 
     <!-- Breadcrumb -->
     <div class="text-mono mb-4" style="font-size:0.78rem; color:var(--text-muted);">
-        <a href="/Product" style="color:var(--text-muted); text-decoration:none;">LINH KIỆN</a>
+        <a href="/Product" style="color:var(--text-muted); text-decoration:none;">COMPONENTS</a>
         <span style="margin:0 8px;">›</span>
         <a href="/Product?category=@Model.Category.Slug" style="color:var(--text-muted); text-decoration:none;">
             @Model.Category.Icon @Model.Category.Name
@@ -108,19 +108,19 @@
             @if (Model.StockQuantity <= 0)
             {
                 <div class="dialog-box mb-3" style="border-color:var(--red-soul); color:var(--red-soul); padding:10px 16px;">
-                    ● Hết hàng
+                    ● Out of stock
                 </div>
             }
             else if (Model.StockQuantity <= 5)
             {
                 <div class="dialog-box mb-3" style="border-color:var(--gold); color:var(--gold); padding:10px 16px;">
-                    ⚠ Còn @Model.StockQuantity sản phẩm
+                    ⚠ Only @Model.StockQuantity left
                 </div>
             }
             else
             {
                 <div class="dialog-box mb-3" style="border-color:var(--green-kindness); color:var(--green-kindness); padding:10px 16px;">
-                    ✓ Còn hàng (@Model.StockQuantity sản phẩm)
+                    ✓ In stock (@Model.StockQuantity items)
                 </div>
             }
 
@@ -132,7 +132,7 @@
                             onclick="addToCartDetail(@Model.Id)"
                             id="btn-detail-add-cart"
                             style="padding:12px 24px;">
-                        🛒 THÊM VÀO GIỎ
+                        🛒 ADD TO CART
                     </button>
                 }
                 <a href="/Build" class="btn-ut btn-ut-outline btn-en" style="padding:12px 24px;">
@@ -142,7 +142,7 @@
 
             <!-- Thông số kỹ thuật -->
             <div style="background:var(--bg-surface); border:var(--border-muted); padding:var(--space-md);">
-                <div class="panel-label-en mb-3" style="font-size:0.42rem;">📋 THÔNG SỐ KỸ THUẬT</div>
+                <div class="panel-label-en mb-3" style="font-size:0.42rem;">📋 TECH SPECS</div>
 
                 @if (!string.IsNullOrEmpty(Model.Socket))
                 {
@@ -168,7 +168,7 @@
                 @if (Model.TdpWatt > 0)
                 {
                     <div class="spec-row">
-                        <span class="spec-key">@(Model.Category.Slug == "psu" ? "Công suất" : "TDP")</span>
+                        <span class="spec-key">@(Model.Category.Slug == "psu" ? "Wattage" : "TDP")</span>
                         <span class="spec-value">@Model.TdpWatt W</span>
                     </div>
                 }
@@ -180,8 +180,8 @@
                     </div>
                 }
                 <div class="spec-row">
-                    <span class="spec-key">Tồn kho</span>
-                    <span class="spec-value">@Model.StockQuantity sản phẩm</span>
+                    <span class="spec-key">Stock</span>
+                    <span class="spec-value">@Model.StockQuantity items</span>
                 </div>
             </div>
 
@@ -201,7 +201,7 @@
         <div class="mt-5">
             <div class="section-header">
                 <h2 class="section-title-pixel" style="font-size:0.9rem;">
-                    @Model.Category.Icon LINH KIỆN LIÊN QUAN
+                    @Model.Category.Icon RELATED COMPONENTS
                 </h2>
                 <div class="section-line"></div>
             </div>
@@ -231,10 +231,10 @@
                         </div>
                         <div class="card-actions">
                             <a href="/Product/Detail/@p.Id" class="btn-ut btn-ut-outline btn-en"
-                               style="font-size:0.65rem; padding:5px 10px;">CHI TIẾT</a>
+                               style="font-size:0.65rem; padding:5px 10px;">DETAILS</a>
                             <button class="btn-ut btn-ut-primary btn-en"
                                     onclick="addToCartDetail(@p.Id)"
-                                    style="font-size:0.65rem; padding:5px 10px;">+ GIỎ</button>
+                                    style="font-size:0.65rem; padding:5px 10px;">+ CART</button>
                         </div>
                     </div>
                 }
@@ -259,16 +259,16 @@
             });
             const data = await res.json();
             if (data.success) {
-                btn.textContent = '✅ ĐÃ THÊM!';
+                btn.textContent = '✅ ADDED!';
                 btn.style.borderColor = 'var(--green-kindness)';
                 const badge = document.getElementById('cartCountBadge');
                 if (badge) { badge.textContent = data.cartCount; badge.style.display = 'inline'; }
-                setTimeout(() => { btn.textContent = '🛒 THÊM VÀO GIỎ'; btn.style.borderColor = ''; btn.disabled = false; }, 2000);
+                setTimeout(() => { btn.textContent = '🛒 ADD TO CART'; btn.style.borderColor = ''; btn.disabled = false; }, 2000);
             } else {
-                btn.textContent = '❌ LỖI'; btn.disabled = false;
+                btn.textContent = '❌ ERROR'; btn.disabled = false;
             }
         } catch {
-            btn.textContent = '❌ LỖI KẾT NỐI'; btn.disabled = false;
+            btn.textContent = '❌ CONNECTION ERROR'; btn.disabled = false;
         }
     }
 </script>
