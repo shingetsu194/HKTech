@@ -40,3 +40,7 @@ npm-debug.log*
 
 ## Test screenshots
 screenshots/
+
+# Python cache (scraper tooling)
+__pycache__/
+*.pyc

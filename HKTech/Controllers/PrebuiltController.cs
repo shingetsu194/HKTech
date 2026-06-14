@@ -25,7 +25,6 @@ namespace HKTech.Controllers
         // ── GET /Prebuilt ──────────────────────────────────────────────────
         [HttpGet]
         public async Task<IActionResult> Index(
-            string? source = null,
             decimal? minPrice = null,
             decimal? maxPrice = null,
             string? gpu = null,
@@ -39,9 +38,6 @@ namespace HKTech.Controllers
                 .Where(p => p.IsActive && p.Category.Slug == "prebuild");
 
             // ── Filters ──────────────────────────────────────────────────
-            if (!string.IsNullOrEmpty(source))
-                query = query.Where(p => p.Description != null && p.Description.Contains($"source:{source}"));
-
             if (minPrice.HasValue)
                 query = query.Where(p => p.Price >= minPrice.Value);
 
@@ -62,31 +58,46 @@ namespace HKTech.Controllers
 
             var prebuilts = await query.ToListAsync();
 
-            // ── ViewBag data ─────────────────────────────────────────────
-            // Collect distinct sources from DB
-            var allSources = await _db.Products
-                .Include(p => p.Category)
-                .Where(p => p.IsActive && p.Category.Slug == "prebuild" && p.Description != null)
-                .Select(p => p.Description!)
-                .ToListAsync();
-
-            var sources = allSources
-                .SelectMany(d => d.Split('|'))
-                .Where(s => s.StartsWith("source:"))
-                .Select(s => s.Replace("source:", "").Trim())
-                .Where(s => !string.IsNullOrEmpty(s))
-                .Distinct()
-                .OrderBy(s => s)
-                .ToList();
-
-            ViewBag.Sources     = sources;
-            ViewBag.SelSource   = source;
             ViewBag.SelMinPrice = minPrice;
             ViewBag.SelMaxPrice = maxPrice;
             ViewBag.SelGpu      = gpu;
             ViewBag.SelSort     = sort;
 
             return View(prebuilts);
+        }
+
+        // ── GET /Prebuilt/Details/{id} ─────────────────────────────────────
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var pc = await _db.Products
+                .Include(p => p.Category)
+                .Include(p => p.Images)
+                .FirstOrDefaultAsync(p => p.Id == id
+                                       && p.IsActive
+                                       && p.Category.Slug == "prebuild");
+
+            if (pc == null) return NotFound();
+
+            // ── Ước tính FPS từ tên CPU + GPU trong description ─────────────
+            var specs = (pc.Description ?? "").Split('|')
+                .Select(s => s.Split(':', 2))
+                .Where(a => a.Length == 2)
+                .ToDictionary(a => a[0].Trim(), a => a[1].Trim());
+
+            string cpuName = specs.GetValueOrDefault("fullCpu") ?? specs.GetValueOrDefault("cpu") ?? "";
+            string gpuName = specs.GetValueOrDefault("fullGpu") ?? specs.GetValueOrDefault("gpu") ?? "";
+
+            int cpuScore = HardwareSpecEstimator.Estimate("cpu", cpuName)?.BenchmarkScore ?? 0;
+            int gpuScore = HardwareSpecEstimator.Estimate("gpu", gpuName)?.BenchmarkScore ?? 0;
+
+            ViewBag.CpuScore = cpuScore;
+            ViewBag.GpuScore = gpuScore;
+            ViewBag.FpsTable = FpsCalculator.Calc(cpuScore, gpuScore);
+            ViewBag.Badge    = FpsCalculator.Badge(cpuScore, gpuScore);
+
+            ViewData["Title"] = pc.Name;
+            return View(pc);
         }
 
         // ── POST /Prebuilt/AddToCart ───────────────────────────────────────

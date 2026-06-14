@@ -1,9 +1,7 @@
 @model List<HKTech.Models.Product>
 
 @{
-    ViewData["Title"] = "Prebuilt PCs";
-    var sources   = (List<string>)(ViewBag.Sources ?? new List<string>());
-    var selSource = ViewBag.SelSource as string;
+    ViewData["Title"] = "PC Build Sẵn";
     var selSort   = ViewBag.SelSort   as string ?? "default";
 
     // Helper: parse Description pipe-string into dict
@@ -99,8 +97,9 @@
         flex: 1;
         background: var(--gold);
         color: var(--bg-void);
-        font-family: var(--font-pixel);
-        font-size: 0.38rem;
+        /* VT323 để hiển thị dấu tiếng Việt */
+        font-family: var(--font-pixel-vn);
+        font-size: 0.9rem;
         border: none;
         padding: 8px;
         cursor: pointer;
@@ -128,10 +127,11 @@
     }
     .filter-group { margin-bottom: var(--space-lg); }
     .filter-label {
-        font-family: var(--font-pixel);
-        font-size: 0.4rem;
+        /* VT323 để hiển thị dấu tiếng Việt (Press Start 2P không có dấu) */
+        font-family: var(--font-pixel-vn);
+        font-size: 0.95rem;
         color: var(--gold);
-        letter-spacing: 2px;
+        letter-spacing: 1px;
         margin-bottom: var(--space-sm);
         display: block;
     }
@@ -168,14 +168,14 @@
 <div class="container-hk" style="padding-top: var(--space-xl); padding-bottom: var(--space-xl);">
 
     <div class="section-header">
-        <h1 class="section-title-pixel" style="font-size: 0.85rem;">🖥️ PREBUILT PCs</h1>
+        <h1 class="section-title-pixel">🖥️ PC BUILD SẴN</h1>
         <div class="section-line"></div>
     </div>
 
     <div class="dialog-box mb-4" style="font-size: 0.82rem;">
-        * Exclusive prebuilt PCs from <span class="text-gold">TTG Shop</span>.
-        Click <span class="text-gold">CART</span> to add to cart, or
-        <span class="text-gold">🔗</span> to view original page.
+        * PC nguyên chiếc lắp ráp sẵn, đã kiểm tra tương thích.
+        Nhấn <span class="text-gold">THÊM VÀO GIỎ</span> để mua ngay, hoặc
+        <span class="text-gold">🔍 XEM CHI TIẾT</span> để xem cấu hình đầy đủ.
     </div>
 
     <div class="prebuilt-layout mt-4">
@@ -185,59 +185,43 @@
             <form method="get" action="/Prebuilt" id="filterForm">
                 <!-- Sort -->
                 <div class="filter-group">
-                    <span class="filter-label">⬆ SORT</span>
+                    <span class="filter-label">⬆ SẮP XẾP</span>
                     <select name="sort" class="form-control-hk form-select-hk"
-                            style="font-size:0.75rem; padding:6px 8px;"
+                            style="font-size:0.85rem; padding:10px 12px; width:100%;"
                             onchange="document.getElementById('filterForm').submit()">
-                        <option value="default" selected="@(selSort == "default")">Default</option>
-                        <option value="price-asc"  selected="@(selSort == "price-asc")">Price Low → High</option>
-                        <option value="price-desc" selected="@(selSort == "price-desc")">Price High → Low</option>
-                        <option value="name-asc"   selected="@(selSort == "name-asc")">Name A → Z</option>
+                        <option value="default" selected="@(selSort == "default")">Mặc định</option>
+                        <option value="price-asc"  selected="@(selSort == "price-asc")">Giá Thấp → Cao</option>
+                        <option value="price-desc" selected="@(selSort == "price-desc")">Giá Cao → Thấp</option>
+                        <option value="name-asc"   selected="@(selSort == "name-asc")">Tên A → Z</option>
                     </select>
                 </div>
 
-                <!-- Source filter -->
-                @if (sources.Any())
-                {
-                    <div class="filter-group">
-                        <span class="filter-label">🏪 SOURCE</span>
-                        <a href="/Prebuilt" class="filter-chip @(selSource == null ? "active" : "")">All</a>
-                        @foreach (var src in sources)
-                        {
-                            <a href="/Prebuilt?source=@Uri.EscapeDataString(src)&sort=@selSort"
-                               class="filter-chip @(selSource == src ? "active" : "")">
-                                @src
-                            </a>
-                        }
-                    </div>
-                }
-
                 <!-- Price range -->
                 <div class="filter-group">
-                    <span class="filter-label">💰 PRICE RANGE (VND)</span>
+                    <span class="filter-label">💰 KHOẢNG GIÁ (VNĐ)</span>
                     <div class="price-inputs">
                         <input class="price-input-hk" type="number" name="minPrice"
-                               placeholder="Min" value="@ViewBag.SelMinPrice" />
+                               placeholder="Từ" value="@ViewBag.SelMinPrice" />
                         <span style="color:var(--text-muted);">–</span>
                         <input class="price-input-hk" type="number" name="maxPrice"
-                               placeholder="Max" value="@ViewBag.SelMaxPrice" />
+                               placeholder="Đến" value="@ViewBag.SelMaxPrice" />
                     </div>
                 </div>
 
                 <!-- GPU filter -->
                 <div class="filter-group">
-                    <span class="filter-label">🎮 FIND BY GPU</span>
+                    <span class="filter-label">🎮 TÌM THEO GPU</span>
                     <input class="price-input-hk" type="text" name="gpu"
                            placeholder="VD: RTX 5070, RX 9070..."
                            value="@ViewBag.SelGpu" />
                 </div>
 
-                <button type="submit" class="btn-ut btn-ut-primary btn-en" style="width:100%; padding:10px;">
-                    <i class="bi bi-funnel-fill"></i> FILTER
+                <button type="submit" class="btn-ut btn-ut-primary btn-vn" style="width:100%; padding:10px;">
+                    <i class="bi bi-funnel-fill"></i> LỌC
                 </button>
-                <a href="/Prebuilt" class="btn-ut btn-ut-ghost btn-en mt-2"
+                <a href="/Prebuilt" class="btn-ut btn-ut-ghost btn-vn mt-2"
                    style="width:100%; text-align:center; display:block; padding:8px;">
-                    ✕ CLEAR FILTERS
+                    ✕ XOÁ BỘ LỌC
                 </a>
             </form>
         </aside>
@@ -246,8 +230,7 @@
         <div>
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <div class="product-count-label">
-                    Found <strong>@Model.Count</strong> builds
-                    @if (selSource != null) { <span>· @selSource</span> }
+                    Tìm thấy <strong>@Model.Count</strong> bộ máy
                 </div>
             </div>
 
@@ -256,33 +239,25 @@
                 {
                     <div class="pb-empty dialog-box">
                         <div style="font-size:2.5rem; margin-bottom:12px;">🖥️</div>
-                        <div class="text-pixel-vn text-gold" style="font-size:1.1rem;">No configurations found.</div>
-                        <a href="/Prebuilt" class="btn-ut btn-ut-ghost btn-en mt-3">CLEAR FILTERS</a>
+                        <div class="text-pixel-vn text-gold" style="font-size:1.1rem;">Không tìm thấy cấu hình nào.</div>
+                        <a href="/Prebuilt" class="btn-ut btn-ut-ghost btn-vn mt-3">XOÁ BỘ LỌC</a>
                     </div>
                 }
 
                 @foreach (var p in Model)
                 {
                     var specs = ParseDesc(p.Description);
-                    var srcRaw  = specs.GetValueOrDefault("source", "");
-                    var srcUrl  = specs.GetValueOrDefault("sourceUrl", "#");
                     var cpu     = specs.GetValueOrDefault("cpu", "");
                     var gpu     = specs.GetValueOrDefault("gpu", "");
                     var ram     = specs.GetValueOrDefault("ram", "");
                     var storage = specs.GetValueOrDefault("storage", "");
-                    var badgeCls = srcRaw.ToLower() switch {
-                        var s when s.Contains("ttg")   => "pb-source-ttg",
-                        var s when s.Contains("titek") => "pb-source-titek",
-                        var s when s.Contains("phong") => "pb-source-pv",
-                        _ => "pb-source-ttg"
-                    };
 
                     <div class="pb-card" id="pbcard-@p.Id">
 
 
 
                         <!-- Image -->
-                        <div class="pb-img-wrap">
+                        <a href="/Prebuilt/Details/@p.Id" class="pb-img-wrap" style="text-decoration:none;">
                             @if (p.PrimaryImageUrl != null)
                             {
                                 <img src="@p.PrimaryImageUrl" alt="@p.Name"
@@ -293,11 +268,12 @@
                             {
                                 <div class="pb-img-placeholder">🖥️</div>
                             }
-                        </div>
+                        </a>
 
                         <!-- Body -->
                         <div class="pb-body">
-                            <div class="pb-name" title="@p.Name">@p.Name</div>
+                            <a href="/Prebuilt/Details/@p.Id" class="pb-name" title="@p.Name"
+                               style="text-decoration:none;">@p.Name</a>
                             <div class="pb-price">@p.Price.ToString("N0") ₫</div>
 
                             <!-- Spec chips -->
@@ -323,13 +299,10 @@
                             <!-- Actions -->
                             <div class="pb-actions">
                                 <button class="pb-btn-cart" onclick="addPrebuiltToCart(@p.Id, this)">
-                                    🛒 CART
+                                    🛒 THÊM VÀO GIỎ
                                 </button>
-                                @if (srcUrl != "#")
-                                {
-                                    <a class="pb-btn-link" href="@srcUrl" target="_blank"
-                                       title="View original page @srcRaw">🔗</a>
-                                }
+                                <a class="pb-btn-link" href="/Prebuilt/Details/@p.Id"
+                                   title="Xem chi tiết cấu hình">🔍</a>
                             </div>
                         </div>
 
@@ -345,7 +318,7 @@
 <script>
 async function addPrebuiltToCart(productId, btn) {
     btn.disabled = true;
-    btn.textContent = '⏳ ADDING...';
+    btn.textContent = '⏳ ĐANG THÊM...';
     try {
         const res  = await fetch('/Prebuilt/AddToCart', {
             method: 'POST',
@@ -357,22 +330,22 @@ async function addPrebuiltToCart(productId, btn) {
         });
         const data = await res.json();
         if (data.success) {
-            btn.textContent = '✅ ADDED!';
+            btn.textContent = '✅ ĐÃ THÊM!';
             btn.style.background = 'var(--green-kindness)';
             // Update cart count if badge exists
             const badge = document.querySelector('.cart-count-badge');
             if (badge && data.cartCount) badge.textContent = data.cartCount;
             setTimeout(() => {
-                btn.textContent = '🛒 CART';
+                btn.textContent = '🛒 THÊM VÀO GIỎ';
                 btn.style.background = '';
                 btn.disabled = false;
             }, 2000);
         } else {
-            btn.textContent = '❌ ERROR';
+            btn.textContent = '❌ LỖI';
             btn.disabled = false;
         }
     } catch {
-        btn.textContent = '❌ ERROR';
+        btn.textContent = '❌ LỖI';
         btn.disabled = false;
     }
 }

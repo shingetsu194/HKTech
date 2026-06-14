@@ -419,6 +419,9 @@ public static class DbSeeder
         Dictionary<string, Category> catMap,
         string jsonPath)
     {
+        // Backfill BenchmarkScore/TDP cho sản phẩm CPU/GPU đã seed trước đó (score = 0)
+        await BackfillBenchmarkScores(db, catMap);
+
         var json    = await File.ReadAllTextAsync(jsonPath);
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         var items   = JsonSerializer.Deserialize<List<ScrapedProductDto>>(json, options);
@@ -427,6 +430,30 @@ public static class DbSeeder
         // Lấy danh sách tên sản phẩm đã có để tránh trùng lặp
         var existingNames = (await db.Products.Select(p => p.Name).ToListAsync()).ToHashSet();
 
+        // Cập nhật Description (thông số chi tiết) cho PC build sẵn đã seed trước đó
+        if (catMap.TryGetValue("prebuild", out var pbCat))
+        {
+            var existingPb = await db.Products
+                .Where(p => p.CategoryId == pbCat.Id)
+                .ToDictionaryAsync(p => p.Name);
+            var pbUpdated = 0;
+            foreach (var item in items)
+            {
+                if (item.CategorySlug != "prebuild" || string.IsNullOrWhiteSpace(item.Name)) continue;
+                if (string.IsNullOrEmpty(item.Description) || !item.Description.Contains("fullCpu:")) continue;
+                if (existingPb.TryGetValue(item.Name, out var prod) && prod.Description != item.Description)
+                {
+                    prod.Description = item.Description;
+                    pbUpdated++;
+                }
+            }
+            if (pbUpdated > 0)
+            {
+                await db.SaveChangesAsync();
+                Console.WriteLine($"[Seeder] Đã cập nhật thông số chi tiết cho {pbUpdated} PC build sẵn.");
+            }
+        }
+
         var newProducts = new List<Product>();
 
         foreach (var item in items)
@@ -434,6 +461,19 @@ public static class DbSeeder
             if (!catMap.TryGetValue(item.CategorySlug ?? "", out var category)) continue;
             if (string.IsNullOrWhiteSpace(item.Name)) continue;
             if (existingNames.Contains(item.Name)) continue; // bỏ qua nếu đã có
+
+            // Dữ liệu scrape để benchmark = 0 → ước tính từ tên để FPS Estimator có số liệu
+            var benchmark = item.BenchmarkScore;
+            var tdp       = item.TdpWatt;
+            if (benchmark <= 0)
+            {
+                var est = HardwareSpecEstimator.Estimate(category.Slug, item.Name);
+                if (est != null)
+                {
+                    benchmark = est.BenchmarkScore;
+                    if (tdp <= 0 || tdp == 95 || tdp == 200) tdp = est.TdpWatt; // thay TDP gán cứng từ scraper
+                }
+            }
 
             var product = new Product
             {
@@ -444,8 +484,8 @@ public static class DbSeeder
                 Socket         = item.Socket,
                 RamType        = item.RamType,
                 FormFactor     = item.FormFactor,
-                TdpWatt        = item.TdpWatt,
-                BenchmarkScore = item.BenchmarkScore,
+                TdpWatt        = tdp,
+                BenchmarkScore = benchmark,
                 StockQuantity  = item.StockQuantity > 0 ? item.StockQuantity : 15,
                 IsActive       = item.IsActive,
             };
@@ -472,6 +512,38 @@ public static class DbSeeder
         await db.SaveChangesAsync();
 
         Console.WriteLine($"[Seeder] Đã thêm {newProducts.Count} sản phẩm mới (bỏ qua {existingNames.Count} đã có).");
+    }
+
+    // ── Cập nhật benchmark/TDP cho CPU & GPU đã có trong DB nhưng score = 0 ──
+    private static async Task BackfillBenchmarkScores(
+        ApplicationDbContext db,
+        Dictionary<string, Category> catMap)
+    {
+        if (!catMap.TryGetValue("cpu", out var cpuCat) || !catMap.TryGetValue("gpu", out var gpuCat))
+            return;
+
+        var targets = await db.Products
+            .Where(p => p.BenchmarkScore <= 0 &&
+                        (p.CategoryId == cpuCat.Id || p.CategoryId == gpuCat.Id))
+            .ToListAsync();
+
+        var updated = 0;
+        foreach (var p in targets)
+        {
+            var slug = p.CategoryId == cpuCat.Id ? "cpu" : "gpu";
+            var est  = HardwareSpecEstimator.Estimate(slug, p.Name);
+            if (est == null) continue;
+
+            p.BenchmarkScore = est.BenchmarkScore;
+            if (p.TdpWatt <= 0 || p.TdpWatt == 95 || p.TdpWatt == 200) p.TdpWatt = est.TdpWatt;
+            updated++;
+        }
+
+        if (updated > 0)
+        {
+            await db.SaveChangesAsync();
+            Console.WriteLine($"[Seeder] Đã cập nhật benchmark/TDP cho {updated} CPU/GPU.");
+        }
     }
 
     // DTO khớp với JSON output của scraper.py

@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Checkout";
+    ViewData["Title"] = "Thanh toán";
     var items = ViewBag.CartItems as List<HKTech.Services.CartItem> ?? new();
     var total = (decimal)(ViewBag.Total ?? 0m);
 }
@@ -40,7 +40,7 @@
                         FULL NAME
                     </label>
                     <input type="text" class="form-control-hk" value="@ViewBag.UserName"
-                           placeholder="Recipient full name" readonly style="opacity:0.7;" />
+                           placeholder="Họ và tên người nhận" readonly style="opacity:0.7;" />
                 </div>
 
                 <div class="mb-3">
@@ -48,7 +48,7 @@
                         SHIPPING ADDRESS *
                     </label>
                     <textarea name="shippingAddress" class="form-control-hk" rows="3" required
-                              placeholder="House number, street, ward, district, city/province..."
+                              placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố..."
                               style="resize:vertical; min-height:80px;"></textarea>
                 </div>
 
@@ -57,7 +57,7 @@
                         NOTE (OPTIONAL)
                     </label>
                     <input type="text" name="note" class="form-control-hk"
-                           placeholder="Order notes (optional)..." />
+                           placeholder="Ghi chú cho đơn hàng (nếu có)..." />
                 </div>
 
                 <!-- Payment Method (display only for now) -->
@@ -65,7 +65,7 @@
                     <div class="panel-label-en mb-2" style="font-size:0.38rem;">💵 PAYMENT METHOD</div>
                     <div class="d-flex gap-3">
                         <label class="d-flex align-items-center gap-2 text-mono" style="cursor:pointer;">
-                            <input type="radio" name="payment" value="cod" checked /> COD (Cash on Delivery)
+                            <input type="radio" name="payment" value="cod" checked /> COD (Thanh toán khi nhận hàng)
                         </label>
                     </div>
                 </div>

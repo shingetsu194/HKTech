@@ -13,15 +13,25 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        // Lấy 8 sản phẩm mới nhất (IsActive) để hiển thị "Linh kiện nổi bật"
+        // Linh kiện nổi bật — CHỈ lấy linh kiện, loại bỏ PC build sẵn
         var featured = await _db.Products
             .Include(p => p.Category)
             .Include(p => p.Images)
-            .Where(p => p.IsActive)
+            .Where(p => p.IsActive && p.Category.Slug != "prebuild")
             .OrderByDescending(p => p.Id)
             .Take(8)
             .ToListAsync();
 
+        // PC build sẵn nổi bật — hiển thị ở section riêng
+        var prebuilts = await _db.Products
+            .Include(p => p.Category)
+            .Include(p => p.Images)
+            .Where(p => p.IsActive && p.Category.Slug == "prebuild")
+            .OrderByDescending(p => p.Id)
+            .Take(8)
+            .ToListAsync();
+
+        ViewBag.Prebuilts = prebuilts;
         return View(featured);
     }
 

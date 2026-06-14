@@ -1,7 +1,7 @@
 @using HKTech.Controllers
 @{
-    ViewData["Title"] = "PC Recommendations";
-    ViewData["Description"] = "Enter your budget and needs, and HKTech will auto-suggest the optimal parts combo for you.";
+    ViewData["Title"] = "Gợi ý cấu hình PC";
+    ViewData["Description"] = "Nhập ngân sách và nhu cầu, HKTech sẽ tự động gợi ý combo linh kiện tối ưu nhất cho bạn.";
 
     var combos        = ViewBag.Combos as List<RecommendCombo>;
     var errorMsg      = ViewBag.Error  as string;
@@ -55,12 +55,12 @@
 <div class="container-hk" style="padding: var(--space-xl) 0; max-width: 920px;">
 
     <div class="section-header">
-        <h1 class="section-title-pixel">⭐ RECOMMENDATIONS</h1>
+        <h1 class="section-title-pixel">⭐ GỢI Ý CẤU HÌNH</h1>
         <div class="section-line"></div>
     </div>
 
     <div class="dialog-box mb-4">
-        * The system will auto-find the best component combo based on your budget and needs.
+        * Hệ thống sẽ tự động tìm combo linh kiện phù hợp nhất dựa trên ngân sách và nhu cầu của bạn.
     </div>
 
     <!-- ============================================================
@@ -72,44 +72,44 @@
             <div class="row g-4">
 
                 <div class="col-md-6 form-hk">
-                    <label class="form-label" for="budget">💰 BUDGET (VND)</label>
+                    <label class="form-label" for="budget">💰 NGÂN SÁCH (VNĐ)</label>
                     <select class="form-control-hk form-select-hk" id="budget" name="budget" required>
-                        <option value="">-- Select budget --</option>
-                        <option value="10000000" selected="@(selBudget == 10000000m)">Under 10 million</option>
-                        <option value="15000000" selected="@(selBudget == 15000000m)">10 - 15 million</option>
-                        <option value="20000000" selected="@(selBudget == 20000000m)">15 - 20 million</option>
-                        <option value="30000000" selected="@(selBudget == 30000000m)">20 - 30 million</option>
-                        <option value="50000000" selected="@(selBudget == 50000000m)">30 - 50 million</option>
-                        <option value="99999999" selected="@(selBudget == 99999999m)">Over 50 million</option>
+                        <option value="">-- Chọn ngân sách --</option>
+                        <option value="10000000" selected="@(selBudget == 10000000m)">Dưới 10 triệu</option>
+                        <option value="15000000" selected="@(selBudget == 15000000m)">10 – 15 triệu</option>
+                        <option value="20000000" selected="@(selBudget == 20000000m)">15 – 20 triệu</option>
+                        <option value="30000000" selected="@(selBudget == 30000000m)">20 – 30 triệu</option>
+                        <option value="50000000" selected="@(selBudget == 50000000m)">30 – 50 triệu</option>
+                        <option value="99999999" selected="@(selBudget == 99999999m)">Trên 50 triệu</option>
                     </select>
                 </div>
 
                 <div class="col-md-6 form-hk">
-                    <label class="form-label" for="useCase">🎯 PRIMARY USE</label>
+                    <label class="form-label" for="useCase">🎯 MỤC ĐÍCH SỬ DỤNG</label>
                     <select class="form-control-hk form-select-hk" id="useCase" name="useCase" required>
-                        <option value="">-- Select use case --</option>
-                        <option value="gaming"      selected="@(selUseCase == "gaming")">🎮 AAA Gaming (1080p/1440p)</option>
+                        <option value="">-- Chọn mục đích --</option>
+                        <option value="gaming"      selected="@(selUseCase == "gaming")">🎮 Chơi game AAA (1080p/1440p)</option>
                         <option value="esports"     selected="@(selUseCase == "esports")">⚡ Esports / FPS (144+ FPS)</option>
-                        <option value="office"      selected="@(selUseCase == "office")">💼 Office / Study</option>
-                        <option value="workstation" selected="@(selUseCase == "workstation")">🔬 Graphics / Video Editing</option>
+                        <option value="office"      selected="@(selUseCase == "office")">💼 Văn phòng / Học tập</option>
+                        <option value="workstation" selected="@(selUseCase == "workstation")">🔬 Đồ họa / Video Edit</option>
                         <option value="streaming"   selected="@(selUseCase == "streaming")">📡 Streaming / Content Creator</option>
-                        <option value="balance"     selected="@(selUseCase == "balance")">⚖️ Balanced for everything</option>
+                        <option value="balance"     selected="@(selUseCase == "balance")">⚖️ Cân bằng mọi thứ</option>
                     </select>
                 </div>
 
                 <div class="col-md-6 form-hk">
-                    <label class="form-label" for="ramPref">💾 MINIMUM RAM</label>
+                    <label class="form-label" for="ramPref">💾 DUNG LƯỢNG RAM TỐI THIỂU</label>
                     <select class="form-control-hk form-select-hk" id="ramPref" name="ramPref">
-                        <option value="16" selected="@(selRam == 16)">16 GB (Standard)</option>
-                        <option value="32" selected="@(selRam == 32)">32 GB (High-end)</option>
+                        <option value="16" selected="@(selRam == 16)">16 GB (Tiêu chuẩn)</option>
+                        <option value="32" selected="@(selRam == 32)">32 GB (Cao cấp)</option>
                         <option value="64" selected="@(selRam == 64)">64 GB (Workstation)</option>
                     </select>
                 </div>
 
                 <div class="col-md-6 form-hk">
-                    <label class="form-label" for="notes">📝 EXTRA NOTES (Optional)</label>
+                    <label class="form-label" for="notes">📝 GHI CHÚ THÊM (Tuỳ chọn)</label>
                     <input type="text" class="form-control-hk" id="notes" name="notes"
-                           placeholder="E.g.: Prefer AMD, need a compact case..." maxlength="200" />
+                           placeholder="VD: Thích AMD, cần case nhỏ gọn..." maxlength="200" />
                 </div>
 
             </div>
@@ -137,7 +137,7 @@
     @if (combos == null && string.IsNullOrEmpty(errorMsg))
     {
         <div class="dialog-box mt-4">
-            * Enter your budget and purpose, then click <span class="text-gold">"FIND BUILD"</span> to get recommended setups.
+            * Nhập ngân sách và mục đích rồi bấm <span class="text-gold">"FIND BUILD"</span> để hệ thống gợi ý cấu hình phù hợp.
         </div>
     }
 
@@ -148,12 +148,12 @@
     {
         <div class="mt-5">
             <div class="section-header">
-                <h2 class="section-title-pixel" style="font-size:0.95rem;">📋 RECOMMENDED RESULTS</h2>
+                <h2 class="section-title-pixel" style="font-size:0.95rem;">📋 KẾT QUẢ GỢI Ý</h2>
                 <div class="section-line"></div>
             </div>
             <div class="dialog-box mb-4" style="font-size:0.82rem;">
-                * Found <strong style="color:var(--gold);">@combos!.Count setups</strong> matching your budget.
-                Click <span class="text-gold">ADD TO CART</span> to proceed to checkout.
+                * Tìm được <strong style="color:var(--gold);">@combos!.Count cấu hình</strong> phù hợp với ngân sách.
+                Bấm <span class="text-gold">THÊM VÀO GIỎ</span> để chuyển thẳng sang thanh toán.
             </div>
 
             @foreach (var combo in combos!)
@@ -208,24 +208,24 @@
                     <!-- Footer -->
                     <div class="combo-footer">
                         <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted);">
-                            @combo.Items.Count parts &nbsp;·&nbsp;
+                            @combo.Items.Count linh kiện &nbsp;·&nbsp;
                             @if (combo.Bottleneck <= 10)
                             {
-                                <span style="color:var(--green-kindness);">✅ Well balanced</span>
+                                <span style="color:var(--green-kindness);">✅ Cân bằng tốt</span>
                             }
                             else if (combo.Bottleneck <= 25)
                             {
-                                <span style="color:var(--gold);">⚠ Slight bottleneck</span>
+                                <span style="color:var(--gold);">⚠ Bottleneck nhẹ</span>
                             }
                             else
                             {
-                                <span style="color:var(--red-soul);">❌ High bottleneck</span>
+                                <span style="color:var(--red-soul);">❌ Bottleneck cao</span>
                             }
                         </div>
                         <button class="btn-ut btn-ut-primary btn-en"
                                 onclick="addComboToCart([@Html.Raw(string.Join(",", combo.ProductIds))], this)"
                                 style="padding:8px 20px; font-size:0.45rem;">
-                            🛒 ADD TO CART
+                            🛒 THÊM VÀO GIỎ
                         </button>
                     </div>
                 </div>
@@ -239,7 +239,7 @@
 <script>
     async function addComboToCart(productIds, btn) {
         btn.disabled = true;
-        btn.textContent = '⏳ ADDING...';
+        btn.textContent = '* Đang thêm...';
         try {
             const res  = await fetch('/Recommend/AddComboToCart', {
                 method:  'POST',
@@ -248,17 +248,17 @@
             });
             const data = await res.json();
             if (data.success) {
-                btn.textContent = '✅ ADDED!';
+                btn.textContent = '✅ ĐÃ THÊM!';
                 btn.style.borderColor = 'var(--green-kindness)';
                 btn.style.color       = 'var(--green-kindness)';
                 const badge = document.getElementById('cartCountBadge');
                 if (badge) { badge.textContent = data.cartCount; badge.style.display = 'inline'; }
             } else {
-                btn.textContent = '❌ ERROR';
+                btn.textContent = '❌ LỖI';
                 btn.disabled    = false;
             }
         } catch {
-            btn.textContent = '❌ CONNECTION ERROR';
+            btn.textContent = '❌ LỖI KẾT NỐI';
             btn.disabled    = false;
         }
     }

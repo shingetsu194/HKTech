@@ -1,7 +1,7 @@
 @model List<HKTech.Models.Product>
 @{
-    ViewData["Title"] = "Home";
-    ViewData["Description"] = "HKTech - Smart PC building with Compatibility Guard, Bottleneck Analyzer & FPS Estimator real-time.";
+    ViewData["Title"] = "Trang chủ";
+    ViewData["Description"] = "HKTech - Tự build PC thông minh với Compatibility Guard, Bottleneck Analyzer & FPS Estimator real-time.";
 }
 
 <!-- ============================================================
@@ -19,15 +19,15 @@
                     <span class="en"> THE PARTS.</span>
                 </h1>
                 <p class="hero-subtitle">
-                    * Smart PC building. Auto-compatibility check.
-                    Real-time bottleneck analyzer &amp; FPS estimator.
+                    * Build PC thông minh. Kiểm tra tương thích tự động.
+                    Bottleneck analyzer &amp; FPS estimator real-time.
                 </p>
                 <div class="hero-cta">
                     <a asp-controller="Build" asp-action="Index" class="btn-ut btn-ut-primary btn-vn" id="hero-build-btn">
-                        <i class="bi bi-tools"></i> BUILD PC
+                        <i class="bi bi-tools"></i> TỰ BUILD PC
                     </a>
                     <a asp-controller="Recommend" asp-action="Index" class="btn-ut btn-ut-outline btn-vn" id="hero-recommend-btn">
-                        <i class="bi bi-stars"></i> RECOMMEND ME
+                        <i class="bi bi-stars"></i> GỢI Ý CHO TÔI
                     </a>
                 </div>
             </div>
@@ -150,21 +150,21 @@
                 <span class="feature-icon">🛡️</span>
                 <div class="feature-title-en">COMPATIBILITY GUARD</div>
                 <p class="feature-desc">
-                    Warns instantly when CPU socket mismatches motherboard, RAM type is wrong, or PSU lacks wattage. Never buy the wrong parts again.
+                    Cảnh báo ngay khi socket CPU không khớp mainboard, RAM sai type, hay nguồn thiếu watt. Không bao giờ mua nhầm nữa.
                 </p>
             </div>
             <div class="feature-card" id="feature-bottleneck">
                 <span class="feature-icon">📊</span>
                 <div class="feature-title-en">BOTTLENECK ANALYZER</div>
                 <p class="feature-desc">
-                    Analyzes bottleneck % between CPU and GPU. Shows visual bars and suggests optimal upgrades so they don't 'hold back' each other.
+                    Phân tích % bottleneck giữa CPU và GPU. Hiển thị thanh trực quan và gợi ý nâng cấp tối ưu để không "kìm hãm" nhau.
                 </p>
             </div>
             <div class="feature-card" id="feature-fps">
                 <span class="feature-icon">🎮</span>
                 <div class="feature-title-en">FPS ESTIMATOR</div>
                 <p class="feature-desc">
-                    Estimates FPS at 1080p / 1440p / 4K for games: Valorant, CS2, GTA V, Cyberpunk 2077... Know if your rig will run smooth beforehand.
+                    Ước tính FPS ở 1080p / 1440p / 4K cho các game: Valorant, CS2, GTA V, Cyberpunk 2077... Biết trước máy chạy mượt không.
                 </p>
             </div>
         </div>
@@ -177,10 +177,10 @@
 <section class="py-5">
     <div class="container-hk">
         <div class="section-header">
-            <h2 class="section-title-pixel">COMPONENT CATEGORIES</h2>
+            <h2 class="section-title-pixel">DANH MỤC LINH KIỆN</h2>
             <div class="section-line"></div>
             <a asp-controller="Product" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-products-btn">
-                SEE ALL →
+                XEM TẤT CẢ →
             </a>
         </div>
         <div class="row g-3">
@@ -191,8 +191,8 @@
                     new { Icon = "🎮", Name = "GPU / VGA",  Slug = "gpu",        Count = "..." },
                     new { Icon = "🧩", Name = "Mainboard",  Slug = "mainboard",  Count = "..." },
                     new { Icon = "💾", Name = "RAM",        Slug = "ram",        Count = "..." },
-                    new { Icon = "⚡", Name = "Power Supply",Slug = "psu",        Count = "..." },
-                    new { Icon = "🗄️", Name = "Case",       Slug = "case",       Count = "..." },
+                    new { Icon = "⚡", Name = "Nguồn PSU",  Slug = "psu",        Count = "..." },
+                    new { Icon = "🗄️", Name = "Case / Vỏ", Slug = "case",       Count = "..." },
                 };
             }
             @foreach (var cat in categories)
@@ -215,10 +215,10 @@
 <section class="py-5" style="background: var(--bg-cave);">
     <div class="container-hk">
         <div class="section-header">
-            <h2 class="section-title-pixel">FEATURED COMPONENTS</h2>
+            <h2 class="section-title-pixel">LINH KIỆN NỔI BẬT</h2>
             <div class="section-line"></div>
             <a asp-controller="Product" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-featured-btn">
-                SEE ALL →
+                XEM TẤT CẢ →
             </a>
         </div>
 
@@ -254,7 +254,7 @@
                             <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"
                                class="btn-ut btn-ut-outline btn-en" style="font-size:0.7rem; padding:6px 12px;"
                                id="btn-featured-detail-@p.Id">
-                                DETAILS
+                                CHI TIẾT
                             </a>
                             <a asp-controller="Build" asp-action="Index"
                                class="btn-ut btn-ut-primary btn-en" style="font-size:0.7rem; padding:6px 12px;"
@@ -269,7 +269,7 @@
         else
         {
             <div class="dialog-box mt-2" style="max-width:500px;">
-                * No products available yet. Admin should add products via
+                * Chưa có sản phẩm nào. Admin hãy thêm sản phẩm qua
                 <a asp-controller="Account" asp-action="AdminLogin"
                    style="color:var(--gold);">Admin Panel</a>.
             </div>
@@ -278,21 +278,119 @@
 </section>
 
 <!-- ============================================================
+     PC BUILD SẴN
+     ============================================================ -->
+@{
+    var prebuilts = ViewBag.Prebuilts as List<HKTech.Models.Product> ?? new List<HKTech.Models.Product>();
+}
+@if (prebuilts.Any())
+{
+    <section class="py-5" style="background: var(--bg-void);">
+        <div class="container-hk">
+            <div class="section-header">
+                <h2 class="section-title-pixel">PC BUILD SẴN</h2>
+                <div class="section-line"></div>
+                <a asp-controller="Prebuilt" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-prebuilt-btn">
+                    XEM TẤT CẢ →
+                </a>
+            </div>
+
+            <div class="products-grid" id="prebuilt-products-grid">
+                @foreach (var p in prebuilts)
+                {
+                    <div class="product-card" id="prebuilt-card-@p.Id">
+                        <a href="/Prebuilt/Details/@p.Id" class="card-img-wrap"
+                           style="height:200px; background:#111; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                            @if (p.PrimaryImageUrl != null)
+                            {
+                                <img src="@p.PrimaryImageUrl" alt="@p.Name"
+                                     style="width:100%; height:100%; object-fit:contain; padding:12px;" />
+                            }
+                            else
+                            {
+                                <span style="font-size:3rem;">🖥️</span>
+                            }
+                        </a>
+                        <div class="card-body-hk">
+                            <div class="text-mono" style="font-size:0.7rem; color:var(--text-muted); margin-bottom:4px;">
+                                🖥️ PC Build Sẵn
+                            </div>
+                            <a href="/Prebuilt/Details/@p.Id"
+                               style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-primary); margin-bottom:8px; line-height:1.4; display:block; text-decoration:none;">
+                                @p.Name
+                            </a>
+                            <div class="text-pixel" style="font-size:0.6rem; color:var(--gold); text-shadow:var(--glow-gold);">
+                                @p.Price.ToString("N0")₫
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="/Prebuilt/Details/@p.Id"
+                               class="btn-ut btn-ut-outline btn-en" style="font-size:0.7rem; padding:6px 12px;"
+                               id="btn-prebuilt-detail-@p.Id">
+                                CHI TIẾT
+                            </a>
+                            <button class="btn-ut btn-ut-primary btn-vn" style="font-size:0.95rem; padding:6px 12px;"
+                                    onclick="addPrebuiltToCart(@p.Id, this)"
+                                    id="btn-prebuilt-cart-@p.Id">
+                                🛒 THÊM
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ============================================================
      CALL TO ACTION
      ============================================================ -->
 <section class="py-5 text-center" style="border-top: var(--border-gold); background: var(--bg-void);">
     <div class="container-hk">
         <div class="text-vn-mono mb-3" style="font-size:0.95rem; text-shadow: var(--glow-gold);">
-            ★ ARE YOU READY? ★
+            ★ ĐÃ SẴN SÀNG? ★
         </div>
         <h2 class="text-pixel-vn text-white mb-4" style="font-size:2rem;">
-            Start building your dream PC today
+            Bắt đầu xây dựng bộ PC trong mơ của bạn ngay hôm nay
         </h2>
         <a asp-controller="Build" asp-action="Index" class="btn-ut btn-ut-primary btn-vn me-3" id="cta-build-btn">
-            <i class="bi bi-tools"></i> START BUILDING
+            <i class="bi bi-tools"></i> BUILD PC NGAY
         </a>
         <a asp-controller="Account" asp-action="Register" class="btn-ut btn-ut-outline btn-vn" id="cta-register-btn">
-            <i class="bi bi-person-plus"></i> CREATE ACCOUNT
+            <i class="bi bi-person-plus"></i> TẠO TÀI KHOẢN
         </a>
     </div>
 </section>
+
+@section Scripts {
+<script>
+async function addPrebuiltToCart(productId, btn) {
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = '⏳ ĐANG THÊM...';
+    try {
+        const res = await fetch('/Prebuilt/AddToCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? ''
+            },
+            body: `id=${productId}`
+        });
+        const data = await res.json();
+        if (data.success) {
+            btn.textContent = '✅ ĐÃ THÊM!';
+            btn.style.background = 'var(--green-kindness)';
+            const badge = document.querySelector('.cart-count-badge');
+            if (badge && data.cartCount) badge.textContent = data.cartCount;
+            setTimeout(() => { btn.textContent = original; btn.style.background = ''; btn.disabled = false; }, 2000);
+        } else {
+            btn.textContent = '❌ LỖI'; btn.disabled = false;
+        }
+    } catch {
+        btn.textContent = '❌ LỖI'; btn.disabled = false;
+    }
+}
+</script>
+@Html.AntiForgeryToken()
+}

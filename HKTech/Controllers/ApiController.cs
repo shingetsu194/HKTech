@@ -7,6 +7,7 @@
 
 using HKTech.Data;
 using HKTech.Models;
+using HKTech.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -90,17 +91,10 @@ namespace HKTech.Controllers
             }
 
             // ── FPS Table ───────────────────────────────────────────────
-            var fpsTable = CalcFpsTable(cpuScore, gpuScore);
+            var fpsTable = FpsCalculator.Calc(cpuScore, gpuScore);
 
             // ── Build badge ─────────────────────────────────────────────
-            var avgScore = (cpuScore + gpuScore) / 2;
-            var badge = avgScore switch
-            {
-                < 200  => "BUDGET BUILD",
-                < 500  => "MID-RANGE BUILD",
-                < 800  => "HIGH-END GAMING",
-                _      => "ENTHUSIAST",
-            };
+            var badge = FpsCalculator.Badge(cpuScore, gpuScore);
 
             return Ok(new
             {
@@ -200,46 +194,9 @@ namespace HKTech.Controllers
         }
 
         // ================================================================
-        // FPS TABLE CALCULATION
-        // BenchmarkScore scale giả định 0–3000
-        // (mid-range ~700-1000, high-end ~1500-2500)
-        // ================================================================
-        private static List<FpsRow> CalcFpsTable(int cpuScore, int gpuScore)
-        {
-            // (tên game, trọng số CPU, trọng số GPU, FPS tối đa ở 1080p Ultra)
-            var games = new (string Name, float CpuW, float GpuW, int Max1080)[]
-            {
-                ("Valorant",         0.55f, 0.45f, 600),
-                ("CS2",              0.60f, 0.40f, 500),
-                ("GTA V",            0.40f, 0.60f, 200),
-                ("Cyberpunk 2077",   0.25f, 0.75f, 150),
-                ("Elden Ring",       0.35f, 0.65f, 180),
-                ("Minecraft",        0.70f, 0.30f, 400),
-                ("Red Dead 2",       0.35f, 0.65f, 160),
-                ("FC 25",            0.50f, 0.50f, 300),
-                ("Hogwarts Legacy",  0.30f, 0.70f, 120),
-                ("The Witcher 3",    0.35f, 0.65f, 220),
-            };
-
-            // Chuẩn hóa về 0-1 (2500 = điểm chuẩn max)
-            const float ScoreBase = 2500f;
-
-            return games.Select(g =>
-            {
-                var weighted = Math.Min(cpuScore * g.CpuW + gpuScore * g.GpuW, ScoreBase);
-                var ratio    = weighted / ScoreBase;
-                var f1080    = (int)Math.Round(ratio * g.Max1080);
-                var f1440    = (int)Math.Round(f1080 * 0.65);
-                var f4k      = (int)Math.Round(f1080 * 0.37);
-                return new FpsRow(g.Name, f1080, f1440, f4k);
-            }).ToList();
-        }
-
-        // ================================================================
         // VALUE OBJECTS
         // ================================================================
         private record CompatResult(bool? Ok, string Message);
-        private record FpsRow(string Game, int Fps1080, int Fps1440, int Fps4k);
     }
 
     public class PerformanceRequest

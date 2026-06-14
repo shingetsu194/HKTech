@@ -273,6 +273,17 @@
             requestAnimationFrame(function () { ov.classList.add('pg-loaded'); });
         });
 
+        // Fix màn hình đen khi bấm Back/Forward (trang khôi phục từ bfcache),
+        // chạy lại hiệu ứng lộ trang để giữ animation (thêm pg-loaded đồng bộ
+        // ngay sau reflow để transition chắc chắn chạy).
+        window.addEventListener('pageshow', function (e) {
+            if (e.persisted) {
+                ov.classList.remove('pg-leaving', 'pg-loaded');
+                void ov.offsetWidth;
+                ov.classList.add('pg-loaded');
+            }
+        });
+
         function leave(go) {
             ov.classList.remove('pg-loaded');
             ov.classList.add('pg-leaving');

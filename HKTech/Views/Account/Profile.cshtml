@@ -1,34 +1,34 @@
 @model HKTech.Models.ApplicationUser
 @{
-    ViewData["Title"] = "My Profile";
+    ViewData["Title"] = "Hồ sơ của tôi";
 }
 
 <div class="container-hk" style="max-width:680px; padding: var(--space-xl) 0;">
     <div class="section-header">
-        <h1 class="section-title-pixel">👤 PROFILE</h1>
+        <h1 class="section-title-pixel">👤 HỒ SƠ</h1>
         <div class="section-line"></div>
     </div>
 
     <div style="background: var(--bg-surface); border: var(--border-gold); padding: var(--space-xl);">
         <div class="row g-3 text-mono">
-            <div class="col-sm-4" style="color:var(--text-muted);">FULL NAME</div>
+            <div class="col-sm-4" style="color:var(--text-muted);">HỌ TÊN</div>
             <div class="col-sm-8" style="color:var(--text-primary);">@(Model?.FullName ?? "—")</div>
 
             <div class="col-sm-4" style="color:var(--text-muted);">EMAIL</div>
             <div class="col-sm-8" style="color:var(--gold);">@Model?.Email</div>
 
-            <div class="col-sm-4" style="color:var(--text-muted);">ADDRESS</div>
-            <div class="col-sm-8" style="color:var(--text-primary);">@(Model?.Address ?? "Not updated")</div>
+            <div class="col-sm-4" style="color:var(--text-muted);">ĐỊA CHỈ</div>
+            <div class="col-sm-8" style="color:var(--text-primary);">@(Model?.Address ?? "Chưa cập nhật")</div>
         </div>
 
         <hr style="border-color:#333; margin: var(--space-lg) 0;" />
 
         <div class="d-flex gap-3">
             <a asp-controller="Order" asp-action="History" class="btn-ut btn-ut-outline btn-vn">
-                📦 My Orders
+                📦 Đơn hàng của tôi
             </a>
             <a asp-controller="Build" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn">
-                ⚙️ Create New Build
+                ⚙️ Tạo Build mới
             </a>
         </div>
     </div>

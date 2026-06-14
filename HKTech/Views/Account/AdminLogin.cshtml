@@ -22,7 +22,7 @@
     <div class="battle-dialog">
         @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
         {
-            <p>System authentication denied.</p>
+            <p>Hệ thống từ chối xác thực.</p>
             @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
             {
                 <div class="battle-error">@error.ErrorMessage</div>
@@ -30,8 +30,8 @@
         }
         else
         {
-            <p>System requires identity verification.</p>
-            <p>Enter administrator credentials to continue.<span class="dialog-cursor"></span></p>
+            <p>Hệ thống yêu cầu xác thực danh tính.</p>
+            <p>Nhập thông tin quản trị viên để tiếp tục.<span class="dialog-cursor"></span></p>
         }
     </div>
 
@@ -68,7 +68,8 @@
     </form>
 
     <!-- ── Back link ── -->
-        <a asp-controller="Account" asp-action="LoginSelect">← Go back</a>
+    <div class="battle-back">
+        <a asp-controller="Account" asp-action="LoginSelect">← Quay lại</a>
     </div>
 
 </div>

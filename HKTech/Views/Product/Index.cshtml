@@ -1,7 +1,7 @@
 @model List<HKTech.Models.Product>
 @{
-    ViewData["Title"] = "Components";
-    ViewData["Description"] = "Explore all computer components: CPU, GPU, RAM, Mainboard, PSU, Case at HKTech.";
+    ViewData["Title"] = "Danh sách Linh kiện";
+    ViewData["Description"] = "Khám phá toàn bộ linh kiện máy tính: CPU, GPU, RAM, Mainboard, PSU, Case tại HKTech.";
 }
 
 
@@ -92,7 +92,7 @@
 
 <div class="container-hk" style="padding-top: var(--space-xl);">
     <div class="section-header">
-        <h1 class="section-title-pixel">🖥️ COMPONENTS</h1>
+        <h1 class="section-title-pixel">🖥️ LINH KIỆN</h1>
         <div class="section-line"></div>
     </div>
 
@@ -105,7 +105,7 @@
             <div class="filter-group">
                 <div class="filter-group-label">CATEGORY</div>
                 <a class="filter-chip active" asp-controller="Product" asp-action="Index" id="cat-all">
-                    All
+                    Tất cả
                 </a>
                 @{
                     var cats = new[]
@@ -117,7 +117,7 @@
                         new { Slug = "psu",       Name = "⚡ Nguồn PSU" },
                         new { Slug = "case",      Name = "🗄️ Case / Vỏ" },
                         new { Slug = "storage",   Name = "💿 Ổ cứng / SSD" },
-                        new { Slug = "cooling",   Name = "❄️ Tản nhiệt" }
+                        new { Slug = "cooling",   Name = "❄️ Tản nhiệt" },
                     };
                 }
                 @foreach (var cat in cats)
@@ -132,8 +132,8 @@
             <div class="filter-group form-hk">
                 <div class="filter-group-label">PRICE</div>
                 <div style="display:flex; gap:8px; flex-direction:column;">
-                    <input type="number" class="form-control-hk" placeholder="Min Price" id="priceMin" style="font-size:0.8rem;" />
-                    <input type="number" class="form-control-hk" placeholder="Max Price" id="priceMax" style="font-size:0.8rem;" />
+                    <input type="number" class="form-control-hk" placeholder="Giá từ (VND)" id="priceMin" style="font-size:0.8rem;" />
+                    <input type="number" class="form-control-hk" placeholder="Giá đến (VND)" id="priceMax" style="font-size:0.8rem;" />
                     <button class="btn-ut btn-ut-outline btn-en" onclick="applyPriceFilter()"
                             style="width:100%; justify-content:center;">
                         APPLY
@@ -147,14 +147,14 @@
             <!-- Toolbar -->
             <div class="product-toolbar" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
                 <div class="search-bar form-hk" style="flex:1; min-width:180px;">
-                    <input type="text" class="form-control-hk" placeholder="🔍 Search parts..."
+                    <input type="text" class="form-control-hk" placeholder="🔍 Tìm linh kiện..."
                            id="productSearchInput" oninput="searchProducts(this.value)" />
                 </div>
                 <select class="sort-select" id="sortSelect" onchange="sortProducts(this.value)">
-                    <option value="default">Sort: Default</option>
-                    <option value="price-asc">Price: Low → High</option>
-                    <option value="price-desc">Price: High → Low</option>
-                    <option value="name-asc">Name: A → Z</option>
+                    <option value="default">Sắp xếp: Mặc định</option>
+                    <option value="price-asc">Giá: Thấp → Cao</option>
+                    <option value="price-desc">Giá: Cao → Thấp</option>
+                    <option value="name-asc">Tên: A → Z</option>
                 </select>
                 <div class="product-count-label" id="productCountLabel">
                     Found <strong>@(Model?.Count ?? 0)</strong> products
@@ -195,23 +195,23 @@
                                 }
                                 @if (p.StockQuantity <= 0)
                                 {
-                                    <div class="stock-out">● Out of stock</div>
+                                    <div class="stock-out">● Hết hàng</div>
                                 }
                                 else if (p.StockQuantity <= 5)
                                 {
-                                    <div class="stock-low">⚠ Only @p.StockQuantity left</div>
+                                    <div class="stock-low">⚠ Còn @p.StockQuantity cái</div>
                                 }
                             </div>
                             <div class="card-actions">
                                 <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"
                                    class="btn-ut btn-ut-outline btn-en" style="font-size:0.7rem; padding:6px 12px;"
                                    id="btn-detail-@p.Id">
-                                    DETAILS
+                                    CHI TIẾT
                                 </a>
                                 <button class="btn-ut btn-ut-primary btn-en" style="font-size:0.7rem; padding:6px 12px;"
                                         onclick="addToCartQuick(@p.Id, '@p.Name.Replace("'", "\\'")')"
                                         id="btn-cart-@p.Id">
-                                    + CART
+                                    + GIỎ
                                 </button>
                             </div>
                         </div>
@@ -220,7 +220,7 @@
                 else
                 {
                     <div class="dialog-box" style="grid-column:1/-1;">
-                        * No products match your filters.
+                        * Không tìm thấy sản phẩm nào phù hợp với bộ lọc.
                     </div>
                 }
             </div>
@@ -237,7 +237,7 @@
                         <a asp-controller="Product" asp-action="Index"
                            asp-route-page="@(page-1)" asp-route-category="@ViewBag.Category"
                            asp-route-search="@ViewBag.Search" asp-route-sort="@ViewBag.Sort"
-                           class="btn-ut btn-ut-ghost btn-en" style="font-size:0.75rem;">← PREV</a>
+                           class="btn-ut btn-ut-ghost btn-en" style="font-size:0.75rem;">← TRƯỚC</a>
                     }
                     @for (int i = 1; i <= totalPages; i++)
                     {
@@ -252,12 +252,12 @@
                         <a asp-controller="Product" asp-action="Index"
                            asp-route-page="@(page+1)" asp-route-category="@ViewBag.Category"
                            asp-route-search="@ViewBag.Search" asp-route-sort="@ViewBag.Sort"
-                           class="btn-ut btn-ut-ghost btn-en" style="font-size:0.75rem;">NEXT →</a>
+                           class="btn-ut btn-ut-ghost btn-en" style="font-size:0.75rem;">SAU →</a>
                     }
                 </div>
             }
             <div class="text-mono mt-2" style="font-size:0.75rem; color:var(--text-muted);">
-                Showing @((List<HKTech.Models.Product>)Model!).Count() / @ViewBag.TotalCount products
+                Hiển thị @((List<HKTech.Models.Product>)Model!).Count() / @ViewBag.TotalCount sản phẩm
             </div>
         </div>
 
@@ -320,7 +320,7 @@
             });
             const data = await res.json();
             showQuickToast(
-                data.success ? `✅ Added to cart!` : `❌ ${data.message}`,
+                data.success ? `✅ Đã thêm vào giỏ!` : `❌ ${data.message}`,
                 data.success ? 'ok' : 'error'
             );
             if (data.success) {
@@ -328,7 +328,7 @@
                 if (badge) { badge.textContent = data.cartCount; badge.style.display = 'inline'; }
             }
         } catch {
-            showQuickToast('❌ Server connection error.', 'error');
+            showQuickToast('❌ Lỗi kết nối máy chủ.', 'error');
         }
     }
 

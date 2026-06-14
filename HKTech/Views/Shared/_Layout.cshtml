@@ -50,33 +50,34 @@
                 <ul class="nav-links" id="mainNav">
                     <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Home" asp-action="Index">
-                            <i class="bi bi-house-fill"></i> HOME
+                            <i class="bi bi-house-fill"></i> TRANG CHỦ
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Product" asp-action="Index">
-                            <i class="bi bi-cpu"></i> COMPONENTS
+                            <i class="bi bi-cpu"></i> LINH KIỆN
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Build" asp-action="Index">
-                            <i class="bi bi-tools"></i> BUILD PC
+                            <i class="bi bi-tools"></i> TỰ BUILD PC
                             <span class="save-badge">NEW</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Prebuilt" asp-action="Index">
-                            <i class="bi bi-pc-display"></i> PREBUILTS
+                            <i class="bi bi-pc-display"></i> PC BUILD SẴN
+                            <span class="save-badge">NEW</span>
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Recommend" asp-action="Index">
-                            <i class="bi bi-stars"></i> RECOMMENDATIONS
+                            <i class="bi bi-stars"></i> GỢI Ý CẤU HÌNH
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link-hk position-relative" asp-controller="Cart" asp-action="Index">
-                            <i class="bi bi-cart3"></i> CART
+                            <i class="bi bi-cart3"></i> GIỎ HÀNG
                             @{
                                 var cartCount = _cartSvc.GetItemCount();
                             }
@@ -104,7 +105,7 @@
                             <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="nav-link-hk border-0 bg-transparent" style="cursor:pointer">
-                                    <i class="bi bi-box-arrow-right"></i> LOGOUT
+                                    <i class="bi bi-box-arrow-right"></i> ĐĂNG XUẤT
                                 </button>
                             </form>
                         </li>
@@ -185,35 +186,36 @@
                             </svg>HKTech PC Builder
                         </div>
                         <div class="footer-tagline mt-2">
-                            * Where every component fills you with DETERMINATION.
+                            * Nơi mọi linh kiện tìm thấy DETERMINATION của mình.
                         </div>
                     </div>
                     <div class="col-md-2 mb-4">
-                        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem; letter-spacing:2px;">EXPLORE</div>
+                        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem; letter-spacing:2px;">KHÁM PHÁ</div>
                         <ul class="list-unstyled">
-                            <li><a asp-controller="Product" asp-action="Index" class="text-muted-hk text-mono text-decoration-none hover-gold" style="font-size:0.85rem;">Components</a></li>
-                            <li><a asp-controller="Build" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Build PC</a></li>
-                            <li><a asp-controller="Recommend" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Recommendations</a></li>
+                            <li><a asp-controller="Product" asp-action="Index" class="text-muted-hk text-mono text-decoration-none hover-gold" style="font-size:0.85rem;">Linh kiện</a></li>
+                            <li><a asp-controller="Build" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Tự Build PC</a></li>
+                            <li><a asp-controller="Prebuilt" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">PC Build Sẵn</a></li>
+                            <li><a asp-controller="Recommend" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Gợi ý cấu hình</a></li>
                         </ul>
                     </div>
                     <div class="col-md-2 mb-4">
-                        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem; letter-spacing:2px;">ACCOUNT</div>
+                        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem; letter-spacing:2px;">TÀI KHOẢN</div>
                         <ul class="list-unstyled">
-                            <li><a asp-controller="Account" asp-action="Register" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Register</a></li>
-                            <li><a asp-controller="Account" asp-action="Login" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Login</a></li>
-                            <li><a asp-controller="Order" asp-action="History" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Orders</a></li>
+                            <li><a asp-controller="Account" asp-action="Register" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Đăng ký</a></li>
+                            <li><a asp-controller="Account" asp-action="Login" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Đăng nhập</a></li>
+                            <li><a asp-controller="Order" asp-action="History" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Đơn hàng</a></li>
                         </ul>
                     </div>
                     <div class="col-md-4 mb-4">
                         <div class="text-pixel text-gold mb-2" style="font-size:0.5rem; letter-spacing:1px;">SMART BUILD ⭐</div>
                         <div class="footer-tagline">
-                            Real-time compatibility check, bottleneck analysis & FPS estimation as you pick parts.
+                            Kiểm tra tương thích real-time, phân tích bottleneck & ước tính FPS ngay khi bạn chọn linh kiện.
                         </div>
                     </div>
                 </div>
 
                 <div class="footer-bottom">
-                    <span>© 2026 HKTech — Web Development Project | HUTECH</span>
+                    <span>© 2026 HKTech — Đồ án Lập trình Web | HUTECH</span>
                     <span class="save-point-text">★ SAVE POINT ★</span>
                     <span>Made with
                         <svg width="12" height="9" viewBox="0 0 8 6" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle; margin:0 2px;">
@@ -276,6 +278,20 @@
         ov.classList.add(getAnim(location.pathname));
         requestAnimationFrame(function () {
             requestAnimationFrame(function () { ov.classList.add('pg-loaded'); });
+        });
+
+        // Khi quay lại bằng nút Back/Forward, trình duyệt khôi phục trang từ
+        // bfcache mà KHÔNG chạy lại script → overlay "pg-leaving" còn nguyên
+        // gây màn hình đen. Reset về trạng thái phủ rồi chạy LẠI hiệu ứng lộ
+        // trang để giữ animation. Thêm pg-loaded ĐỒNG BỘ ngay sau reflow —
+        // reflow đã chốt trạng thái phủ làm mốc nên transition chắc chắn chạy
+        // (double rAF dễ bị trình duyệt gộp frame trên trang bfcache → mất hiệu ứng).
+        window.addEventListener('pageshow', function (e) {
+            if (e.persisted) {
+                ov.classList.remove('pg-leaving', 'pg-loaded'); // về trạng thái phủ
+                void ov.offsetWidth;                            // ép reflow, chốt mốc
+                ov.classList.add('pg-loaded');                  // lộ trang (có transition)
+            }
         });
 
         function leave(go) {
