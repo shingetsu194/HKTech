@@ -92,6 +92,12 @@ app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
+// --- Route: Secret Admin Login (hidden URL, not linked on public site) ---
+app.MapControllerRoute(
+    name: "adminSecret",
+    pattern: "hktech-secure-admin",
+    defaults: new { controller = "Account", action = "AdminLogin" });
+
 // --- Route: Default ---
 app.MapControllerRoute(
     name: "default",
