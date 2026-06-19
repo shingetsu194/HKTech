@@ -92,11 +92,9 @@ app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
-// --- Route: Secret Admin Login (hidden URL, not linked on public site) ---
-app.MapControllerRoute(
-    name: "adminSecret",
-    pattern: "hktech-secure-admin",
-    defaults: new { controller = "Account", action = "AdminLogin" });
+// --- Route bí mật cho Admin Login đã chuyển sang attribute routing trên
+//     AccountController.AdminLogin ([HttpGet/HttpPost("hktech-secure-admin")]),
+//     nhờ đó /Account/AdminLogin tự động trả 404 — không cần route ở đây.
 
 // --- Route: Default ---
 app.MapControllerRoute(

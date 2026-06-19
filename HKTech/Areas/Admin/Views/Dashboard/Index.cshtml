@@ -19,7 +19,7 @@
     <div class="col-6 col-md-3">
         <div class="admin-stat-card">
             <div class="stat-icon">💰</div>
-            <div class="stat-value" style="font-size:0.85rem;">
+            <div class="stat-value" style="font-size:1.3rem;">
                 @((ViewBag.TotalRevenue as decimal? ?? 0).ToString("N0")) ₫
             </div>
             <div class="stat-label">Doanh thu (Đã giao)</div>
@@ -78,7 +78,7 @@
             <div class="admin-card-header d-flex justify-content-between align-items-center">
                 <span class="text-pixel-vn text-gold" style="font-size:1rem;">📋 Đơn hàng gần đây</span>
                 <a asp-area="Admin" asp-controller="OrderAdmin" asp-action="Index"
-                   class="btn-ut btn-ut-ghost btn-en" style="font-size:0.38rem; padding:4px 10px;">
+                   class="btn-ut btn-ut-ghost btn-vn-sm" style="font-size:0.38rem; padding:4px 10px;">
                     XEM TẤT CẢ
                 </a>
             </div>
@@ -111,7 +111,7 @@
                                         </a>
                                     </td>
                                     <td>@(order.User?.FullName ?? order.User?.Email)</td>
-                                    <td style="white-space:nowrap; font-family:var(--font-pixel); font-size:0.42rem; color:var(--gold);">
+                                    <td style="white-space:nowrap; font-family:var(--font-pixel-vn); font-size:0.95rem; color:var(--gold);">
                                         @order.TotalPrice.ToString("N0") ₫
                                     </td>
                                     <td>
@@ -160,7 +160,7 @@
                                 <div class="text-mono" style="font-size:0.78rem; color:var(--text-primary);">@p.Name</div>
                                 <div class="text-mono" style="font-size:0.7rem; color:var(--text-muted);">@p.Category.Name</div>
                             </div>
-                            <span style="font-family:var(--font-pixel); font-size:0.55rem;
+                            <span style="font-family:var(--font-pixel-vn); font-size:1rem;
                                          color:@(p.StockQuantity == 0 ? "var(--red-soul)" : "var(--gold)");">
                                 @p.StockQuantity còn
                             </span>
@@ -168,7 +168,7 @@
                     }
                     <div class="p-2 text-center">
                         <a asp-area="Admin" asp-controller="ProductAdmin" asp-action="Index"
-                           class="btn-ut btn-ut-ghost btn-en" style="font-size:0.38rem; padding:4px 10px;">
+                           class="btn-ut btn-ut-ghost btn-vn-sm" style="font-size:0.38rem; padding:4px 10px;">
                             QUẢN LÝ KHO
                         </a>
                     </div>

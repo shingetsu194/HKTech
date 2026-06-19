@@ -189,10 +189,10 @@
                 {
                     new { Icon = "🧠", Name = "CPU",        Slug = "cpu",        Count = "..." },
                     new { Icon = "🎮", Name = "GPU / VGA",  Slug = "gpu",        Count = "..." },
-                    new { Icon = "🧩", Name = "Mainboard",  Slug = "mainboard",  Count = "..." },
+                    new { Icon = "⚙️", Name = "Mainboard",  Slug = "mainboard",  Count = "..." },
                     new { Icon = "💾", Name = "RAM",        Slug = "ram",        Count = "..." },
                     new { Icon = "⚡", Name = "Nguồn PSU",  Slug = "psu",        Count = "..." },
-                    new { Icon = "🗄️", Name = "Case / Vỏ", Slug = "case",       Count = "..." },
+                    new { Icon = "📦", Name = "Case / Vỏ", Slug = "case",       Count = "..." },
                 };
             }
             @foreach (var cat in categories)
@@ -269,9 +269,7 @@
         else
         {
             <div class="dialog-box mt-2" style="max-width:500px;">
-                * Chưa có sản phẩm nào. Admin hãy thêm sản phẩm qua
-                <a asp-controller="Account" asp-action="AdminLogin"
-                   style="color:var(--gold);">Admin Panel</a>.
+                * Chưa có sản phẩm nào. Vui lòng quay lại sau nhé!
             </div>
         }
     </div>

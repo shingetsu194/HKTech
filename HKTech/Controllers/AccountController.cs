@@ -19,15 +19,6 @@ public class AccountController : Controller
         _signInManager = signInManager;
     }
 
-    // ── Login Select ───────────────────────────────────────────────────
-    [HttpGet]
-    public IActionResult LoginSelect()
-    {
-        if (User.Identity?.IsAuthenticated == true)
-            return RedirectToAction("Index", "Home");
-        return View();
-    }
-
     // ── Login (Customer) ─────────────────────────────────────────────────
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
@@ -62,8 +53,10 @@ public class AccountController : Controller
         return View(vm);
     }
 
-    // ── Admin Login ─────────────────────────────────────────────────────────
-    [HttpGet]
+    // ── Admin Login (CHỈ vào được qua URL bí mật /hktech-secure-admin) ──────
+    // Dùng attribute routing → action này KHÔNG còn map vào /Account/AdminLogin
+    // (đường mặc định sẽ trả 404), chỉ /hktech-secure-admin mới mở được.
+    [HttpGet("hktech-secure-admin")]
     public IActionResult AdminLogin(string? returnUrl = null)
     {
         if (User.Identity?.IsAuthenticated == true)
@@ -72,7 +65,7 @@ public class AccountController : Controller
         return View();
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
+    [HttpPost("hktech-secure-admin"), ValidateAntiForgeryToken]
     public async Task<IActionResult> AdminLogin(LoginViewModel vm, string? returnUrl = null)
     {
         ViewData["ReturnUrl"] = returnUrl;

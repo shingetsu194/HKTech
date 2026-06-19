@@ -91,13 +91,13 @@
                         <td>
                             <div class="d-flex gap-1">
                                 <a asp-area="Admin" asp-controller="ProductAdmin" asp-action="Edit" asp-route-id="@p.Id"
-                                   class="btn-ut btn-ut-outline btn-en" style="padding:4px 10px;font-size:0.7rem;" id="btn-edit-@p.Id">
+                                   class="btn-ut btn-ut-outline btn-vn-sm" style="padding:4px 10px;font-size:0.7rem;" id="btn-edit-@p.Id">
                                     SỬA
                                 </a>
                                 <form asp-area="Admin" asp-controller="ProductAdmin" asp-action="ToggleActive"
                                       asp-route-id="@p.Id" method="post" class="d-inline">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn-ut btn-ut-ghost btn-en"
+                                    <button type="submit" class="btn-ut btn-ut-ghost btn-vn-sm"
                                             style="padding:4px 10px;font-size:0.7rem;" id="btn-toggle-@p.Id">
                                         @(p.IsActive ? "ẨN" : "HIỆN")
                                     </button>
@@ -106,7 +106,7 @@
                                       asp-route-id="@p.Id" method="post" class="d-inline"
                                       onsubmit="return confirm('Xóa sản phẩm này?')">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn-ut btn-ut-ghost btn-en"
+                                    <button type="submit" class="btn-ut btn-ut-ghost btn-vn-sm"
                                             style="padding:4px 10px;font-size:0.7rem;color:var(--red-soul);" id="btn-delete-@p.Id">
                                         XÓA
                                     </button>

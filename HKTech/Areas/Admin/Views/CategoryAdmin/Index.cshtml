@@ -39,7 +39,7 @@
                         <td>
                             <div class="d-flex gap-1">
                                 <a asp-area="Admin" asp-controller="CategoryAdmin" asp-action="Edit"
-                                   asp-route-id="@cat.Id" class="btn-ut btn-ut-outline btn-en"
+                                   asp-route-id="@cat.Id" class="btn-ut btn-ut-outline btn-vn-sm"
                                    style="padding:4px 10px;font-size:0.7rem;" id="btn-cat-edit-@cat.Id">
                                     SỬA
                                 </a>
@@ -47,7 +47,7 @@
                                       asp-route-id="@cat.Id" method="post" class="d-inline"
                                       onsubmit="return confirm('Xóa danh mục @cat.Name?')">
                                     @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn-ut btn-ut-ghost btn-en"
+                                    <button type="submit" class="btn-ut btn-ut-ghost btn-vn-sm"
                                             style="padding:4px 10px;font-size:0.7rem;color:var(--red-soul);" id="btn-cat-delete-@cat.Id">
                                         XÓA
                                     </button>

@@ -28,7 +28,7 @@
 
 <div class="mb-3">
     <a asp-area="Admin" asp-controller="OrderAdmin" asp-action="Index"
-       class="btn-ut btn-ut-ghost btn-en" style="font-size:0.42rem; padding:5px 12px;">
+       class="btn-ut btn-ut-ghost btn-vn-sm" style="font-size:0.42rem; padding:5px 12px;">
         ← QUAY LẠI
     </a>
 </div>
@@ -69,7 +69,7 @@
                                 <td style="color:var(--text-primary);">@item.Product.Name</td>
                                 <td style="white-space:nowrap;">@item.UnitPrice.ToString("N0") ₫</td>
                                 <td>×@item.Quantity</td>
-                                <td style="color:var(--gold); white-space:nowrap; font-family:var(--font-pixel); font-size:0.42rem;">
+                                <td style="color:var(--gold); white-space:nowrap; font-family:var(--font-pixel-vn); font-size:0.95rem;">
                                     @item.SubTotal.ToString("N0") ₫
                                 </td>
                             </tr>
@@ -78,7 +78,7 @@
                 </table>
                 <div class="d-flex justify-content-end mt-3 pt-3" style="border-top:1px solid #222;">
                     <span class="text-mono me-3" style="font-size:0.85rem;">TỔNG CỘNG:</span>
-                    <span style="font-family:var(--font-pixel); font-size:0.9rem; color:var(--gold);
+                    <span style="font-family:var(--font-pixel-vn); font-size:1.3rem; color:var(--gold);
                                  text-shadow:var(--glow-gold);">
                         @Model.TotalPrice.ToString("N0") ₫
                     </span>
@@ -135,7 +135,7 @@
                               asp-route-id="@Model.Id" method="post" class="mb-2">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="newStatus" value="@st" />
-                            <button type="submit" class="btn-ut btn-en w-100"
+                            <button type="submit" class="btn-ut btn-vn-sm w-100"
                                     style="font-size:0.42rem; padding:8px; text-align:center;
                                            border-color:@StatusColor(st); color:@StatusColor(st);">
                                 → @StatusLabel(st).ToUpper()

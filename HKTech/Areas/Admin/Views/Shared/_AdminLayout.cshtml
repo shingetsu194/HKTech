@@ -62,11 +62,12 @@
         }
 
         .admin-nav-section {
-            font-family: var(--font-pixel);
-            font-size: 0.4rem;
+            /* VT323 để hiển thị dấu tiếng Việt (Press Start 2P thiếu dấu → lệch phông) */
+            font-family: var(--font-pixel-vn);
+            font-size: 0.8rem;
             color: var(--text-muted);
             padding: 12px 16px 4px;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         /* Main */
@@ -108,8 +109,9 @@
 
         .stat-icon { font-size: 2rem; margin-bottom: 8px; }
         .stat-value {
-            font-family: var(--font-pixel);
-            font-size: 1.2rem;
+            /* VT323: hiển thị ₫ + dấu tiếng Việt nhất quán (Press Start 2P thiếu ₫) */
+            font-family: var(--font-pixel-vn);
+            font-size: 1.6rem;
             color: var(--gold);
             text-shadow: var(--glow-gold);
         }
@@ -137,8 +139,9 @@
         }
 
         .admin-table th {
-            font-family: var(--font-pixel);
-            font-size: 0.4rem;
+            /* VT323 để hiển thị dấu tiếng Việt (TÊN SẢN PHẨM, TRẠNG THÁI...) */
+            font-family: var(--font-pixel-vn);
+            font-size: 0.85rem;
             color: var(--gold);
             padding: 10px 12px;
             text-align: left;
@@ -177,6 +180,14 @@
             cursor: pointer;
         }
         .page-btn:hover, .page-btn.active { border-color: var(--gold); color: var(--gold); }
+
+        /* Nút pixel chữ Việt cỡ nhỏ — VT323 (Press Start 2P thiếu dấu → vỡ chữ).
+           Dùng cho nút thao tác/lọc trong admin: SỬA, XÓA, ẨN, TÌM, lọc trạng thái... */
+        .btn-ut.btn-vn-sm {
+            font-family: var(--font-pixel-vn) !important;
+            font-size: 0.95rem !important;
+            letter-spacing: 1px;
+        }
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>

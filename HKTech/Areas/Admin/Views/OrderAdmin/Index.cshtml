@@ -19,7 +19,7 @@
 <!-- Filter Bar -->
 <div class="d-flex gap-2 mb-4 flex-wrap align-items-center">
     <a href="?@(ViewBag.Search != null ? $"search={ViewBag.Search}&" : "")"
-       class="btn-ut @(currentStatus == null ? "btn-ut-primary" : "btn-ut-ghost") btn-en"
+       class="btn-ut @(currentStatus == null ? "btn-ut-primary" : "btn-ut-ghost") btn-vn-sm"
        style="font-size:0.42rem; padding:5px 12px;">
         TẤT CẢ (@ViewBag.Total)
     </a>
@@ -33,7 +33,7 @@
     })
     {
         <a href="?status=@st@(ViewBag.Search != null ? $"&search={ViewBag.Search}" : "")"
-           class="btn-ut btn-en @(currentStatus == st ? "btn-ut-primary" : "btn-ut-ghost")"
+           class="btn-ut btn-vn-sm @(currentStatus == st ? "btn-ut-primary" : "btn-ut-ghost")"
            style="font-size:0.42rem; padding:5px 12px; border-color:@StatusColor(st);">
             @label (@count)
         </a>
@@ -47,7 +47,7 @@
         }
         <input type="text" name="search" value="@ViewBag.Search" placeholder="Tên / email / #ID..."
                class="form-control-hk" style="font-size:0.8rem; flex:1;" />
-        <button type="submit" class="btn-ut btn-ut-outline btn-en" style="font-size:0.42rem; padding:5px 12px;">
+        <button type="submit" class="btn-ut btn-ut-outline btn-vn-sm" style="font-size:0.42rem; padding:5px 12px;">
             TÌM
         </button>
     </form>
@@ -85,7 +85,7 @@
                                 <div style="font-size:0.72rem; color:var(--text-muted);">@o.User?.Email</div>
                             </td>
                             <td>@o.OrderDetails.Count sản phẩm</td>
-                            <td style="color:var(--gold); font-family:var(--font-pixel); font-size:0.42rem; white-space:nowrap;">
+                            <td style="color:var(--gold); font-family:var(--font-pixel-vn); font-size:0.95rem; white-space:nowrap;">
                                 @o.TotalPrice.ToString("N0") ₫
                             </td>
                             <td>
@@ -100,7 +100,7 @@
                             <td>
                                 <a asp-area="Admin" asp-controller="OrderAdmin" asp-action="Detail"
                                    asp-route-id="@o.Id"
-                                   class="btn-ut btn-ut-outline btn-en"
+                                   class="btn-ut btn-ut-outline btn-vn-sm"
                                    style="font-size:0.38rem; padding:4px 10px;">CHI TIẾT</a>
                             </td>
                         </tr>

@@ -49,11 +49,11 @@ public static class DbSeeder
                 new Category { Name = "CPU",         Slug = "cpu",       Icon = "🧠", Description = "Bộ vi xử lý Intel và AMD" },
                 new Category { Name = "GPU / VGA",   Slug = "gpu",       Icon = "🎮", Description = "Card đồ họa rời" },
                 new Category { Name = "RAM",         Slug = "ram",       Icon = "💾", Description = "Bộ nhớ DDR4 / DDR5" },
-                new Category { Name = "Mainboard",   Slug = "mainboard", Icon = "🧩", Description = "Bo mạch chủ Intel và AMD" },
+                new Category { Name = "Mainboard",   Slug = "mainboard", Icon = "⚙️", Description = "Bo mạch chủ Intel và AMD" },
                 new Category { Name = "PSU / Nguồn", Slug = "psu",       Icon = "⚡", Description = "Nguồn máy tính 80+ Gold/Bronze" },
-                new Category { Name = "Case / Vỏ",  Slug = "case",      Icon = "🗄️", Description = "Vỏ case ATX, mATX, ITX" },
+                new Category { Name = "Case / Vỏ",  Slug = "case",      Icon = "📦", Description = "Vỏ case ATX, mATX, ITX" },
                 new Category { Name = "Ổ cứng",     Slug = "storage",   Icon = "💿", Description = "SSD NVMe, SATA và HDD" },
-                new Category { Name = "Tản nhiệt",  Slug = "cooling",   Icon = "❄️", Description = "Tản nhiệt khí và tản nhiệt nước AIO" },
+                new Category { Name = "Tản nhiệt",  Slug = "cooling",   Icon = "🌀", Description = "Tản nhiệt khí và tản nhiệt nước AIO" },
                 new Category { Name = "PC Build Sẵn", Slug = "prebuild", Icon = "🖥️", Description = "PC nguyên chiếc gaming từ các shop uy tín" }
             );
             await db.SaveChangesAsync();
@@ -68,6 +68,28 @@ public static class DbSeeder
                 Icon = "🖥️", Description = "PC nguyên chiếc gaming từ các shop uy tín"
             });
             await db.SaveChangesAsync();
+        }
+
+        // Đồng bộ icon danh mục (cập nhật icon mới cho danh mục đã seed trước đó)
+        var iconMap = new Dictionary<string, string>
+        {
+            ["cpu"] = "🧠", ["gpu"] = "🎮", ["ram"] = "💾", ["mainboard"] = "⚙️",
+            ["psu"] = "⚡", ["case"] = "📦", ["storage"] = "💿", ["cooling"] = "🌀",
+            ["prebuild"] = "🖥️",
+        };
+        var iconsChanged = 0;
+        foreach (var c in await db.Categories.ToListAsync())
+        {
+            if (iconMap.TryGetValue(c.Slug, out var icon) && c.Icon != icon)
+            {
+                c.Icon = icon;
+                iconsChanged++;
+            }
+        }
+        if (iconsChanged > 0)
+        {
+            await db.SaveChangesAsync();
+            Console.WriteLine($"[Seeder] Đã cập nhật icon cho {iconsChanged} danh mục.");
         }
 
         // ── 4. Products ───────────────────────────────────────────────────
