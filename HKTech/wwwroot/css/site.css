@@ -126,16 +126,21 @@ body {
 
 .navbar-brand-hk .brand-sub {
     font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: var(--text-muted);
     letter-spacing: 3px;
+    line-height: 1;
+    align-self: flex-end;
+    padding-bottom: 1px;
 }
 
 .heart-icon {
-    color: var(--red-soul);
-    font-size: 1.2rem;
     animation: heartbeat 1.5s ease-in-out infinite;
-    text-shadow: var(--glow-red);
+    filter: drop-shadow(0 0 6px #FF4444) drop-shadow(0 0 12px #FF2222);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
 @keyframes heartbeat {
@@ -147,7 +152,7 @@ body {
 
 .nav-links .nav-item .nav-link-hk {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 1rem;
     color: var(--text-secondary);
     text-decoration: none;
     padding: var(--space-md) var(--space-md);
@@ -604,7 +609,7 @@ body {
 .feature-title {
     /* VT323: các title card có thể chứa tiếng Việt */
     font-family: var(--font-pixel-vn);
-    font-size: 1rem;
+    font-size: 1.3rem;
     color: var(--gold);
     margin-bottom: var(--space-sm);
     letter-spacing: 1px;
@@ -704,7 +709,7 @@ body {
 .slot-label {
     /* VT323: slot labels có tiếng Việt (NGUỒN PSU, TẢN NHIỆT...) */
     font-family: var(--font-pixel-vn);
-    font-size: 0.95rem;
+    font-size: 1.15rem;
     color: var(--gold);
     width: 120px;
     letter-spacing: 1px;
@@ -876,7 +881,7 @@ body {
 .slot-label-en {
     /* ASCII slots: CPU, RAM, GPU, MAINBOARD */
     font-family: var(--font-pixel);
-    font-size: 0.45rem;
+    font-size: 0.6rem;
     color: var(--gold);
     width: 120px;
     letter-spacing: 1px;
@@ -900,7 +905,7 @@ body {
 /* btn-vn: no-op now (base .btn-ut đã dùng VT323), giữ lại cho legacy */
 .btn-ut.btn-vn {
     font-family: var(--font-pixel-vn) !important;
-    font-size: 1rem !important;
+    font-size: 1.25rem !important;
     letter-spacing: 1px;
 }
 
@@ -911,10 +916,241 @@ body {
     letter-spacing: 2px;
 }
 
+/* ── Page Transitions ─────────────────────────────────────── */
+#pg-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    pointer-events: none;
+    background: #000;
+    opacity: 1;
+}
+
+/* FADE — Home, Account, Profile */
+#pg-overlay.pg-a-fade { transition: opacity 0.4s ease; }
+#pg-overlay.pg-a-fade.pg-loaded  { opacity: 0; }
+#pg-overlay.pg-a-fade.pg-leaving { opacity: 1; pointer-events: all; transition: opacity 0.28s ease; }
+
+/* GOLD FADE — Order (SAVE point) */
+#pg-overlay.pg-a-gold {
+    background: radial-gradient(ellipse at center, #120e00 0%, #000 65%);
+    transition: opacity 0.5s ease;
+}
+#pg-overlay.pg-a-gold.pg-loaded  { opacity: 0; }
+#pg-overlay.pg-a-gold.pg-leaving { opacity: 1; pointer-events: all; transition: opacity 0.28s ease; }
+
+/* SLIDE UP — Products (overlay rises off-screen) */
+#pg-overlay.pg-a-slide-up { transition: transform 0.5s cubic-bezier(0.76,0,0.24,1); }
+#pg-overlay.pg-a-slide-up.pg-loaded  { transform: translateY(-100%); }
+#pg-overlay.pg-a-slide-up.pg-leaving { transform: translateY(0); pointer-events: all;
+                                        transition: transform 0.28s ease-in; }
+
+/* SLIDE DOWN — Build (overlay falls off-screen) */
+#pg-overlay.pg-a-slide-down { transition: transform 0.5s cubic-bezier(0.76,0,0.24,1); }
+#pg-overlay.pg-a-slide-down.pg-loaded  { transform: translateY(100%); }
+#pg-overlay.pg-a-slide-down.pg-leaving { transform: translateY(0); pointer-events: all;
+                                          transition: transform 0.28s ease-in; }
+
+/* SLIDE LEFT — Recommend, Register */
+#pg-overlay.pg-a-slide-left { transition: transform 0.5s cubic-bezier(0.76,0,0.24,1); }
+#pg-overlay.pg-a-slide-left.pg-loaded  { transform: translateX(-100%); }
+#pg-overlay.pg-a-slide-left.pg-leaving { transform: translateX(0); pointer-events: all;
+                                          transition: transform 0.28s ease-in; }
+
+/* SLIDE RIGHT — Cart */
+#pg-overlay.pg-a-slide-right { transition: transform 0.5s cubic-bezier(0.76,0,0.24,1); }
+#pg-overlay.pg-a-slide-right.pg-loaded  { transform: translateX(100%); }
+#pg-overlay.pg-a-slide-right.pg-leaving { transform: translateX(0); pointer-events: all;
+                                           transition: transform 0.28s ease-in; }
+
+/* SPLIT — Login (2 halves split apart like battle box) */
+#pg-overlay.pg-a-split { background: transparent; }
+#pg-overlay.pg-a-split::before,
+#pg-overlay.pg-a-split::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 50%;
+    background: #000;
+    transition: transform 0.55s cubic-bezier(0.76,0,0.24,1);
+}
+#pg-overlay.pg-a-split::before { top: 0; }
+#pg-overlay.pg-a-split::after  { bottom: 0; }
+#pg-overlay.pg-a-split.pg-loaded::before { transform: translateY(-100%); }
+#pg-overlay.pg-a-split.pg-loaded::after  { transform: translateY(100%);  }
+#pg-overlay.pg-a-split.pg-leaving { pointer-events: all; }
+#pg-overlay.pg-a-split.pg-leaving::before,
+#pg-overlay.pg-a-split.pg-leaving::after { transform: translateY(0); transition: transform 0.28s ease-in; }
+
+/* WIPE — Admin (dark-red sweep) */
+#pg-overlay.pg-a-wipe {
+    background: linear-gradient(90deg, #1a0000 0%, #0d0000 40%, #000 100%);
+    transition: transform 0.5s cubic-bezier(0.76,0,0.24,1);
+}
+#pg-overlay.pg-a-wipe.pg-loaded  { transform: translateX(100%); }
+#pg-overlay.pg-a-wipe.pg-leaving { transform: translateX(0); pointer-events: all;
+                                    transition: transform 0.28s ease-in; }
+
+/* GLITCH — 404 */
+#pg-overlay.pg-a-glitch { transition: opacity 0.3s ease; }
+#pg-overlay.pg-a-glitch.pg-loaded  { animation: pgGlitch 0.65s ease forwards; }
+#pg-overlay.pg-a-glitch.pg-leaving { opacity: 1; pointer-events: all; }
+
+@keyframes pgGlitch {
+    0%   { opacity: 1; transform: none; clip-path: none; }
+    10%  { clip-path: inset(20% 0 30% 0); transform: skewX(-8deg) translateX(-6px); }
+    22%  { clip-path: inset(65% 0 5% 0);  transform: skewX(8deg)  translateX(6px); opacity: .8; }
+    35%  { clip-path: none; transform: skewX(-3deg); opacity: .7; }
+    50%  { clip-path: inset(10% 0 75% 0); transform: translateX(-10px); opacity: .5; }
+    65%  { clip-path: inset(72% 0 5% 0);  transform: translateX(8px);  opacity: .3; }
+    82%  { clip-path: none; transform: skewX(2deg); opacity: .12; }
+    100% { opacity: 0; transform: none; clip-path: none; }
+}
+
 /* .text-vn-mono: Share Tech Mono cho Vietnamese text khi VT323 thiếu glyph (Ổ, Í, Ẵ...) */
 .text-vn-mono {
     font-family: 'Share Tech Mono', 'Noto Sans Mono', monospace;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--gold);
+}
+
+/* ============================================================
+   UI/UX POLISH PACK — Phase 5+
+   ============================================================ */
+
+/* --- Product Card: Category-Coloured Top Border --- */
+.product-card[data-cat="cpu"]       { border-top-color: #FF6B6B; }
+.product-card[data-cat="gpu"]       { border-top-color: #4ECDC4; }
+.product-card[data-cat="ram"]       { border-top-color: #45B7D1; }
+.product-card[data-cat="mainboard"] { border-top-color: #96CEB4; }
+.product-card[data-cat="psu"]       { border-top-color: #FECA57; }
+.product-card[data-cat="case"]      { border-top-color: #BB44FF; }
+.product-card[data-cat="storage"]   { border-top-color: #54A0FF; }
+.product-card[data-cat="cooling"]   { border-top-color: #00DDDD; }
+
+/* --- Product Card: Richer Image Container --- */
+.product-card .card-img-wrap {
+    background: radial-gradient(ellipse at 50% 30%, #272727, #0D0D0D) !important;
+}
+/* Blend image into card body at the bottom */
+.product-card .card-img-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0; height: 52px;
+    background: linear-gradient(to top, var(--bg-card), transparent);
+    pointer-events: none;
+    z-index: 1;
+}
+/* Deeper glow on hover */
+.product-card:hover {
+    box-shadow: 0 12px 40px rgba(0,0,0,0.7),
+                0 0 0 1px rgba(255,215,0,0.18),
+                inset 0 0 24px rgba(255,215,0,0.04);
+}
+
+/* --- Benchmark Score Mini-Badge --- */
+.bench-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(68,136,255,0.10);
+    border: 1px solid rgba(68,136,255,0.25);
+    color: var(--blue-patience);
+    font-family: var(--font-pixel);
+    font-size: 0.38rem;
+    padding: 2px 6px;
+    margin-top: 6px;
+    letter-spacing: 1px;
+}
+
+/* --- Stock Badges --- */
+@keyframes lowStockPulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.55; }
+}
+.stock-low {
+    animation: lowStockPulse 1.6s ease-in-out infinite;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--gold);
+    margin-top: 4px;
+}
+.stock-out {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--red-soul);
+    margin-top: 4px;
+}
+
+/* --- Recommend: Tier-based Combo Cards --- */
+.combo-card.tier-budget {
+    border-left: 4px solid var(--green-kindness);
+    border-top: 3px solid var(--green-kindness);
+}
+.combo-card.tier-budget .combo-header { background: rgba(68,204,68,0.04); }
+
+.combo-card.tier-balanced {
+    border-left: 4px solid var(--gold);
+    border-top: 3px solid var(--gold);
+}
+.combo-card.tier-balanced .combo-header { background: rgba(255,215,0,0.04); }
+
+.combo-card.tier-performance {
+    border-left: 4px solid var(--red-soul);
+    border-top: 3px solid var(--red-soul);
+}
+.combo-card.tier-performance .combo-header { background: rgba(255,68,68,0.04); }
+
+/* --- Cart Table: Row Hover --- */
+.cart-table tbody tr { transition: background var(--transition-fast); }
+.cart-table tbody tr:hover { background: rgba(255,215,0,0.03); }
+
+/* --- Product Count Label in Toolbar --- */
+.product-count-label {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+.product-count-label strong { color: var(--gold); font-weight: normal; }
+
+/* --- Build Slot: Filled glow enhancement --- */
+.build-slot.filled {
+    background: rgba(68,204,68,0.04);
+}
+
+/* --- Feature Icon: Grow on hover --- */
+.feature-icon { transition: transform 0.25s ease, filter 0.25s ease; }
+.feature-card:hover .feature-icon {
+    transform: scale(1.25) rotate(-3deg);
+    filter: drop-shadow(0 0 8px rgba(255,215,0,0.5));
+}
+
+/* --- Button: Active press micro-animation --- */
+.btn-ut:active { transform: translateY(1px) scale(0.98) !important; }
+
+/* --- Cart Badge: Pulse when items added --- */
+@keyframes cartBadgePop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.35); box-shadow: 0 0 6px var(--red-soul); }
+    100% { transform: scale(1); }
+}
+.cart-badge.pop { animation: cartBadgePop 0.4s ease-out forwards; }
+
+/* --- Dialog Box: no-prefix variant for empty states --- */
+.dialog-box.no-prefix::before { display: none; }
+
+/* --- Home: Section header subtle left accent --- */
+.section-header::before {
+    content: '▶';
+    font-family: var(--font-pixel);
+    font-size: 0.4rem;
+    color: var(--red-soul);
+    animation: heartbeat 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+    align-self: center;
 }

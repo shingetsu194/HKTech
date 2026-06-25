@@ -1,3 +1,4 @@
+@model List<HKTech.Models.Product>
 @{
     ViewData["Title"] = "Trang chủ";
     ViewData["Description"] = "HKTech - Tự build PC thông minh với Compatibility Guard, Bottleneck Analyzer & FPS Estimator real-time.";
@@ -10,16 +11,16 @@
     <div class="container-hk">
         <div class="row align-items-center g-4">
             <div class="col-lg-7 hero-content">
-                <div class="hero-eyebrow">★ DETERMINATION MODE ACTIVATED ★</div>
+                <div class="hero-eyebrow">♦ SMART BUILD INTELLIGENCE ♦</div>
                 <h1 class="hero-title">
-                    <span class="en">BUILD PC</span><br/>
-                    <span class="vn">CỦA BẠN.</span><br/>
-                    <span class="en" style="color: var(--red-soul); text-shadow: var(--glow-red);">SMART.</span>
-                    <span class="vn"> NHANH. CHUẨN.</span>
+                    <span class="en">YOU HAVE</span><br/>
+                    <span class="en">DETERMINATION.</span><br/>
+                    <span class="en" style="color: var(--red-soul); text-shadow: var(--glow-red);">WE HAVE</span>
+                    <span class="en"> THE PARTS.</span>
                 </h1>
                 <p class="hero-subtitle">
-                    * Kiểm tra tương thích tự động. Phân tích bottleneck real-time.
-                    Ước tính FPS ngay khi bạn chọn linh kiện.
+                    * Build PC thông minh. Kiểm tra tương thích tự động.
+                    Bottleneck analyzer &amp; FPS estimator real-time.
                 </p>
                 <div class="hero-cta">
                     <a asp-controller="Build" asp-action="Index" class="btn-ut btn-ut-primary btn-vn" id="hero-build-btn">
@@ -188,10 +189,10 @@
                 {
                     new { Icon = "🧠", Name = "CPU",        Slug = "cpu",        Count = "..." },
                     new { Icon = "🎮", Name = "GPU / VGA",  Slug = "gpu",        Count = "..." },
-                    new { Icon = "🧩", Name = "Mainboard",  Slug = "mainboard",  Count = "..." },
+                    new { Icon = "⚙️", Name = "Mainboard",  Slug = "mainboard",  Count = "..." },
                     new { Icon = "💾", Name = "RAM",        Slug = "ram",        Count = "..." },
                     new { Icon = "⚡", Name = "Nguồn PSU",  Slug = "psu",        Count = "..." },
-                    new { Icon = "🗄️", Name = "Case / Vỏ", Slug = "case",       Count = "..." },
+                    new { Icon = "📦", Name = "Case / Vỏ", Slug = "case",       Count = "..." },
                 };
             }
             @foreach (var cat in categories)
@@ -209,33 +210,135 @@
 </section>
 
 <!-- ============================================================
-     SẢN PHẨM NỔI BẬT (Placeholder — sẽ load từ DB sau)
+     SẢN PHẨM NỔI BẬT
      ============================================================ -->
 <section class="py-5" style="background: var(--bg-cave);">
     <div class="container-hk">
         <div class="section-header">
             <h2 class="section-title-pixel">LINH KIỆN NỔI BẬT</h2>
             <div class="section-line"></div>
+            <a asp-controller="Product" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-featured-btn">
+                XEM TẤT CẢ →
+            </a>
         </div>
-        <div class="products-grid" id="featured-products-grid">
-            @* Placeholder cards — sẽ render từ ViewBag/Model sau Phase 2 *@
-            @for (int i = 0; i < 4; i++)
-            {
-                <div class="product-card">
-                    <div class="card-img-wrap skeleton" style="height:200px;"></div>
-                    <div class="card-body-hk">
-                        <div class="skeleton" style="height:16px; width:80%; margin-bottom:8px;"></div>
-                        <div class="skeleton" style="height:12px; width:50%;"></div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="products-grid" id="featured-products-grid">
+                @foreach (var p in Model)
+                {
+                    <div class="product-card" id="featured-card-@p.Id">
+                        <div class="card-img-wrap" style="height:200px; background:#111; display:flex; align-items:center; justify-content:center;">
+                            @if (p.PrimaryImageUrl != null)
+                            {
+                                <img src="@p.PrimaryImageUrl" alt="@p.Name"
+                                     style="width:100%; height:100%; object-fit:contain; padding:12px;" />
+                            }
+                            else
+                            {
+                                <span style="font-size:3rem;">@p.Category.Icon</span>
+                            }
+                        </div>
+                        <div class="card-body-hk">
+                            <div class="text-mono" style="font-size:0.7rem; color:var(--text-muted); margin-bottom:4px;">
+                                @p.Category.Icon @p.Category.Name
+                            </div>
+                            <div style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-primary); margin-bottom:8px; line-height:1.4;">
+                                @p.Name
+                            </div>
+                            <div class="text-pixel" style="font-size:0.6rem; color:var(--gold); text-shadow:var(--glow-gold);">
+                                @p.Price.ToString("N0")₫
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a asp-controller="Product" asp-action="Detail" asp-route-id="@p.Id"
+                               class="btn-ut btn-ut-outline btn-en" style="font-size:0.7rem; padding:6px 12px;"
+                               id="btn-featured-detail-@p.Id">
+                                CHI TIẾT
+                            </a>
+                            <a asp-controller="Build" asp-action="Index"
+                               class="btn-ut btn-ut-primary btn-en" style="font-size:0.7rem; padding:6px 12px;"
+                               id="btn-featured-build-@p.Id">
+                                + BUILD
+                            </a>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
-        <div class="dialog-box mt-4" style="max-width:500px;">
-            Dữ liệu sản phẩm sẽ được tải từ database sau khi hoàn thiện Phase 2.
-            Bây giờ hãy thử trang <strong style="color:var(--gold);">Tự Build PC</strong>!
-        </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="dialog-box mt-2" style="max-width:500px;">
+                * Chưa có sản phẩm nào. Vui lòng quay lại sau nhé!
+            </div>
+        }
     </div>
 </section>
+
+<!-- ============================================================
+     PC BUILD SẴN
+     ============================================================ -->
+@{
+    var prebuilts = ViewBag.Prebuilts as List<HKTech.Models.Product> ?? new List<HKTech.Models.Product>();
+}
+@if (prebuilts.Any())
+{
+    <section class="py-5" style="background: var(--bg-void);">
+        <div class="container-hk">
+            <div class="section-header">
+                <h2 class="section-title-pixel">PC BUILD SẴN</h2>
+                <div class="section-line"></div>
+                <a asp-controller="Prebuilt" asp-action="Index" class="btn-ut btn-ut-ghost btn-vn" id="see-all-prebuilt-btn">
+                    XEM TẤT CẢ →
+                </a>
+            </div>
+
+            <div class="products-grid" id="prebuilt-products-grid">
+                @foreach (var p in prebuilts)
+                {
+                    <div class="product-card" id="prebuilt-card-@p.Id">
+                        <a href="/Prebuilt/Details/@p.Id" class="card-img-wrap"
+                           style="height:200px; background:#111; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+                            @if (p.PrimaryImageUrl != null)
+                            {
+                                <img src="@p.PrimaryImageUrl" alt="@p.Name"
+                                     style="width:100%; height:100%; object-fit:contain; padding:12px;" />
+                            }
+                            else
+                            {
+                                <span style="font-size:3rem;">🖥️</span>
+                            }
+                        </a>
+                        <div class="card-body-hk">
+                            <div class="text-mono" style="font-size:0.7rem; color:var(--text-muted); margin-bottom:4px;">
+                                🖥️ PC Build Sẵn
+                            </div>
+                            <a href="/Prebuilt/Details/@p.Id"
+                               style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-primary); margin-bottom:8px; line-height:1.4; display:block; text-decoration:none;">
+                                @p.Name
+                            </a>
+                            <div class="text-pixel" style="font-size:0.6rem; color:var(--gold); text-shadow:var(--glow-gold);">
+                                @p.Price.ToString("N0")₫
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="/Prebuilt/Details/@p.Id"
+                               class="btn-ut btn-ut-outline btn-en" style="font-size:0.7rem; padding:6px 12px;"
+                               id="btn-prebuilt-detail-@p.Id">
+                                CHI TIẾT
+                            </a>
+                            <button class="btn-ut btn-ut-primary btn-vn" style="font-size:0.95rem; padding:6px 12px;"
+                                    onclick="addPrebuiltToCart(@p.Id, this)"
+                                    id="btn-prebuilt-cart-@p.Id">
+                                🛒 THÊM
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
 
 <!-- ============================================================
      CALL TO ACTION
@@ -256,3 +359,36 @@
         </a>
     </div>
 </section>
+
+@section Scripts {
+<script>
+async function addPrebuiltToCart(productId, btn) {
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = '⏳ ĐANG THÊM...';
+    try {
+        const res = await fetch('/Prebuilt/AddToCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? ''
+            },
+            body: `id=${productId}`
+        });
+        const data = await res.json();
+        if (data.success) {
+            btn.textContent = '✅ ĐÃ THÊM!';
+            btn.style.background = 'var(--green-kindness)';
+            const badge = document.querySelector('.cart-count-badge');
+            if (badge && data.cartCount) badge.textContent = data.cartCount;
+            setTimeout(() => { btn.textContent = original; btn.style.background = ''; btn.disabled = false; }, 2000);
+        } else {
+            btn.textContent = '❌ LỖI'; btn.disabled = false;
+        }
+    } catch {
+        btn.textContent = '❌ LỖI'; btn.disabled = false;
+    }
+}
+</script>
+@Html.AntiForgeryToken()
+}

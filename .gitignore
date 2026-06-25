@@ -34,4 +34,13 @@ npm-debug.log*
 
 ## Temp files
 *.tmp
-fix_buttons.py
+
+## Python scripts (dev tools, không thuộc project .NET)
+*.py
+
+## Test screenshots
+screenshots/
+
+# Python cache (scraper tooling)
+__pycache__/
+*.pyc

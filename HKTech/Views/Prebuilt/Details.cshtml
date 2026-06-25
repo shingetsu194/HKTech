@@ -1,0 +1,266 @@
+@model HKTech.Models.Product
+@using HKTech.Services
+
+@{
+    // Parse chuỗi Description (pipe-separated key:value) thành dict
+    Dictionary<string, string> ParseDesc(string? desc)
+    {
+        if (string.IsNullOrEmpty(desc)) return new();
+        return desc.Split('|')
+                   .Select(s => s.Split(':', 2))
+                   .Where(p => p.Length == 2)
+                   .ToDictionary(p => p[0].Trim(), p => p[1].Trim());
+    }
+
+    var specs = ParseDesc(Model.Description);
+
+    // Danh sách linh kiện theo thứ tự hiển thị: (icon, nhãn, key)
+    var components = new (string Icon, string Label, string Key)[]
+    {
+        ("🧠", "CPU",        "fullCpu"),
+        ("⚙️", "Mainboard",  "fullMainboard"),
+        ("💾", "RAM",        "fullRam"),
+        ("🎮", "Card đồ họa","fullGpu"),
+        ("💿", "Ổ cứng",     "fullStorage"),
+        ("⚡", "Nguồn",      "fullPsu"),
+        ("📦", "Vỏ Case",    "fullCase"),
+        ("🌀", "Tản nhiệt",  "fullCooling"),
+    };
+    var warranty = specs.GetValueOrDefault("warranty", "");
+
+    var fpsTable = ViewBag.FpsTable as List<FpsCalculator.FpsRow> ?? new();
+    var badge    = ViewBag.Badge as string ?? "";
+
+    string FpsCls(int fps) => fps >= 120 ? "fps-good" : fps >= 60 ? "fps-ok" : "fps-bad";
+}
+
+@section Styles {
+<style>
+    .pbd-top { display: grid; grid-template-columns: 560px 1fr; gap: var(--space-xl); align-items: start; }
+    @@media (max-width: 992px) { .pbd-top { grid-template-columns: 1fr; } }
+
+    /* ── Khung ảnh phóng to (kiểu CellphoneS) ── */
+    .pbd-img-wrap {
+        background: radial-gradient(ellipse at 50% 30%, #2A2A2A, #0D0D0D);
+        border: var(--border-gold);
+        padding: var(--space-xl);
+        display: flex; align-items: center; justify-content: center;
+        position: sticky; top: 80px;
+        min-height: 460px;
+    }
+    .pbd-img-wrap img { max-width: 100%; max-height: 520px; object-fit: contain; }
+    .pbd-img-placeholder { font-size: 6rem; opacity: 0.3; }
+
+    .pbd-name {
+        font-family: var(--font-pixel-vn);
+        font-size: 1.5rem;
+        color: var(--text-primary);
+        line-height: 1.3;
+        margin-bottom: var(--space-sm);
+    }
+    .pbd-price {
+        font-family: var(--font-pixel);
+        font-size: 1.3rem;
+        color: var(--gold);
+        text-shadow: var(--glow-gold);
+        margin-bottom: var(--space-sm);
+    }
+    .pbd-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: var(--space-md); }
+    .pbd-warranty {
+        font-family: var(--font-mono); font-size: 0.85rem;
+        color: var(--green-kindness);
+        display: flex; align-items: center; gap: 8px;
+    }
+    .pbd-badge {
+        font-family: var(--font-pixel); font-size: 0.5rem;
+        color: var(--bg-void); background: var(--gold);
+        padding: 6px 10px; letter-spacing: 1px;
+        display: inline-flex; align-items: center;
+    }
+
+    /* ── Bảng FPS (bên phải) ── */
+    .pbd-fps-table { width: 100%; border-collapse: collapse; font-family: var(--font-mono); font-size: 0.95rem; }
+    .pbd-fps-table th {
+        font-family: var(--font-mono); font-size: 0.9rem; font-weight: bold;
+        letter-spacing: 1px; color: var(--gold); padding: 9px 8px;
+        text-align: center; border-bottom: 2px solid var(--gold); text-transform: uppercase;
+    }
+    .pbd-fps-table td {
+        padding: 8px; color: var(--text-secondary);
+        border-bottom: 1px solid #1A1A1A; text-align: center;
+    }
+    .pbd-fps-table td:first-child { text-align: left; color: var(--text-primary); }
+    .pbd-fps-table .fps-good { color: var(--green-kindness); font-weight: bold; }
+    .pbd-fps-table .fps-ok   { color: var(--gold); font-weight: bold; }
+    .pbd-fps-table .fps-bad  { color: var(--red-soul); font-weight: bold; }
+
+    /* ── Bảng linh kiện (xuống dưới, full-width) ── */
+    .pbd-spec-table { display: flex; flex-direction: column; border: 1px solid #2A2A2A; }
+    .pbd-spec-row { display: grid; grid-template-columns: 180px 1fr; border-bottom: 1px solid #1F1F1F; }
+    .pbd-spec-row:last-child { border-bottom: none; }
+    .pbd-spec-row:nth-child(even) { background: rgba(255,255,255,0.02); }
+    .pbd-spec-key {
+        font-family: var(--font-pixel-vn); font-size: 0.95rem; color: var(--gold);
+        padding: 12px 16px; display: flex; align-items: center; gap: 8px;
+        border-right: 1px solid #2A2A2A; background: rgba(255,215,0,0.03);
+    }
+    .pbd-spec-val {
+        font-family: var(--font-mono); font-size: 0.92rem; color: var(--text-secondary);
+        padding: 12px 16px; line-height: 1.45;
+    }
+    .pbd-spec-val.empty { color: var(--text-muted); font-style: italic; }
+
+    .pbd-actions { display: flex; gap: 12px; margin-top: var(--space-lg); flex-wrap: wrap; }
+    .pbd-section-divider { margin: var(--space-xl) 0 var(--space-md); }
+</style>
+}
+
+<div class="container-hk" style="padding-top: var(--space-xl); padding-bottom: var(--space-xl);">
+
+    <!-- Breadcrumb / back -->
+    <div class="mb-3">
+        <a href="/Prebuilt" class="text-mono text-muted-hk text-decoration-none hover-gold" style="font-size:0.85rem;">
+            ← Quay lại danh sách PC Build Sẵn
+        </a>
+    </div>
+
+    <div class="section-header">
+        <h1 class="section-title-pixel" style="font-size:1.1rem;">🖥️ CHI TIẾT CẤU HÌNH</h1>
+        <div class="section-line"></div>
+    </div>
+
+    <!-- ══ TOP: Ảnh (trái) + FPS (phải) ══ -->
+    <div class="pbd-top mt-4">
+
+        <!-- LEFT: Ảnh phóng to -->
+        <div class="pbd-img-wrap">
+            @if (Model.PrimaryImageUrl != null)
+            {
+                <img src="@Model.PrimaryImageUrl" alt="@Model.Name"
+                     onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
+                <div class="pbd-img-placeholder" style="display:none;">🖥️</div>
+            }
+            else
+            {
+                <div class="pbd-img-placeholder">🖥️</div>
+            }
+        </div>
+
+        <!-- RIGHT: Tên, giá, FPS -->
+        <div>
+            <div class="pbd-name">@Model.Name</div>
+            <div class="pbd-price">@Model.Price.ToString("N0") ₫</div>
+
+            <div class="pbd-meta">
+                @if (!string.IsNullOrEmpty(warranty))
+                {
+                    <div class="pbd-warranty">🛡️ Bảo hành: <strong>@warranty</strong></div>
+                }
+                @if (!string.IsNullOrEmpty(badge))
+                {
+                    <span class="pbd-badge">🎮 @badge</span>
+                }
+            </div>
+
+            <!-- Bảng FPS 10 game -->
+            <div class="panel-label-vn mb-2" style="font-size:1rem;">🎮 ĐÁNH GIÁ FPS GAME</div>
+            <div class="dialog-box mb-3" style="font-size:0.78rem; padding:10px 14px;">
+                * FPS ước tính ở thiết lập Ultra, dựa trên benchmark CPU + GPU (thực tế chênh ±15%).
+            </div>
+            <table class="pbd-fps-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left">Game</th>
+                        <th>1080p</th><th>1440p</th><th>4K</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in fpsTable)
+                    {
+                        <tr>
+                            <td>@r.Game</td>
+                            <td class="@FpsCls(r.Fps1080)">@r.Fps1080</td>
+                            <td class="@FpsCls(r.Fps1440)">@r.Fps1440</td>
+                            <td class="@FpsCls(r.Fps4k)">@r.Fps4k</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Actions -->
+            <div class="pbd-actions">
+                <button class="btn-ut btn-ut-primary btn-vn" id="pbdCartBtn"
+                        onclick="addPrebuiltToCart(@Model.Id, this)"
+                        style="padding:12px 24px;">
+                    🛒 THÊM VÀO GIỎ
+                </button>
+                <a href="/Prebuilt" class="btn-ut btn-ut-ghost btn-vn" style="padding:12px 24px;">
+                    ← QUAY LẠI
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ══ DƯỚI: Thông số linh kiện (full-width) ══ -->
+    <div class="pbd-section-divider">
+        <div class="panel-label-vn mb-2" style="font-size:1rem;">📋 THÔNG SỐ LINH KIỆN</div>
+    </div>
+    <div class="pbd-spec-table">
+        @foreach (var c in components)
+        {
+            var val = specs.GetValueOrDefault(c.Key, "");
+            <div class="pbd-spec-row">
+                <div class="pbd-spec-key">@c.Icon @c.Label</div>
+                @if (!string.IsNullOrEmpty(val))
+                {
+                    <div class="pbd-spec-val">@val</div>
+                }
+                else
+                {
+                    <div class="pbd-spec-val empty">Chưa có thông tin</div>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+@section Scripts {
+<script>
+async function addPrebuiltToCart(productId, btn) {
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = '⏳ ĐANG THÊM...';
+    try {
+        const res  = await fetch('/Prebuilt/AddToCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? ''
+            },
+            body: `id=${productId}`
+        });
+        const data = await res.json();
+        if (data.success) {
+            btn.textContent = '✅ ĐÃ THÊM!';
+            btn.style.background = 'var(--green-kindness)';
+            const badge = document.querySelector('.cart-count-badge');
+            if (badge && data.cartCount) badge.textContent = data.cartCount;
+            setTimeout(() => {
+                btn.textContent = original;
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 2000);
+        } else {
+            btn.textContent = '❌ LỖI';
+            btn.disabled = false;
+        }
+    } catch {
+        btn.textContent = '❌ LỖI';
+        btn.disabled = false;
+    }
+}
+</script>
+@Html.AntiForgeryToken()
+}

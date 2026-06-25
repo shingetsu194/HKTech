@@ -96,9 +96,10 @@ Mở trình duyệt: **http://localhost:5010**
 | Phase | Nội dung | Trạng thái |
 |---|---|---|
 | **Phase 1** | Frontend UI, Layout, Smart Build Intelligence UI | ✅ Hoàn thành |
-| **Phase 2** | Database, Models, EF Core Migration, Admin CRUD | 🔄 Tiếp theo |
-| **Phase 3** | Auth, Cart, Order, Recommend Engine | ⏳ Kế hoạch |
-| **Phase 4** | Testing, Security Audit, Deployment | ⏳ Kế hoạch |
+| **Phase 2** | Database, Models, EF Core Migration, Admin CRUD, Undertale Login | ✅ Hoàn thành |
+| **Phase 3** | Build PC, Cart, Order, Recommend Engine | ✅ Hoàn thành |
+| **Phase 4** | Smart Build Intelligence: API, Compatibility Guard, Bottleneck, FPS | ✅ Hoàn thành |
+| **Phase 5** | Admin Dashboard, Polish, Demo Prep | 🔄 Đang làm |
 
 ---
 

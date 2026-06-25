@@ -1,0 +1,71 @@
+@model HKTech.Models.Order
+
+@{
+    ViewData["Title"] = "Xác nhận đơn hàng";
+}
+
+<div class="container-hk" style="padding-top: var(--space-xl); max-width: 700px;">
+    <div class="section-header">
+        <h1 class="section-title-pixel" style="color: var(--green-kindness);">✅ ORDER PLACED!</h1>
+        <div class="section-line"></div>
+    </div>
+
+    <div class="dialog-box mt-4" style="border-color: var(--green-kindness);">
+        <div class="text-pixel-vn text-gold mb-2" style="font-size:1.1rem;">
+            Đặt hàng thành công! ♥
+        </div>
+        <p class="text-mono" style="font-size:0.85rem;">
+            Mã đơn hàng: <strong style="color:var(--gold);">#@Model.Id</strong> |
+            Ngày đặt: <span style="color:var(--text-secondary);">@Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+        </p>
+        <p class="text-mono" style="font-size:0.82rem; color:var(--text-muted);">
+            Địa chỉ giao hàng: @Model.ShippingAddress
+        </p>
+    </div>
+
+    <!-- Order Items -->
+    <div class="mt-4">
+        <div class="panel-label-en mb-3">📦 ORDER DETAILS</div>
+        @foreach (var item in Model.OrderDetails)
+        {
+            <div class="d-flex align-items-center gap-3 mb-3 p-3"
+                 style="background:var(--bg-surface); border:1px solid #2A2A2A;">
+                <img src="@(item.Product.PrimaryImageUrl ?? "/images/placeholder.png")"
+                     style="width:56px; height:56px; object-fit:contain; background:#111; padding:4px;"
+                     onerror="this.src='/images/placeholder.png'" />
+                <div style="flex:1;">
+                    <div class="text-mono" style="color:var(--text-primary); font-size:0.85rem;">@item.Product.Name</div>
+                    <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted);">
+                        @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
+                    </div>
+                </div>
+                <div class="cart-price" style="font-family:var(--font-pixel); font-size:0.42rem; color:var(--gold);">
+                    @item.SubTotal.ToString("N0") ₫
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Total -->
+    <div class="d-flex justify-content-between align-items-center mt-3 p-3"
+         style="background:var(--bg-card); border:var(--border-gold);">
+        <span class="text-mono" style="font-size:0.85rem;">TỔNG CỘNG</span>
+        <span style="font-family:var(--font-pixel); font-size:0.9rem; color:var(--gold);
+                     text-shadow:var(--glow-gold);">
+            @Model.TotalPrice.ToString("N0") ₫
+        </span>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="mt-3 text-center">
+        <span class="badge-ut badge-ut-gold">
+            STATUS: @Model.Status.ToUpper()
+        </span>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-3 mt-4 justify-content-center">
+        <a href="/Order/History" class="btn-ut btn-ut-outline btn-en">MY ORDERS</a>
+        <a href="/Product" class="btn-ut btn-ut-primary btn-en">SHOP MORE</a>
+    </div>
+</div>

@@ -1,0 +1,354 @@
+@model List<HKTech.Models.Product>
+
+@{
+    ViewData["Title"] = "PC Build Sẵn";
+    var selSort   = ViewBag.SelSort   as string ?? "default";
+
+    // Helper: parse Description pipe-string into dict
+    Dictionary<string, string> ParseDesc(string? desc)
+    {
+        if (string.IsNullOrEmpty(desc)) return new();
+        return desc.Split('|')
+                   .Select(s => s.Split(':', 2))
+                   .Where(p => p.Length == 2)
+                   .ToDictionary(p => p[0].Trim(), p => p[1].Trim());
+    }
+}
+
+@section Styles {
+<style>
+    .prebuilt-layout { display: grid; grid-template-columns: 260px 1fr; gap: var(--space-xl); align-items: start; }
+    @@media (max-width: 768px) { .prebuilt-layout { grid-template-columns: 1fr; } }
+
+    /* Gallery grid */
+    .pb-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--space-lg);
+    }
+
+    /* Card */
+    .pb-card {
+        background: var(--bg-card);
+        border: 2px solid #2A2A2A;
+        border-top: 3px solid var(--gold-dim);
+        transition: all var(--transition-med);
+        display: flex; flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+    .pb-card:hover {
+        border-color: var(--gold);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 36px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,215,0,0.15);
+    }
+
+
+
+    /* Image */
+    .pb-img-wrap {
+        height: 200px;
+        background: radial-gradient(ellipse at 50% 30%, #272727, #0D0D0D);
+        display: flex; align-items: center; justify-content: center;
+        overflow: hidden; position: relative;
+    }
+    .pb-img-wrap::after {
+        content: ''; position: absolute;
+        bottom: 0; left: 0; right: 0; height: 50px;
+        background: linear-gradient(to top, var(--bg-card), transparent);
+        pointer-events: none;
+    }
+    .pb-img-wrap img { max-height: 190px; max-width: 100%; object-fit: contain; }
+    .pb-img-placeholder { font-size: 3rem; opacity: 0.3; }
+
+    /* Body */
+    .pb-body { padding: var(--space-md); flex: 1; display: flex; flex-direction: column; }
+    .pb-name {
+        font-family: var(--font-pixel-vn);
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        line-height: 1.3;
+        margin-bottom: var(--space-sm);
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .pb-price {
+        font-family: var(--font-pixel);
+        font-size: 0.65rem;
+        color: var(--gold);
+        text-shadow: var(--glow-gold);
+        margin-bottom: var(--space-sm);
+    }
+
+    /* Spec chips */
+    .pb-specs { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--space-sm); }
+    .pb-spec-chip {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        background: rgba(255,255,255,0.04);
+        border: 1px solid #2A2A2A;
+        padding: 2px 6px;
+    }
+    .pb-spec-chip span { color: var(--text-secondary); }
+
+    /* Actions */
+    .pb-actions { display: flex; gap: 8px; margin-top: auto; padding-top: var(--space-sm); }
+    .pb-btn-cart {
+        flex: 1;
+        background: var(--gold);
+        color: var(--bg-void);
+        /* VT323 để hiển thị dấu tiếng Việt */
+        font-family: var(--font-pixel-vn);
+        font-size: 0.9rem;
+        border: none;
+        padding: 8px;
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: all var(--transition-fast);
+    }
+    .pb-btn-cart:hover { background: var(--gold-dim); box-shadow: var(--glow-gold); }
+    .pb-btn-link {
+        display: flex; align-items: center; justify-content: center;
+        width: 36px; height: 36px;
+        border: 1px solid #333;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: all var(--transition-fast);
+        font-size: 0.9rem;
+    }
+    .pb-btn-link:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Sidebar */
+    .pb-sidebar {
+        background: var(--bg-surface);
+        border: var(--border-gold);
+        padding: var(--space-lg);
+        position: sticky; top: 80px;
+    }
+    .filter-group { margin-bottom: var(--space-lg); }
+    .filter-label {
+        /* VT323 để hiển thị dấu tiếng Việt (Press Start 2P không có dấu) */
+        font-family: var(--font-pixel-vn);
+        font-size: 0.95rem;
+        color: var(--gold);
+        letter-spacing: 1px;
+        margin-bottom: var(--space-sm);
+        display: block;
+    }
+    .filter-chip {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: var(--font-mono); font-size: 0.78rem;
+        color: var(--text-muted);
+        padding: 4px 10px; margin: 2px;
+        border: 1px solid #2A2A2A;
+        cursor: pointer; text-decoration: none;
+        transition: all var(--transition-fast);
+    }
+    .filter-chip:hover, .filter-chip.active {
+        border-color: var(--gold); color: var(--gold);
+        background: rgba(255,215,0,0.06);
+    }
+    .filter-chip.active { background: rgba(255,215,0,0.12); }
+
+    /* Price range */
+    .price-inputs { display: flex; gap: 6px; align-items: center; }
+    .price-input-hk {
+        background: var(--bg-void); border: 1px solid #333;
+        color: var(--text-primary); font-family: var(--font-mono);
+        font-size: 0.78rem; padding: 6px 8px; width: 100%;
+        outline: none;
+    }
+    .price-input-hk:focus { border-color: var(--gold); }
+
+    /* Empty */
+    .pb-empty { grid-column: 1/-1; text-align: center; padding: 60px 20px; }
+</style>
+}
+
+<div class="container-hk" style="padding-top: var(--space-xl); padding-bottom: var(--space-xl);">
+
+    <div class="section-header">
+        <h1 class="section-title-pixel">🖥️ PC BUILD SẴN</h1>
+        <div class="section-line"></div>
+    </div>
+
+    <div class="dialog-box mb-4" style="font-size: 0.82rem;">
+        * PC nguyên chiếc lắp ráp sẵn, đã kiểm tra tương thích.
+        Nhấn <span class="text-gold">THÊM VÀO GIỎ</span> để mua ngay, hoặc
+        <span class="text-gold">🔍 XEM CHI TIẾT</span> để xem cấu hình đầy đủ.
+    </div>
+
+    <div class="prebuilt-layout mt-4">
+
+        <!-- ── SIDEBAR ─────────────────────────────────────────────── -->
+        <aside class="pb-sidebar">
+            <form method="get" action="/Prebuilt" id="filterForm">
+                <!-- Sort -->
+                <div class="filter-group">
+                    <span class="filter-label">⬆ SẮP XẾP</span>
+                    <select name="sort" class="form-control-hk form-select-hk"
+                            style="font-size:0.85rem; padding:10px 12px; width:100%;"
+                            onchange="document.getElementById('filterForm').submit()">
+                        <option value="default" selected="@(selSort == "default")">Mặc định</option>
+                        <option value="price-asc"  selected="@(selSort == "price-asc")">Giá Thấp → Cao</option>
+                        <option value="price-desc" selected="@(selSort == "price-desc")">Giá Cao → Thấp</option>
+                        <option value="name-asc"   selected="@(selSort == "name-asc")">Tên A → Z</option>
+                    </select>
+                </div>
+
+                <!-- Price range -->
+                <div class="filter-group">
+                    <span class="filter-label">💰 KHOẢNG GIÁ (VNĐ)</span>
+                    <div class="price-inputs">
+                        <input class="price-input-hk" type="number" name="minPrice"
+                               placeholder="Từ" value="@ViewBag.SelMinPrice" />
+                        <span style="color:var(--text-muted);">–</span>
+                        <input class="price-input-hk" type="number" name="maxPrice"
+                               placeholder="Đến" value="@ViewBag.SelMaxPrice" />
+                    </div>
+                </div>
+
+                <!-- GPU filter -->
+                <div class="filter-group">
+                    <span class="filter-label">🎮 TÌM THEO GPU</span>
+                    <input class="price-input-hk" type="text" name="gpu"
+                           placeholder="VD: RTX 5070, RX 9070..."
+                           value="@ViewBag.SelGpu" />
+                </div>
+
+                <button type="submit" class="btn-ut btn-ut-primary btn-vn" style="width:100%; padding:10px;">
+                    <i class="bi bi-funnel-fill"></i> LỌC
+                </button>
+                <a href="/Prebuilt" class="btn-ut btn-ut-ghost btn-vn mt-2"
+                   style="width:100%; text-align:center; display:block; padding:8px;">
+                    ✕ XOÁ BỘ LỌC
+                </a>
+            </form>
+        </aside>
+
+        <!-- ── MAIN GRID ───────────────────────────────────────────── -->
+        <div>
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div class="product-count-label">
+                    Tìm thấy <strong>@Model.Count</strong> bộ máy
+                </div>
+            </div>
+
+            <div class="pb-grid" id="pbGrid">
+                @if (!Model.Any())
+                {
+                    <div class="pb-empty dialog-box">
+                        <div style="font-size:2.5rem; margin-bottom:12px;">🖥️</div>
+                        <div class="text-pixel-vn text-gold" style="font-size:1.1rem;">Không tìm thấy cấu hình nào.</div>
+                        <a href="/Prebuilt" class="btn-ut btn-ut-ghost btn-vn mt-3">XOÁ BỘ LỌC</a>
+                    </div>
+                }
+
+                @foreach (var p in Model)
+                {
+                    var specs = ParseDesc(p.Description);
+                    var cpu     = specs.GetValueOrDefault("cpu", "");
+                    var gpu     = specs.GetValueOrDefault("gpu", "");
+                    var ram     = specs.GetValueOrDefault("ram", "");
+                    var storage = specs.GetValueOrDefault("storage", "");
+
+                    <div class="pb-card" id="pbcard-@p.Id">
+
+
+
+                        <!-- Image -->
+                        <a href="/Prebuilt/Details/@p.Id" class="pb-img-wrap" style="text-decoration:none;">
+                            @if (p.PrimaryImageUrl != null)
+                            {
+                                <img src="@p.PrimaryImageUrl" alt="@p.Name"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='block'" />
+                                <div class="pb-img-placeholder" style="display:none;">🖥️</div>
+                            }
+                            else
+                            {
+                                <div class="pb-img-placeholder">🖥️</div>
+                            }
+                        </a>
+
+                        <!-- Body -->
+                        <div class="pb-body">
+                            <a href="/Prebuilt/Details/@p.Id" class="pb-name" title="@p.Name"
+                               style="text-decoration:none;">@p.Name</a>
+                            <div class="pb-price">@p.Price.ToString("N0") ₫</div>
+
+                            <!-- Spec chips -->
+                            <div class="pb-specs">
+                                @if (!string.IsNullOrEmpty(cpu))
+                                {
+                                    <div class="pb-spec-chip">🧠 <span>@cpu</span></div>
+                                }
+                                @if (!string.IsNullOrEmpty(gpu))
+                                {
+                                    <div class="pb-spec-chip">🎮 <span>@gpu</span></div>
+                                }
+                                @if (!string.IsNullOrEmpty(ram))
+                                {
+                                    <div class="pb-spec-chip">💾 <span>@ram</span></div>
+                                }
+                                @if (!string.IsNullOrEmpty(storage))
+                                {
+                                    <div class="pb-spec-chip">💿 <span>@storage</span></div>
+                                }
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="pb-actions">
+                                <button class="pb-btn-cart" onclick="addPrebuiltToCart(@p.Id, this)">
+                                    🛒 THÊM VÀO GIỎ
+                                </button>
+                                <a class="pb-btn-link" href="/Prebuilt/Details/@p.Id"
+                                   title="Xem chi tiết cấu hình">🔍</a>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+<script>
+async function addPrebuiltToCart(productId, btn) {
+    btn.disabled = true;
+    btn.textContent = '⏳ ĐANG THÊM...';
+    try {
+        const res  = await fetch('/Prebuilt/AddToCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? ''
+            },
+            body: `id=${productId}`
+        });
+        const data = await res.json();
+        if (data.success) {
+            btn.textContent = '✅ ĐÃ THÊM!';
+            btn.style.background = 'var(--green-kindness)';
+            // Update cart count if badge exists
+            const badge = document.querySelector('.cart-count-badge');
+            if (badge && data.cartCount) badge.textContent = data.cartCount;
+            setTimeout(() => {
+                btn.textContent = '🛒 THÊM VÀO GIỎ';
+                btn.style.background = '';
+                btn.disabled = false;
+            }, 2000);
+        } else {
+            btn.textContent = '❌ LỖI';
+            btn.disabled = false;
+        }
+    } catch {
+        btn.textContent = '❌ LỖI';
+        btn.disabled = false;
+    }
+}
+</script>
+@Html.AntiForgeryToken()
+}

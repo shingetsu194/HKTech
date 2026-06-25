@@ -1,0 +1,121 @@
+@model List<HKTech.Models.Order>
+
+@{
+    ViewData["Title"] = "Lịch sử đơn hàng";
+}
+
+<div class="container-hk" style="padding-top: var(--space-xl);">
+    <div class="section-header">
+        <h1 class="section-title-pixel">📋 MY ORDERS</h1>
+        <div class="section-line"></div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="dialog-box text-center mt-4" style="padding: 48px;">
+            <div style="font-size: 3rem; margin-bottom: 16px;">📦</div>
+            <div class="text-pixel-vn text-gold mb-3" style="font-size: 1.1rem;">Chưa có đơn hàng nào!</div>
+            <a href="/Product" class="btn-ut btn-ut-primary btn-en">SHOP NOW</a>
+        </div>
+    }
+    else
+    {
+        @foreach (var order in Model)
+        {
+            var statusColor = order.Status switch
+            {
+                "Pending"   => "#FFD700",
+                "Confirmed" => "#4488FF",
+                "Shipping"  => "#44AAFF",
+                "Delivered" => "#44CC44",
+                "Cancelled" => "#FF4444",
+                _           => "#888888"
+            };
+
+            <div class="mb-4" style="background:var(--bg-surface); border:1px solid #2A2A2A;
+                                     border-left: 3px solid @statusColor;">
+                <!-- Order Header -->
+                <div class="d-flex justify-content-between align-items-center p-3"
+                     style="border-bottom: 1px solid #1E1E1E; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <span class="text-mono" style="color:var(--text-muted); font-size:0.78rem;">ORDER</span>
+                        <span class="text-mono" style="color:var(--gold); font-size:0.9rem; margin-left:4px;">
+                            #@order.Id
+                        </span>
+                        <span class="text-mono" style="color:var(--text-muted); font-size:0.75rem; margin-left:12px;">
+                            @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="badge-ut" style="border-color:@statusColor; color:@statusColor; font-size:0.38rem;">
+                            @order.Status.ToUpper()
+                        </span>
+                        @if (order.Status == HKTech.Models.OrderStatus.Pending)
+                        {
+                            <button class="btn-ut btn-ut-ghost btn-en"
+                                    onclick="cancelOrder(@order.Id, this)"
+                                    style="font-size:0.38rem; padding:4px 10px;">CANCEL</button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Order Items (first 3) -->
+                <div class="p-3">
+                    @foreach (var item in order.OrderDetails.Take(3))
+                    {
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="text-mono" style="flex:1; font-size:0.82rem; color:var(--text-primary);">
+                                @item.Product?.Name
+                            </div>
+                            <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap;">
+                                @item.UnitPrice.ToString("N0") ₫ × @item.Quantity
+                            </div>
+                        </div>
+                    }
+                    @if (order.OrderDetails.Count > 3)
+                    {
+                        <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted);">
+                            + @(order.OrderDetails.Count - 3) sản phẩm khác...
+                        </div>
+                    }
+                </div>
+
+                <!-- Order Footer -->
+                <div class="d-flex justify-content-between align-items-center p-3"
+                     style="border-top: 1px solid #1E1E1E; flex-wrap: wrap; gap: 8px;">
+                    <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted);">
+                        📍 @order.ShippingAddress
+                    </div>
+                    <div>
+                        <span style="font-family:var(--font-pixel); font-size:0.45rem;
+                                     color:var(--gold); text-shadow:var(--glow-gold);">
+                            @order.TotalPrice.ToString("N0") ₫
+                        </span>
+                        <a href="/Order/Confirm/@order.Id"
+                           class="btn-ut btn-ut-outline btn-en ms-3"
+                           style="font-size:0.38rem; padding:4px 10px;">DETAIL</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+<script>
+    async function cancelOrder(orderId, btn) {
+        if (!confirm('Bạn có chắc muốn huỷ đơn hàng #' + orderId + '?')) return;
+        const token = document.querySelector('meta[name="aft"]')?.content ?? '';
+        const res   = await fetch(`/Order/Cancel/${orderId}`, {
+            method: 'POST',
+            headers: { 'RequestVerificationToken': token },
+        });
+        const data = await res.json();
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('❌ ' + data.message);
+        }
+    }
+</script>
+}

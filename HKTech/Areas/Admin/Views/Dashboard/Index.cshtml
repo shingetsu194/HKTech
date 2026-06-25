@@ -1,0 +1,179 @@
+@using HKTech.Models
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    string StatusColor(string s) => s switch
+    {
+        OrderStatus.Pending   => "#FFD700",
+        OrderStatus.Confirmed => "#4488FF",
+        OrderStatus.Shipping  => "#44AAFF",
+        OrderStatus.Delivered => "#44CC44",
+        OrderStatus.Cancelled => "#FF4444",
+        _                     => "#888888",
+    };
+}
+
+<!-- ── Stat Cards ───────────────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="admin-stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value" style="font-size:1.3rem;">
+                @((ViewBag.TotalRevenue as decimal? ?? 0).ToString("N0")) ₫
+            </div>
+            <div class="stat-label">Doanh thu (Đã giao)</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="admin-stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-value">@ViewBag.TotalOrders</div>
+            <div class="stat-label">Tổng đơn hàng</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="admin-stat-card">
+            <div class="stat-icon">🖥️</div>
+            <div class="stat-value">@ViewBag.TotalProducts</div>
+            <div class="stat-label">Sản phẩm đang bán</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="admin-stat-card">
+            <div class="stat-icon">👤</div>
+            <div class="stat-value">@ViewBag.TotalUsers</div>
+            <div class="stat-label">Người dùng</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Order Status Summary ─────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    @foreach (var (label, st, count) in new[]
+    {
+        ("Chờ xử lý",   OrderStatus.Pending,   (int)ViewBag.CountPending),
+        ("Xác nhận",    OrderStatus.Confirmed,  (int)ViewBag.CountConfirmed),
+        ("Đang giao",   OrderStatus.Shipping,   (int)ViewBag.CountShipping),
+        ("Đã giao",     OrderStatus.Delivered,  (int)ViewBag.CountDelivered),
+        ("Đã hủy",      OrderStatus.Cancelled,  (int)ViewBag.CountCancelled),
+    })
+    {
+        <div class="col-6 col-md">
+            <a asp-area="Admin" asp-controller="OrderAdmin" asp-action="Index"
+               asp-route-status="@st" class="text-decoration-none">
+                <div class="admin-stat-card" style="border-top-color:@StatusColor(st); padding:12px;">
+                    <div class="stat-value" style="color:@StatusColor(st); font-size:1rem;">@count</div>
+                    <div class="stat-label" style="font-size:0.72rem;">@label</div>
+                </div>
+            </a>
+        </div>
+    }
+</div>
+
+<div class="row g-4">
+    <!-- Đơn hàng gần đây -->
+    <div class="col-md-8">
+        <div class="admin-card">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span class="text-pixel-vn text-gold" style="font-size:1rem;">📋 Đơn hàng gần đây</span>
+                <a asp-area="Admin" asp-controller="OrderAdmin" asp-action="Index"
+                   class="btn-ut btn-ut-ghost btn-vn-sm" style="font-size:0.38rem; padding:4px 10px;">
+                    XEM TẤT CẢ
+                </a>
+            </div>
+            <div class="admin-card-body" style="padding:0;">
+                @if (ViewBag.RecentOrders?.Count == 0)
+                {
+                    <div class="text-mono text-muted-hk text-center py-4">* Chưa có đơn hàng nào</div>
+                }
+                else
+                {
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>#ID</th>
+                                <th>KHÁCH HÀNG</th>
+                                <th>TỔNG TIỀN</th>
+                                <th>TRẠNG THÁI</th>
+                                <th>NGÀY</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in ViewBag.RecentOrders)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-area="Admin" asp-controller="OrderAdmin"
+                                           asp-action="Detail" asp-route-id="@order.Id"
+                                           class="text-gold" style="text-decoration:none;">
+                                            #@order.Id
+                                        </a>
+                                    </td>
+                                    <td>@(order.User?.FullName ?? order.User?.Email)</td>
+                                    <td style="white-space:nowrap; font-family:var(--font-pixel-vn); font-size:0.95rem; color:var(--gold);">
+                                        @order.TotalPrice.ToString("N0") ₫
+                                    </td>
+                                    <td>
+                                        <span class="badge-status"
+                                              style="border-color:@StatusColor(order.Status.ToString()); color:@StatusColor(order.Status.ToString());">
+                                            @order.Status
+                                        </span>
+                                    </td>
+                                    <td class="text-muted-hk" style="font-size:0.75rem;">
+                                        @order.CreatedAt.ToString("dd/MM/yyyy")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Sản phẩm sắp hết hàng -->
+    <div class="col-md-4">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <span class="text-pixel-vn" style="font-size:0.9rem; color:var(--gold);">
+                    ⚠ Sắp hết hàng
+                </span>
+            </div>
+            <div class="admin-card-body" style="padding:0;">
+                @{
+                    var lowStock = ViewBag.LowStock as List<HKTech.Models.Product>;
+                }
+                @if (lowStock == null || !lowStock.Any())
+                {
+                    <div class="text-mono text-muted-hk text-center py-3" style="font-size:0.78rem;">
+                        ✓ Tất cả sản phẩm còn đủ hàng
+                    </div>
+                }
+                else
+                {
+                    @foreach (var p in lowStock)
+                    {
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2"
+                             style="border-bottom:1px solid #1A1A1A;">
+                            <div>
+                                <div class="text-mono" style="font-size:0.78rem; color:var(--text-primary);">@p.Name</div>
+                                <div class="text-mono" style="font-size:0.7rem; color:var(--text-muted);">@p.Category.Name</div>
+                            </div>
+                            <span style="font-family:var(--font-pixel-vn); font-size:1rem;
+                                         color:@(p.StockQuantity == 0 ? "var(--red-soul)" : "var(--gold)");">
+                                @p.StockQuantity còn
+                            </span>
+                        </div>
+                    }
+                    <div class="p-2 text-center">
+                        <a asp-area="Admin" asp-controller="ProductAdmin" asp-action="Index"
+                           class="btn-ut btn-ut-ghost btn-vn-sm" style="font-size:0.38rem; padding:4px 10px;">
+                            QUẢN LÝ KHO
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

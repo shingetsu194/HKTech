@@ -1,9 +1,58 @@
+@using HKTech.Controllers
 @{
     ViewData["Title"] = "Gợi ý cấu hình PC";
     ViewData["Description"] = "Nhập ngân sách và nhu cầu, HKTech sẽ tự động gợi ý combo linh kiện tối ưu nhất cho bạn.";
+
+    var combos        = ViewBag.Combos as List<RecommendCombo>;
+    var errorMsg      = ViewBag.Error  as string;
+    decimal selBudget = ViewBag.Budget  ?? 0m;
+    string selUseCase = ViewBag.UseCase ?? "";
+    int    selRam     = ViewBag.RamPref ?? 16;
+    bool   hasResult  = combos != null && combos.Any();
 }
 
-<div class="container-hk" style="padding: var(--space-xl) 0; max-width: 900px;">
+@section Styles {
+<style>
+    .combo-card {
+        background: var(--bg-surface);
+        border: 2px solid #2A2A2A;
+        margin-bottom: var(--space-lg);
+        transition: border-color 0.2s;
+    }
+    .combo-card:hover { border-color: var(--gold-dim); }
+
+    .combo-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: var(--space-md) var(--space-lg);
+        border-bottom: 1px solid #222; flex-wrap: wrap; gap: 8px;
+    }
+
+    .combo-items { padding: var(--space-md) var(--space-lg); }
+
+    .combo-item-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 6px 0; border-bottom: 1px solid #1A1A1A;
+        font-family: var(--font-mono); font-size: 0.82rem;
+    }
+    .combo-item-row:last-child { border-bottom: none; }
+
+    .combo-footer {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: var(--space-md) var(--space-lg);
+        border-top: 2px solid #222; flex-wrap: wrap; gap: 12px;
+    }
+
+    .slot-tag {
+        display: inline-block; padding: 2px 6px;
+        background: #111; border: 1px solid #333;
+        font-family: var(--font-pixel); font-size: 0.32rem;
+        color: var(--text-muted); margin-right: 6px; text-transform: uppercase;
+        flex-shrink: 0;
+    }
+</style>
+}
+
+<div class="container-hk" style="padding: var(--space-xl) 0; max-width: 920px;">
 
     <div class="section-header">
         <h1 class="section-title-pixel">⭐ GỢI Ý CẤU HÌNH</h1>
@@ -14,99 +63,204 @@
         * Hệ thống sẽ tự động tìm combo linh kiện phù hợp nhất dựa trên ngân sách và nhu cầu của bạn.
     </div>
 
-    <!-- FORM -->
+    <!-- ============================================================
+         FORM
+         ============================================================ -->
     <div style="background: var(--bg-surface); border: var(--border-gold); padding: var(--space-xl);">
-        <form id="recommendForm" asp-controller="Recommend" asp-action="Index" method="post">
+        <form asp-controller="Recommend" asp-action="Index" method="post">
             @Html.AntiForgeryToken()
-
             <div class="row g-4">
-                <!-- Budget -->
+
                 <div class="col-md-6 form-hk">
                     <label class="form-label" for="budget">💰 NGÂN SÁCH (VNĐ)</label>
-                    <select class="form-control-hk form-select-hk" id="budget" name="budget">
+                    <select class="form-control-hk form-select-hk" id="budget" name="budget" required>
                         <option value="">-- Chọn ngân sách --</option>
-                        <option value="10000000">Dưới 10 triệu</option>
-                        <option value="15000000">10 - 15 triệu</option>
-                        <option value="20000000">15 - 20 triệu</option>
-                        <option value="30000000">20 - 30 triệu</option>
-                        <option value="50000000">30 - 50 triệu</option>
-                        <option value="99999999">Trên 50 triệu</option>
+                        <option value="10000000" selected="@(selBudget == 10000000m)">Dưới 10 triệu</option>
+                        <option value="15000000" selected="@(selBudget == 15000000m)">10 – 15 triệu</option>
+                        <option value="20000000" selected="@(selBudget == 20000000m)">15 – 20 triệu</option>
+                        <option value="30000000" selected="@(selBudget == 30000000m)">20 – 30 triệu</option>
+                        <option value="50000000" selected="@(selBudget == 50000000m)">30 – 50 triệu</option>
+                        <option value="99999999" selected="@(selBudget == 99999999m)">Trên 50 triệu</option>
                     </select>
                 </div>
 
-                <!-- Use Case -->
                 <div class="col-md-6 form-hk">
                     <label class="form-label" for="useCase">🎯 MỤC ĐÍCH SỬ DỤNG</label>
-                    <select class="form-control-hk form-select-hk" id="useCase" name="useCase">
+                    <select class="form-control-hk form-select-hk" id="useCase" name="useCase" required>
                         <option value="">-- Chọn mục đích --</option>
-                        <option value="gaming">🎮 Chơi game AAA (1080p/1440p)</option>
-                        <option value="esports">⚡ Esports / FPS (144+ FPS)</option>
-                        <option value="office">💼 Văn phòng / Học tập</option>
-                        <option value="workstation">🔬 Đồ họa / Video Edit</option>
-                        <option value="streaming">📡 Streaming / Content Creator</option>
-                        <option value="balance">⚖️ Cân bằng mọi thứ</option>
+                        <option value="gaming"      selected="@(selUseCase == "gaming")">🎮 Chơi game AAA (1080p/1440p)</option>
+                        <option value="esports"     selected="@(selUseCase == "esports")">⚡ Esports / FPS (144+ FPS)</option>
+                        <option value="office"      selected="@(selUseCase == "office")">💼 Văn phòng / Học tập</option>
+                        <option value="workstation" selected="@(selUseCase == "workstation")">🔬 Đồ họa / Video Edit</option>
+                        <option value="streaming"   selected="@(selUseCase == "streaming")">📡 Streaming / Content Creator</option>
+                        <option value="balance"     selected="@(selUseCase == "balance")">⚖️ Cân bằng mọi thứ</option>
                     </select>
                 </div>
 
-                <!-- RAM Preference -->
                 <div class="col-md-6 form-hk">
                     <label class="form-label" for="ramPref">💾 DUNG LƯỢNG RAM TỐI THIỂU</label>
                     <select class="form-control-hk form-select-hk" id="ramPref" name="ramPref">
-                        <option value="16">16 GB (Tiêu chuẩn)</option>
-                        <option value="32">32 GB (Cao cấp)</option>
-                        <option value="64">64 GB (Workstation)</option>
+                        <option value="16" selected="@(selRam == 16)">16 GB (Tiêu chuẩn)</option>
+                        <option value="32" selected="@(selRam == 32)">32 GB (Cao cấp)</option>
+                        <option value="64" selected="@(selRam == 64)">64 GB (Workstation)</option>
                     </select>
                 </div>
 
-                <!-- Notes -->
                 <div class="col-md-6 form-hk">
                     <label class="form-label" for="notes">📝 GHI CHÚ THÊM (Tuỳ chọn)</label>
                     <input type="text" class="form-control-hk" id="notes" name="notes"
                            placeholder="VD: Thích AMD, cần case nhỏ gọn..." maxlength="200" />
                 </div>
-            </div>
 
+            </div>
             <div class="mt-4">
-                <button type="submit" class="btn-ut btn-ut-primary btn-en" id="btn-recommend-submit"
-                        style="padding:12px 28px;">
+                <button type="submit" class="btn-ut btn-ut-primary btn-en" style="padding:12px 28px;">
                     <i class="bi bi-stars"></i> FIND BUILD
                 </button>
             </div>
         </form>
     </div>
 
-    <!-- RESULTS (placeholder — sẽ có logic từ Phase 3) -->
-    <div class="mt-5" id="recommendResults">
-        <div class="dialog-box">
-            * Nhập ngân sách và mục đích rồi bấm <span class="text-gold">"TÌM CẤU HÌNH PHÙ HỢP"</span> để hệ thống gợi ý cho bạn.
-            Tính năng sẽ hoạt động đầy đủ sau khi database được kết nối (Phase 2-3).
+    <!-- ============================================================
+         LỖI
+         ============================================================ -->
+    @if (!string.IsNullOrEmpty(errorMsg))
+    {
+        <div class="dialog-box mt-4" style="border-color:var(--red-soul); color:var(--red-soul);">
+            ❌ @errorMsg
         </div>
-    </div>
+    }
+
+    <!-- ============================================================
+         PLACEHOLDER (chưa submit lần nào)
+         ============================================================ -->
+    @if (combos == null && string.IsNullOrEmpty(errorMsg))
+    {
+        <div class="dialog-box mt-4">
+            * Nhập ngân sách và mục đích rồi bấm <span class="text-gold">"FIND BUILD"</span> để hệ thống gợi ý cấu hình phù hợp.
+        </div>
+    }
+
+    <!-- ============================================================
+         KẾT QUẢ GỢI Ý
+         ============================================================ -->
+    @if (hasResult)
+    {
+        <div class="mt-5">
+            <div class="section-header">
+                <h2 class="section-title-pixel" style="font-size:0.95rem;">📋 KẾT QUẢ GỢI Ý</h2>
+                <div class="section-line"></div>
+            </div>
+            <div class="dialog-box mb-4" style="font-size:0.82rem;">
+                * Tìm được <strong style="color:var(--gold);">@combos!.Count cấu hình</strong> phù hợp với ngân sách.
+                Bấm <span class="text-gold">THÊM VÀO GIỎ</span> để chuyển thẳng sang thanh toán.
+            </div>
+
+            @foreach (var combo in combos!)
+            {
+                var tierClass = combo.Badge?.ToUpper() switch {
+                    "BUDGET"      => "tier-budget",
+                    "BALANCED"    => "tier-balanced",
+                    "PERFORMANCE" => "tier-performance",
+                    _             => ""
+                };
+                <div class="combo-card @tierClass">
+                    <!-- Header -->
+                    <div class="combo-header">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <span class="badge-ut" style="border-color:@combo.BadgeColor; color:@combo.BadgeColor; font-size:0.38rem;">
+                                @combo.Badge
+                            </span>
+                            <span class="text-pixel-vn" style="font-size:1rem;">@combo.Label</span>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-family:var(--font-pixel); font-size:0.75rem; color:var(--gold); text-shadow:var(--glow-gold);">
+                                @combo.TotalPrice.ToString("N0") ₫
+                            </div>
+                            <div class="text-mono mt-1" style="font-size:0.72rem; color:var(--text-muted);">
+                                TDP: @combo.TotalTdp W &nbsp;|&nbsp;
+                                Bottleneck:
+                                <span style="color:@(combo.Bottleneck > 25 ? "var(--red-soul)" : combo.Bottleneck > 10 ? "var(--gold)" : "var(--green-kindness)");">
+                                    @combo.Bottleneck%
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items -->
+                    <div class="combo-items">
+                        @foreach (var item in combo.Items)
+                        {
+                            <div class="combo-item-row">
+                                <div style="display:flex; align-items:center; gap:4px; flex:1; min-width:0;">
+                                    <span class="slot-tag">@item.Category.Slug.ToUpper()</span>
+                                    <span style="color:var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                        @item.Name
+                                    </span>
+                                </div>
+                                <span style="color:var(--gold); white-space:nowrap; font-family:var(--font-pixel); font-size:0.38rem; margin-left:12px;">
+                                    @item.Price.ToString("N0") ₫
+                                </span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="combo-footer">
+                        <div class="text-mono" style="font-size:0.75rem; color:var(--text-muted);">
+                            @combo.Items.Count linh kiện &nbsp;·&nbsp;
+                            @if (combo.Bottleneck <= 10)
+                            {
+                                <span style="color:var(--green-kindness);">✅ Cân bằng tốt</span>
+                            }
+                            else if (combo.Bottleneck <= 25)
+                            {
+                                <span style="color:var(--gold);">⚠ Bottleneck nhẹ</span>
+                            }
+                            else
+                            {
+                                <span style="color:var(--red-soul);">❌ Bottleneck cao</span>
+                            }
+                        </div>
+                        <button class="btn-ut btn-ut-primary btn-en"
+                                onclick="addComboToCart([@Html.Raw(string.Join(",", combo.ProductIds))], this)"
+                                style="padding:8px 20px; font-size:0.45rem;">
+                            🛒 THÊM VÀO GIỎ
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 
 </div>
 
 @section Scripts {
 <script>
-    document.getElementById('recommendForm').addEventListener('submit', function (e) {
-        const budget = document.getElementById('budget').value;
-        const useCase = document.getElementById('useCase').value;
-
-        if (!budget || !useCase) {
-            e.preventDefault();
-            document.getElementById('recommendResults').innerHTML = `
-                <div class="alert-ut alert-ut-warning">
-                    Vui lòng chọn cả ngân sách và mục đích sử dụng trước!
-                </div>`;
-            return;
+    async function addComboToCart(productIds, btn) {
+        btn.disabled = true;
+        btn.textContent = '* Đang thêm...';
+        try {
+            const res  = await fetch('/Recommend/AddComboToCart', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(productIds),
+            });
+            const data = await res.json();
+            if (data.success) {
+                btn.textContent = '✅ ĐÃ THÊM!';
+                btn.style.borderColor = 'var(--green-kindness)';
+                btn.style.color       = 'var(--green-kindness)';
+                const badge = document.getElementById('cartCountBadge');
+                if (badge) { badge.textContent = data.cartCount; badge.style.display = 'inline'; }
+            } else {
+                btn.textContent = '❌ LỖI';
+                btn.disabled    = false;
+            }
+        } catch {
+            btn.textContent = '❌ LỖI KẾT NỐI';
+            btn.disabled    = false;
         }
-
-        // TODO Phase 3: Submit form → RecommendController → Query DB
-        // Hiện tại show placeholder
-        e.preventDefault();
-        document.getElementById('recommendResults').innerHTML = `
-            <div class="dialog-box">
-                * Đang tìm cấu hình phù hợp... (Tính năng hoàn thiện sau Phase 3)
-            </div>`;
-    });
+    }
 </script>
 }

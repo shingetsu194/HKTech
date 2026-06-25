@@ -1,0 +1,275 @@
+@model HKTech.Models.Product
+@{
+    ViewData["Title"] = Model.Name;
+    var related = ViewBag.Related as List<HKTech.Models.Product> ?? new();
+}
+
+@section Styles {
+<style>
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-xl);
+        align-items: start;
+    }
+    @@media (max-width: 768px) { .detail-grid { grid-template-columns: 1fr; } }
+
+    .detail-img-wrap {
+        background: #0A0A0A;
+        border: var(--border-gold);
+        display: flex; align-items: center; justify-content: center;
+        min-height: 320px; padding: var(--space-lg);
+    }
+    .detail-img { max-width: 100%; max-height: 300px; object-fit: contain; }
+
+    .spec-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 8px 0; border-bottom: 1px solid #1E1E1E;
+        font-family: var(--font-mono); font-size: 0.82rem;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key   { color: var(--text-muted); }
+    .spec-value { color: var(--text-primary); font-weight: 500; }
+
+    .related-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--space-md);
+    }
+</style>
+}
+
+<div class="container-hk" style="padding: var(--space-xl) 0;">
+
+    <!-- Breadcrumb -->
+    <div class="text-mono mb-4" style="font-size:0.78rem; color:var(--text-muted);">
+        <a href="/Product" style="color:var(--text-muted); text-decoration:none;">LINH KIỆN</a>
+        <span style="margin:0 8px;">›</span>
+        <a href="/Product?category=@Model.Category.Slug" style="color:var(--text-muted); text-decoration:none;">
+            @Model.Category.Icon @Model.Category.Name
+        </a>
+        <span style="margin:0 8px;">›</span>
+        <span style="color:var(--gold);">@Model.Name</span>
+    </div>
+
+    <div class="detail-grid">
+
+        <!-- LEFT: Hình ảnh -->
+        <div>
+            <div class="detail-img-wrap">
+                @if (Model.PrimaryImageUrl != null)
+                {
+                    <img class="detail-img" src="@Model.PrimaryImageUrl" alt="@Model.Name"
+                         onerror="this.src='/images/placeholder.svg'" />
+                }
+                else
+                {
+                    <span style="font-size:5rem;">@Model.Category.Icon</span>
+                }
+            </div>
+
+            <!-- Thư viện ảnh phụ -->
+            @if (Model.Images.Count > 1)
+            {
+                <div class="d-flex gap-2 mt-2 flex-wrap">
+                    @foreach (var img in Model.Images)
+                    {
+                        <div style="width:64px; height:64px; background:#0A0A0A; border:1px solid #333;
+                                    display:flex; align-items:center; justify-content:center;
+                                    cursor:pointer; @(img.IsPrimary ? "border-color:var(--gold);" : "")"
+                             onclick="document.querySelector('.detail-img').src='@img.ImageUrl'">
+                            <img src="@img.ImageUrl" style="max-width:56px; max-height:56px; object-fit:contain;"
+                                 onerror="this.src='/images/placeholder.svg'" />
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- RIGHT: Thông tin sản phẩm -->
+        <div>
+            <!-- Category badge -->
+            <div class="text-mono mb-2" style="font-size:0.75rem; color:var(--text-muted);">
+                @Model.Category.Icon @Model.Category.Name.ToUpper()
+            </div>
+
+            <!-- Tên sản phẩm -->
+            <h1 class="text-pixel-vn" style="font-size:1.4rem; margin-bottom: var(--space-md);">
+                @Model.Name
+            </h1>
+
+            <!-- Giá -->
+            <div style="font-family:var(--font-pixel); font-size:1.1rem;
+                        color:var(--gold); text-shadow:var(--glow-gold); margin-bottom:var(--space-md);">
+                @Model.Price.ToString("N0") ₫
+            </div>
+
+            <!-- Tình trạng tồn kho -->
+            @if (Model.StockQuantity <= 0)
+            {
+                <div class="dialog-box mb-3" style="border-color:var(--red-soul); color:var(--red-soul); padding:10px 16px;">
+                    ● Hết hàng
+                </div>
+            }
+            else if (Model.StockQuantity <= 5)
+            {
+                <div class="dialog-box mb-3" style="border-color:var(--gold); color:var(--gold); padding:10px 16px;">
+                    ⚠ Còn @Model.StockQuantity sản phẩm
+                </div>
+            }
+            else
+            {
+                <div class="dialog-box mb-3" style="border-color:var(--green-kindness); color:var(--green-kindness); padding:10px 16px;">
+                    ✓ Còn hàng (@Model.StockQuantity sản phẩm)
+                </div>
+            }
+
+            <!-- Nút hành động -->
+            <div class="d-flex gap-3 mb-4">
+                @if (Model.StockQuantity > 0)
+                {
+                    <button class="btn-ut btn-ut-primary btn-en"
+                            onclick="addToCartDetail(@Model.Id)"
+                            id="btn-detail-add-cart"
+                            style="padding:12px 24px;">
+                        🛒 THÊM VÀO GIỎ
+                    </button>
+                }
+                <a href="/Build" class="btn-ut btn-ut-outline btn-en" style="padding:12px 24px;">
+                    ⚙ BUILD PC
+                </a>
+            </div>
+
+            <!-- Thông số kỹ thuật -->
+            <div style="background:var(--bg-surface); border:var(--border-muted); padding:var(--space-md);">
+                <div class="panel-label-en mb-3" style="font-size:0.42rem;">📋 THÔNG SỐ KỸ THUẬT</div>
+
+                @if (!string.IsNullOrEmpty(Model.Socket))
+                {
+                    <div class="spec-row">
+                        <span class="spec-key">Socket</span>
+                        <span class="spec-value">@Model.Socket</span>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.RamType))
+                {
+                    <div class="spec-row">
+                        <span class="spec-key">RAM Type</span>
+                        <span class="spec-value">@Model.RamType</span>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.FormFactor))
+                {
+                    <div class="spec-row">
+                        <span class="spec-key">Form Factor</span>
+                        <span class="spec-value">@Model.FormFactor</span>
+                    </div>
+                }
+                @if (Model.TdpWatt > 0)
+                {
+                    <div class="spec-row">
+                        <span class="spec-key">@(Model.Category.Slug == "psu" ? "Công suất" : "TDP")</span>
+                        <span class="spec-value">@Model.TdpWatt W</span>
+                    </div>
+                }
+                @if (Model.BenchmarkScore > 0)
+                {
+                    <div class="spec-row">
+                        <span class="spec-key">Benchmark Score</span>
+                        <span class="spec-value" style="color:var(--gold);">@Model.BenchmarkScore</span>
+                    </div>
+                }
+                <div class="spec-row">
+                    <span class="spec-key">Tồn kho</span>
+                    <span class="spec-value">@Model.StockQuantity sản phẩm</span>
+                </div>
+            </div>
+
+            <!-- Mô tả -->
+            @if (!string.IsNullOrEmpty(Model.Description))
+            {
+                <div class="dialog-box mt-3" style="font-size:0.82rem; line-height:1.7;">
+                    @Model.Description
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Sản phẩm liên quan -->
+    @if (related.Any())
+    {
+        <div class="mt-5">
+            <div class="section-header">
+                <h2 class="section-title-pixel" style="font-size:0.9rem;">
+                    @Model.Category.Icon LINH KIỆN LIÊN QUAN
+                </h2>
+                <div class="section-line"></div>
+            </div>
+
+            <div class="related-grid mt-3">
+                @foreach (var p in related)
+                {
+                    <div class="product-card">
+                        <div style="height:140px; background:#111; display:flex; align-items:center; justify-content:center;">
+                            @if (p.PrimaryImageUrl != null)
+                            {
+                                <img src="@p.PrimaryImageUrl" alt="@p.Name"
+                                     style="max-width:100%; max-height:130px; object-fit:contain; padding:8px;"
+                                     onerror="this.src='/images/placeholder.svg'" />
+                            }
+                            else
+                            {
+                                <span style="font-size:2.5rem;">@p.Category.Icon</span>
+                            }
+                        </div>
+                        <div class="card-body-hk">
+                            <div style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-primary);
+                                        margin-bottom:6px; line-height:1.4;">@p.Name</div>
+                            <div style="font-family:var(--font-pixel); font-size:0.45rem; color:var(--gold);">
+                                @p.Price.ToString("N0") ₫
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <a href="/Product/Detail/@p.Id" class="btn-ut btn-ut-outline btn-en"
+                               style="font-size:0.65rem; padding:5px 10px;">CHI TIẾT</a>
+                            <button class="btn-ut btn-ut-primary btn-en"
+                                    onclick="addToCartDetail(@p.Id)"
+                                    style="font-size:0.65rem; padding:5px 10px;">+ GIỎ</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+<script>
+    async function addToCartDetail(productId) {
+        const btn = event.currentTarget;
+        btn.disabled = true;
+        try {
+            const res  = await fetch('/Cart/Add', {
+                method:  'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                body: `productId=${productId}&quantity=1`,
+            });
+            const data = await res.json();
+            if (data.success) {
+                btn.textContent = '✅ ĐÃ THÊM!';
+                btn.style.borderColor = 'var(--green-kindness)';
+                const badge = document.getElementById('cartCountBadge');
+                if (badge) { badge.textContent = data.cartCount; badge.style.display = 'inline'; }
+                setTimeout(() => { btn.textContent = '🛒 THÊM VÀO GIỎ'; btn.style.borderColor = ''; btn.disabled = false; }, 2000);
+            } else {
+                btn.textContent = '❌ LỖI'; btn.disabled = false;
+            }
+        } catch {
+            btn.textContent = '❌ LỖI KẾT NỐI'; btn.disabled = false;
+        }
+    }
+</script>
+}

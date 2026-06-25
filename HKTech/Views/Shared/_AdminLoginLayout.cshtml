@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — HKTech Admin</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Share+Tech+Mono&display=swap" />
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+
+        /* ── Undertale Battle Palette ────────────────── */
+        :root {
+            --ut-bg:       #000000;
+            --ut-white:    #FFFFFF;
+            --ut-gray:     #C8C8C8;
+            --ut-dark:     #1A1A1A;
+            --ut-border:   #FFFFFF;
+            --ut-heart:    #FF2020;
+            --ut-yellow:   #FFFF00;
+            --ut-green:    #00FF7F;
+            --ut-font-px:  'Press Start 2P', monospace;
+            --ut-font-vn:  'VT323', 'Share Tech Mono', monospace;
+            --ut-font-mono:'Share Tech Mono', monospace;
+        }
+
+        body {
+            background: var(--ut-bg);
+            color: var(--ut-white);
+            font-family: var(--ut-font-mono);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            /* Undertale scanline texture */
+            background-image: repeating-linear-gradient(
+                0deg, transparent, transparent 3px,
+                rgba(255,255,255,0.015) 3px, rgba(255,255,255,0.015) 4px
+            );
+        }
+
+        /* ── Battle Screen Container ─────────────────── */
+        .battle-screen {
+            width: 100%;
+            max-width: 700px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* ── Enemy / System Info Bar ─────────────────── */
+        .battle-enemy-bar {
+            border: 3px solid var(--ut-white);
+            background: var(--ut-dark);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .enemy-name {
+            font-family: var(--ut-font-px);
+            font-size: 0.65rem;
+            color: var(--ut-white);
+            letter-spacing: 2px;
+        }
+
+        .enemy-hp-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .enemy-hp-label {
+            font-family: var(--ut-font-px);
+            font-size: 0.45rem;
+            color: var(--ut-gray);
+        }
+
+        .enemy-hp-bar {
+            width: 130px;
+            height: 12px;
+            border: 2px solid var(--ut-white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enemy-hp-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--ut-green);
+            animation: hp-pulse 3s ease-in-out infinite;
+        }
+
+        @@keyframes hp-pulse {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.7; }
+        }
+
+        .enemy-hp-text {
+            font-family: var(--ut-font-px);
+            font-size: 0.45rem;
+            color: var(--ut-white);
+            white-space: nowrap;
+        }
+
+        /* ── Dialog Box ──────────────────────────────── */
+        .battle-dialog {
+            border: 3px solid var(--ut-white);
+            background: var(--ut-bg);
+            padding: 20px 24px;
+            position: relative;
+            min-height: 90px;
+        }
+
+        .battle-dialog p {
+            font-family: var(--ut-font-vn);
+            font-size: 1.25rem;
+            color: var(--ut-white);
+            line-height: 1.7;
+        }
+
+        .battle-dialog p::before {
+            content: '* ';
+            color: var(--ut-white);
+        }
+
+        /* blinking cursor at end */
+        .dialog-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.1em;
+            background: var(--ut-white);
+            animation: blink 0.8s step-end infinite;
+            vertical-align: text-bottom;
+            margin-left: 4px;
+        }
+
+        @@keyframes blink {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0; }
+        }
+
+        /* ── Action Buttons Row ──────────────────────── */
+        .battle-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .battle-btn {
+            border: 3px solid var(--ut-white);
+            background: var(--ut-bg);
+            color: var(--ut-white);
+            font-family: var(--ut-font-px);
+            font-size: 0.55rem;
+            padding: 10px 4px;
+            text-align: center;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.1s ease;
+            user-select: none;
+        }
+
+        .battle-btn.active {
+            background: var(--ut-white);
+            color: var(--ut-bg);
+        }
+
+        .battle-btn:hover {
+            background: var(--ut-white);
+            color: var(--ut-bg);
+        }
+
+        /* ── Input Area (like ACT sub-menu) ──────────── */
+        .battle-input-area {
+            border: 3px solid var(--ut-white);
+            background: var(--ut-bg);
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .battle-input-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .battle-input-label {
+            font-family: var(--ut-font-px);
+            font-size: 0.5rem;
+            color: var(--ut-gray);
+            white-space: nowrap;
+            width: 90px;
+            text-align: right;
+        }
+
+        .battle-heart-cursor {
+            color: var(--ut-heart);
+            font-size: 1rem;
+            animation: heart-beat 1s ease-in-out infinite;
+            flex-shrink: 0;
+        }
+
+        @@keyframes heart-beat {
+            0%, 100% { transform: scale(1); }
+            50%       { transform: scale(1.2); }
+        }
+
+        .battle-input {
+            flex: 1;
+            background: var(--ut-bg);
+            border: none;
+            border-bottom: 2px solid var(--ut-white);
+            color: var(--ut-white);
+            font-family: var(--ut-font-mono);
+            font-size: 1rem;
+            padding: 6px 4px;
+            outline: none;
+            letter-spacing: 1px;
+        }
+
+        .battle-input::placeholder {
+            color: #444;
+            font-size: 0.85rem;
+        }
+
+        .battle-input:focus {
+            border-bottom-color: var(--ut-yellow);
+            color: var(--ut-yellow);
+        }
+
+        /* Error message */
+        .battle-error {
+            border: 2px solid var(--ut-heart);
+            padding: 10px 14px;
+            font-family: var(--ut-font-vn);
+            font-size: 1rem;
+            color: var(--ut-heart);
+        }
+
+        .battle-error::before { content: '✖ '; }
+
+        /* ── Submit Button ───────────────────────────── */
+        .battle-submit {
+            border: 3px solid var(--ut-white);
+            background: var(--ut-bg);
+            color: var(--ut-white);
+            font-family: var(--ut-font-px);
+            font-size: 0.6rem;
+            padding: 14px;
+            width: 100%;
+            cursor: pointer;
+            letter-spacing: 2px;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .battle-submit:hover {
+            background: var(--ut-white);
+            color: var(--ut-bg);
+        }
+
+        /* ── Back link ───────────────────────────────── */
+        .battle-back {
+            text-align: center;
+            font-family: var(--ut-font-vn);
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .battle-back a {
+            color: #888;
+            text-decoration: none;
+        }
+
+        .battle-back a:hover { color: var(--ut-white); }
+
+        @@media (max-width: 600px) {
+            .battle-actions { grid-template-columns: repeat(2, 1fr); }
+            .battle-input-label { width: 60px; font-size: 0.4rem; }
+        }
+    </style>
+</head>
+<body>
+    @RenderBody()
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

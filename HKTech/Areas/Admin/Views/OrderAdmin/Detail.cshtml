@@ -1,0 +1,157 @@
+@using HKTech.Models
+@model Order
+@{
+    ViewData["Title"] = $"Đơn hàng #{Model.Id}";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+
+    var nextStatuses = ViewBag.NextStatuses as string[] ?? Array.Empty<string>();
+
+    string StatusColor(string s) => s switch
+    {
+        OrderStatus.Pending   => "#FFD700",
+        OrderStatus.Confirmed => "#4488FF",
+        OrderStatus.Shipping  => "#44AAFF",
+        OrderStatus.Delivered => "#44CC44",
+        OrderStatus.Cancelled => "#FF4444",
+        _                     => "#888888",
+    };
+    string StatusLabel(string s) => s switch
+    {
+        OrderStatus.Pending   => "Chờ xử lý",
+        OrderStatus.Confirmed => "Đã xác nhận",
+        OrderStatus.Shipping  => "Đang giao",
+        OrderStatus.Delivered => "Đã giao",
+        OrderStatus.Cancelled => "Đã hủy",
+        _                     => s,
+    };
+}
+
+<div class="mb-3">
+    <a asp-area="Admin" asp-controller="OrderAdmin" asp-action="Index"
+       class="btn-ut btn-ut-ghost btn-vn-sm" style="font-size:0.42rem; padding:5px 12px;">
+        ← QUAY LẠI
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- LEFT: Order info -->
+    <div class="col-md-8">
+        <div class="admin-card mb-4">
+            <div class="admin-card-header d-flex justify-content-between align-items-center">
+                <span class="text-pixel-vn text-gold">📦 Chi tiết đơn #@Model.Id</span>
+                <span class="badge-status"
+                      style="border-color:@StatusColor(Model.Status); color:@StatusColor(Model.Status); font-size:0.75rem;">
+                    @StatusLabel(Model.Status)
+                </span>
+            </div>
+            <div class="admin-card-body">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">SẢN PHẨM</th>
+                            <th>ĐƠN GIÁ</th>
+                            <th>SL</th>
+                            <th>THÀNH TIỀN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderDetails)
+                        {
+                            <tr>
+                                <td style="width:56px;">
+                                    @if (item.Product.PrimaryImageUrl != null)
+                                    {
+                                        <img src="@item.Product.PrimaryImageUrl"
+                                             style="width:48px; height:48px; object-fit:contain; background:#111; padding:4px;"
+                                             onerror="this.style.display='none'" />
+                                    }
+                                </td>
+                                <td style="color:var(--text-primary);">@item.Product.Name</td>
+                                <td style="white-space:nowrap;">@item.UnitPrice.ToString("N0") ₫</td>
+                                <td>×@item.Quantity</td>
+                                <td style="color:var(--gold); white-space:nowrap; font-family:var(--font-pixel-vn); font-size:0.95rem;">
+                                    @item.SubTotal.ToString("N0") ₫
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-end mt-3 pt-3" style="border-top:1px solid #222;">
+                    <span class="text-mono me-3" style="font-size:0.85rem;">TỔNG CỘNG:</span>
+                    <span style="font-family:var(--font-pixel-vn); font-size:1.3rem; color:var(--gold);
+                                 text-shadow:var(--glow-gold);">
+                        @Model.TotalPrice.ToString("N0") ₫
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Địa chỉ giao hàng -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <span class="text-mono text-gold">📍 ĐỊA CHỈ GIAO HÀNG</span>
+            </div>
+            <div class="admin-card-body text-mono" style="font-size:0.85rem; color:var(--text-secondary);">
+                @(Model.ShippingAddress ?? "—")
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Customer + Update Status -->
+    <div class="col-md-4">
+        <!-- Thông tin khách hàng -->
+        <div class="admin-card mb-4">
+            <div class="admin-card-header">
+                <span class="text-mono text-gold">👤 KHÁCH HÀNG</span>
+            </div>
+            <div class="admin-card-body">
+                <div class="text-mono mb-1" style="color:var(--text-primary); font-size:0.85rem;">
+                    @(Model.User?.FullName ?? "—")
+                </div>
+                <div class="text-mono" style="color:var(--text-muted); font-size:0.78rem;">
+                    @Model.User?.Email
+                </div>
+                <div class="text-mono mt-2" style="color:var(--text-muted); font-size:0.75rem;">
+                    📅 @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                </div>
+            </div>
+        </div>
+
+        <!-- Cập nhật trạng thái -->
+        @if (nextStatuses.Any())
+        {
+            <div class="admin-card">
+                <div class="admin-card-header">
+                    <span class="text-mono text-gold">🔄 CẬP NHẬT TRẠNG THÁI</span>
+                </div>
+                <div class="admin-card-body">
+                    <div class="text-mono mb-3" style="font-size:0.78rem; color:var(--text-muted);">
+                        Trạng thái hiện tại:
+                        <span style="color:@StatusColor(Model.Status);">@StatusLabel(Model.Status)</span>
+                    </div>
+                    @foreach (var st in nextStatuses)
+                    {
+                        <form asp-area="Admin" asp-controller="OrderAdmin" asp-action="UpdateStatus"
+                              asp-route-id="@Model.Id" method="post" class="mb-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="newStatus" value="@st" />
+                            <button type="submit" class="btn-ut btn-vn-sm w-100"
+                                    style="font-size:0.42rem; padding:8px; text-align:center;
+                                           border-color:@StatusColor(st); color:@StatusColor(st);">
+                                → @StatusLabel(st).ToUpper()
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="admin-card">
+                <div class="admin-card-body text-mono" style="font-size:0.78rem; color:var(--text-muted);">
+                    Đơn hàng đã ở trạng thái cuối — không thể cập nhật thêm.
+                </div>
+            </div>
+        }
+    </div>
+</div>

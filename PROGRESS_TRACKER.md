@@ -25,31 +25,32 @@ Kết quả : Phân tích yêu cầu, chọn tech stack (.NET 10 + SQL Server)
 Note    : Đã xác định tính năng độc đáo "Smart Build Intelligence"
 
 ================================================================
-TUẦN 5-6 — PHASE 1: Project Setup + Giao diện (ĐANG LÀM)
+TUẦN 5-6 — PHASE 1: Project Setup + Giao diện
 ================================================================
-Status  : [/] ĐANG THỰC HIỆN
+Status  : [x] HOÀN THÀNH
 Bắt đầu : 2026-06-01
 
   SETUP
-  [/] Khởi tạo ASP.NET Core MVC project (.NET 10)
-  [ ] Cài NuGet packages (EF Core, Identity, ImageSharp)
-  [ ] Cấu hình appsettings.json (connection string SQL Server)
+  [x] Khởi tạo ASP.NET Core MVC project (.NET 10)
+  [x] Cài NuGet packages (EF Core, Identity, ImageSharp)
+  [x] Cấu hình appsettings.json (connection string SQL Server)
 
   LAYOUT & DESIGN (Undertale Theme)
-  [ ] _Layout.cshtml: Header + Navigation + Footer
-  [ ] CSS Design System (Press Start 2P font, gold/dark/red)
-  [ ] Pixel-style border và animation effects
-  [ ] Responsive (mobile menu)
+  [x] _Layout.cshtml: Header + Navigation + Footer
+  [x] CSS Design System (Press Start 2P font, gold/dark/red)
+  [x] Pixel-style border và animation effects
+  [x] Responsive (mobile menu)
+  [x] Tinh chỉnh font chữ to hơn, dễ nhìn hơn
 
   VIEWS TĨNH
-  [ ] Home/Index.cshtml — Hero banner + PC nổi bật + Linh kiện mới
-  [ ] Product/Index.cshtml — Danh sách linh kiện (có filter)
-  [ ] Build/Index.cshtml — Slot-based PC builder UI
-  [ ] Recommend/Index.cshtml — Form chọn nhu cầu/budget
+  [x] Home/Index.cshtml — Hero banner + PC nổi bật + Linh kiện mới
+  [x] Product/Index.cshtml — Danh sách linh kiện (có filter)
+  [x] Build/Index.cshtml — Slot-based PC builder UI
+  [x] Recommend/Index.cshtml — Form chọn nhu cầu/budget
 
   SEED DATA PLACEHOLDER
-  [ ] Seed 6 danh mục (CPU, GPU, RAM, PSU, Case, Mainboard)
-  [ ] Seed ~30 sản phẩm mẫu với benchmark data
+  [x] Seed 6 danh mục (CPU, GPU, RAM, PSU, Case, Mainboard)
+  [x] Seed ~30 sản phẩm mẫu với benchmark data
 
 Ghi chú tuần này:
   - ___________________________________________
@@ -58,26 +59,27 @@ Ghi chú tuần này:
 ================================================================
 TUẦN 6-7 — PHASE 2: Models + Database + CRUD + Auth
 ================================================================
-Status  : [ ] CHƯA BẮT ĐẦU
+Status  : [x] HOÀN THÀNH
 
   DATABASE & EF CORE
-  [ ] Tạo ApplicationDbContext
-  [ ] Models: Category, Product, ProductImage
-  [ ] Models: Order, OrderDetail, PcBuild, PcBuildItem
-  [ ] Code-First Migration + Update Database
-  [ ] Seed data thật vào DB
+  [x] Tạo ApplicationDbContext
+  [x] Models: Category, Product, ProductImage
+  [x] Models: Order, OrderDetail, PcBuild, PcBuildItem
+  [x] Code-First Migration + Update Database
+  [x] Seed data thật vào DB (KATO\MSSQLSERVER01)
 
   IDENTITY & AUTH
-  [ ] ApplicationUser (extend IdentityUser)
-  [ ] Đăng ký / Đăng nhập / Đăng xuất
-  [ ] Phân quyền: Admin vs Customer
-  [ ] Trang Profile user
+  [x] ApplicationUser (extend IdentityUser)
+  [x] Đăng ký / Đăng nhập / Đăng xuất
+  [x] Phân quyền: Admin vs Customer
+  [x] Trang Profile user
+  [x] Đăng nhập Admin phong cách Undertale Battle Screen
 
   CRUD ADMIN
-  [ ] Area Admin setup
-  [ ] ProductController CRUD + upload nhiều ảnh
-  [ ] CategoryController CRUD
-  [ ] Validation (server-side + client-side)
+  [x] Area Admin setup (Giao diện Dark Dashboard)
+  [x] ProductController CRUD + upload nhiều ảnh
+  [x] CategoryController CRUD
+  [x] Validation (server-side + client-side)
 
 Ghi chú tuần này:
   - ___________________________________________
@@ -86,114 +88,129 @@ Ghi chú tuần này:
 ================================================================
 TUẦN 7 — PHASE 3: Core Features (Build PC + Recommend + Cart)
 ================================================================
-Status  : [ ] CHƯA BẮT ĐẦU
+Status  : [x] HOÀN THÀNH
 
   BUILD PC
-  [ ] BuildController — Hiển thị slot builder
-  [ ] Chọn linh kiện từng slot (CPU, GPU, RAM, MB, PSU, Case)
-  [ ] Lưu cấu hình tạm thời (Session)
-  [ ] Nút "Thêm toàn bộ vào giỏ hàng"
-  [ ] Lưu build của user đã đăng nhập
+  [x] BuildController — Hiển thị slot builder
+  [x] Chọn linh kiện từng slot (CPU, GPU, RAM, MB, PSU, Case)
+  [x] Lưu cấu hình tạm thời (Session)
+  [x] Nút "Thêm toàn bộ vào giỏ hàng"
+  [x] Lưu build của user đã đăng nhập
 
   RECOMMEND PC
-  [ ] RecommendController
-  [ ] Form: Budget + Mục đích sử dụng
-  [ ] Thuật toán query combo linh kiện tối ưu từ DB
-  [ ] Hiển thị top 3 gợi ý cấu hình
+  [x] RecommendController
+  [x] Form: Budget + Mục đích sử dụng
+  [x] Thuật toán query combo linh kiện tối ưu từ DB
+  [x] Hiển thị top 3 gợi ý cấu hình (Budget / Balanced / Performance)
 
   GIỎ HÀNG & ĐẶT HÀNG
-  [ ] CartService (Session-based)
-  [ ] CartController: Xem, Thêm, Xóa, Cập nhật
-  [ ] OrderController: Thanh toán + Tạo Order/OrderDetail
-  [ ] Trang xác nhận đơn hàng
-  [ ] Lịch sử đơn hàng của user
+  [x] CartService (Session-based)
+  [x] CartController: Xem, Thêm, Xóa, Cập nhật
+  [x] OrderController: Thanh toán + Tạo Order/OrderDetail
+  [x] Trang xác nhận đơn hàng
+  [x] Lịch sử đơn hàng của user
+
+  BUG FIX & POLISH (thêm vào trong quá trình)
+  [x] Cart badge navbar đọc đúng từ CartService (không còn luôn = 0)
+  [x] Product page: addToCartQuick, search/sort/filter hoạt động thật
+  [x] Recommend View: form submit thật tới controller, render combo cards
+  [x] Connection string về đúng instance KATO\MSSQLSERVER01
 
 Ghi chú tuần này:
-  - ___________________________________________
-  - ___________________________________________
+  - Phase 3 hoàn chỉnh 100%. Tất cả luồng Build → Cart → Order → History hoạt động.
+  - Recommend Engine: 3 combo (Budget/Balanced/Performance) với bottleneck, thêm vào giỏ 1 click.
 
 ================================================================
 TUẦN 7-8 — PHASE 4: Smart Build Intelligence ⭐
 ================================================================
-Status  : [ ] CHƯA BẮT ĐẦU
+Status  : [x] HOÀN THÀNH
 
   API ENDPOINTS
-  [ ] GET /api/compatibility — Kiểm tra tương thích (JSON)
-  [ ] GET /api/performance — Bottleneck + FPS estimate (JSON)
-  [ ] GET /api/products/category/{slug} — Filter sản phẩm
+  [x] POST /api/compatibility — Socket, RAM type, PSU wattage, Form factor
+  [x] POST /api/performance  — Bottleneck % + FPS 10 game
+  [-] GET /api/products/category/{slug} — Không cần (dùng /Build/GetProducts)
 
   COMPATIBILITY GUARD
-  [ ] Socket CPU vs Mainboard
-  [ ] RAM type (DDR4/DDR5) vs Mainboard
-  [ ] PSU wattage vs Tổng TDP
-  [ ] Case form factor vs Mainboard size
+  [x] Socket CPU vs Mainboard (LGA1700, AM5...)
+  [x] RAM type (DDR4/DDR5) vs Mainboard
+  [x] PSU wattage vs Tổng TDP + 20% headroom (yêu cầu có CPU/GPU mới check)
+  [x] Case form factor vs Mainboard size (ATX/mATX/ITX)
 
   BOTTLENECK ANALYZER
-  [ ] Công thức tính bottleneck từ BenchmarkScore
-  [ ] Animated progress bar CPU↔GPU
-  [ ] Gợi ý nâng cấp tự động
+  [x] Công thức tính bottleneck từ BenchmarkScore thật trong DB
+  [x] Animated progress bar CPU↔GPU (CSS transition 0.6s)
+  [x] Gợi ý nâng cấp tự động theo mức chênh lệch
 
   FPS PERFORMANCE ESTIMATOR
-  [ ] Seed benchmark data cho ~25 CPU + ~25 GPU
-  [ ] Bảng FPS cho 10 game phổ biến
-  [ ] Badge phân loại build
+  [x] Seed 41 sản phẩm: 8 CPU + 8 GPU + RAM + MB + PSU + Case + Storage + Cooling
+  [x] Bảng FPS 10 game (Valorant, CS2, GTA V, Cyberpunk, Elden Ring...)
+  [x] Badge phân loại build (BUDGET / MID-RANGE / HIGH-END / ENTHUSIAST)
 
   JAVASCRIPT REAL-TIME
-  [ ] Event listener khi thay đổi linh kiện
-  [ ] AJAX gọi API + cập nhật UI không reload
-  [ ] Animate số tiền tổng
+  [x] Event listener sau mỗi selectProduct / clearSlot
+  [x] AJAX gọi /api/compatibility + /api/performance không reload
+  [x] Animate tổng tiền (bump animation CSS)
 
 Ghi chú tuần này:
-  - ___________________________________________
-  - ___________________________________________
+  - Smart Build Intelligence hoàn chỉnh: Compatibility Guard + Bottleneck + FPS real-time.
+  - Seed 41 sản phẩm vào DB với đầy đủ BenchmarkScore, Socket, RamType, FormFactor, TdpWatt.
 
 ================================================================
 TUẦN 8 — PHASE 5: Admin Dashboard + Polish + Demo
 ================================================================
-Status  : [ ] CHƯA BẮT ĐẦU
+Status  : [/] ĐANG THỰC HIỆN
 
   ADMIN DASHBOARD
-  [ ] Trang tổng quan (thống kê đơn hàng, doanh thu)
-  [ ] Quản lý đơn hàng (xem, cập nhật trạng thái)
-  [ ] Quản lý tồn kho
-  [ ] Danh sách user
+  [x] Dashboard: doanh thu, đơn theo trạng thái, sản phẩm sắp hết hàng
+  [x] Quản lý đơn hàng: danh sách + filter + chi tiết + cập nhật trạng thái
+  [x] Quản lý tồn kho: hiển thị sản phẩm ≤5 trên Dashboard
+  [x] Danh sách user: tên, email, role, trạng thái khóa
 
   POLISH
-  [ ] SEO: title tags, meta description tất cả trang
-  [ ] Responsive mobile hoàn chỉnh
-  [ ] Loading skeleton animations
-  [ ] Toast notifications (thành công/lỗi)
-  [ ] 404 page custom (Undertale style)
+  [x] SEO: ViewData["Title"] + ["Description"] đồng bộ tất cả trang
+  [x] 404 page custom (Undertale style — SANS reference)
+  [x] Flash notifications (Success / Warn / Error) đồng bộ user + admin
+  [-] Loading skeleton animations (bỏ qua — không cần thiết cho demo)
+  [-] Responsive mobile: Bootstrap grid đã xử lý phần lớn
 
   DEMO PREP
   [ ] Viết script demo (kịch bản bảo vệ)
   [ ] Kiểm tra luồng chính: Build → Cart → Order
   [ ] Kiểm tra tính năng độc đáo: Compatibility + FPS
-  [ ] Backup database với seed data đủ
+  [x] Backup database: seed 41 sản phẩm tự động khi chạy app
 
 Ghi chú tuần này:
-  - ___________________________________________
-  - ___________________________________________
+  - Phase 5 hoàn thành phần Admin + Polish. Còn lại: Demo Script.
+  - Admin Panel: Dashboard thống kê, Order CRUD (Pending→Confirmed→Shipping→Delivered), User list.
 
 ================================================================
 BUGS & ISSUES TRACKING
 ================================================================
 
-Date       | Bug Description                  | Status
------------|----------------------------------|--------
-           |                                  |
-           |                                  |
-           |                                  |
+Date       | Bug Description                                      | Status
+-----------|------------------------------------------------------|--------
+2026-06-03 | Meta tag trùng + sai cú pháp Razor (_Layout)         | [x] Fixed
+2026-06-03 | serverBuild PascalCase → undefined khi reload trang  | [x] Fixed
+2026-06-03 | Cart Remove thiếu AJAX header → trả HTML thay JSON   | [x] Fixed
+2026-06-03 | Detail.cshtml không tồn tại → crash khi click CHI TIẾT| [x] Fixed
+2026-06-03 | Admin Dashboard Razor ?? thiếu @()                   | [x] Fixed
+2026-06-03 | PSU báo OK khi chưa chọn CPU/GPU                    | [x] Fixed
+2026-06-03 | Recommend gaming không yêu cầu GPU                   | [x] Fixed
+2026-06-03 | Ghost product checkout (sản phẩm bị xóa)            | [x] Fixed
+2026-06-03 | Admin login sign-in customer rồi sign-out ngay       | [x] Fixed
+2026-06-03 | Cancel đơn hàng thiếu CSRF protection                | [x] Fixed
 
 ================================================================
 TỔNG KẾT TIẾN ĐỘ
 ================================================================
 
-Phase 1 : [  0%] ░░░░░░░░░░
-Phase 2 : [  0%] ░░░░░░░░░░
-Phase 3 : [  0%] ░░░░░░░░░░
-Phase 4 : [  0%] ░░░░░░░░░░
-Phase 5 : [  0%] ░░░░░░░░░░
-OVERALL : [  5%] ░░░░░░░░░░  (Lên kế hoạch xong)
+Phase 1 : [100%] ██████████
+Phase 2 : [100%] ██████████
+Phase 3 : [100%] ██████████
+Phase 4 : [100%] ██████████
+Phase 5 : [ 85%] █████████░  (Admin+Polish xong, còn Demo Script)
+OVERALL : [ 93%] █████████░  (Gần hoàn thành — còn Demo Script)
 
-Cập nhật lần cuối: 2026-06-01
+Cập nhật lần cuối: 2026-06-03
+
+Cập nhật lần cuối: 2026-06-02

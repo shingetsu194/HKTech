@@ -1,9 +1,12 @@
+@inject HKTech.Services.CartService _cartSvc
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery _xsrf
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="@ViewData["Description"] ?? "HKTech - Tự build PC theo phong cách của bạn. Smart Build Intelligence giúp kiểm tra tương thích và ước tính FPS real-time."" />
+    <meta name="description" content="@(ViewData["Description"] ?? "HKTech - Tự build PC theo phong cách của bạn. Smart Build Intelligence giúp kiểm tra tương thích và ước tính FPS real-time.")" />
+    <meta name="aft" content="@_xsrf.GetAndStoreTokens(Context).RequestToken" />
     <title>@ViewData["Title"] - HKTech PC Builder</title>
 
     <!-- Bootstrap 5 -->
@@ -16,6 +19,7 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
+    <div id="pg-overlay"></div>
     <div class="site-wrapper">
 
         <!-- ====================================================
@@ -26,11 +30,20 @@
 
                 <!-- Brand -->
                 <a class="navbar-brand-hk" asp-controller="Home" asp-action="Index">
-                    <span class="heart-icon">♥</span>
-                    <div>
-                        <div class="brand-pixel">HKTech</div>
-                        <div class="brand-sub">PC BUILDER</div>
-                    </div>
+                    <span class="heart-icon">
+                        <svg width="20" height="16" viewBox="0 0 8 6" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="1" y="0" width="2" height="1" fill="#FF4444"/>
+                            <rect x="5" y="0" width="2" height="1" fill="#FF4444"/>
+                            <rect x="0" y="1" width="8" height="2" fill="#FF4444"/>
+                            <rect x="1" y="3" width="6" height="1" fill="#FF4444"/>
+                            <rect x="2" y="4" width="4" height="1" fill="#FF4444"/>
+                            <rect x="3" y="5" width="2" height="1" fill="#FF4444"/>
+                            <rect x="1" y="0" width="1" height="1" fill="#FF9999"/>
+                            <rect x="5" y="0" width="1" height="1" fill="#FF9999"/>
+                        </svg>
+                    </span>
+                    <span class="brand-pixel">HKTech</span>
+                    <span class="brand-sub">PC BUILDER</span>
                 </a>
 
                 <!-- Desktop Nav Links -->
@@ -52,6 +65,12 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link-hk" asp-controller="Prebuilt" asp-action="Index">
+                            <i class="bi bi-pc-display"></i> PC BUILD SẴN
+                            <span class="save-badge">NEW</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link-hk" asp-controller="Recommend" asp-action="Index">
                             <i class="bi bi-stars"></i> GỢI Ý CẤU HÌNH
                         </a>
@@ -60,12 +79,10 @@
                         <a class="nav-link-hk position-relative" asp-controller="Cart" asp-action="Index">
                             <i class="bi bi-cart3"></i> GIỎ HÀNG
                             @{
-                                var cartCount = Context.Session.GetInt32("CartCount") ?? 0;
-                                if (cartCount > 0)
-                                {
-                                    <span class="cart-badge">@cartCount</span>
-                                }
+                                var cartCount = _cartSvc.GetItemCount();
                             }
+                            <span class="cart-badge" id="cartCountBadge"
+                                  style="display:@(cartCount > 0 ? "inline" : "none");">@cartCount</span>
                         </a>
                     </li>
 
@@ -95,14 +112,10 @@
                     }
                     else
                     {
-                        <li class="nav-item">
-                            <a class="nav-link-hk" asp-controller="Account" asp-action="Login">
-                                <i class="bi bi-person"></i> ĐĂNG NHẬP
-                            </a>
-                        </li>
                         <li class="nav-item" style="padding: 0 8px;">
-                            <a class="btn-ut btn-ut-primary" asp-controller="Account" asp-action="Register">
-                                ĐĂNG KÝ
+                            <a class="btn-ut btn-ut-primary btn-en" asp-controller="Account" asp-action="Login"
+                               style="white-space: nowrap;">
+                                LOG IN
                             </a>
                         </li>
                     }
@@ -120,12 +133,21 @@
              ==================================================== -->
         @{
             var success = TempData["Success"] as string;
+            var warn    = TempData["Warn"]    as string;
             var error   = TempData["Error"]   as string;
         }
         @if (success != null)
         {
             <div class="container-hk mt-2">
                 <div class="alert-ut alert-ut-success">@success
+                    <button onclick="this.parentElement.remove()" style="float:right;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">✕</button>
+                </div>
+            </div>
+        }
+        @if (warn != null)
+        {
+            <div class="container-hk mt-2">
+                <div class="alert-ut" style="border-color:var(--gold); color:var(--gold);">@warn
                     <button onclick="this.parentElement.remove()" style="float:right;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">✕</button>
                 </div>
             </div>
@@ -153,7 +175,16 @@
             <div class="container-hk">
                 <div class="row">
                     <div class="col-md-4 mb-4">
-                        <div class="footer-brand">♥ HKTech PC Builder</div>
+                        <div class="footer-brand">
+                            <svg width="14" height="11" viewBox="0 0 8 6" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle; margin-right:4px;">
+                                <rect x="1" y="0" width="2" height="1" fill="#FF4444"/>
+                                <rect x="5" y="0" width="2" height="1" fill="#FF4444"/>
+                                <rect x="0" y="1" width="8" height="2" fill="#FF4444"/>
+                                <rect x="1" y="3" width="6" height="1" fill="#FF4444"/>
+                                <rect x="2" y="4" width="4" height="1" fill="#FF4444"/>
+                                <rect x="3" y="5" width="2" height="1" fill="#FF4444"/>
+                            </svg>HKTech PC Builder
+                        </div>
                         <div class="footer-tagline mt-2">
                             * Nơi mọi linh kiện tìm thấy DETERMINATION của mình.
                         </div>
@@ -163,6 +194,7 @@
                         <ul class="list-unstyled">
                             <li><a asp-controller="Product" asp-action="Index" class="text-muted-hk text-mono text-decoration-none hover-gold" style="font-size:0.85rem;">Linh kiện</a></li>
                             <li><a asp-controller="Build" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Tự Build PC</a></li>
+                            <li><a asp-controller="Prebuilt" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">PC Build Sẵn</a></li>
                             <li><a asp-controller="Recommend" asp-action="Index" class="text-muted-hk text-mono text-decoration-none" style="font-size:0.85rem;">Gợi ý cấu hình</a></li>
                         </ul>
                     </div>
@@ -185,7 +217,16 @@
                 <div class="footer-bottom">
                     <span>© 2026 HKTech — Đồ án Lập trình Web | HUTECH</span>
                     <span class="save-point-text">★ SAVE POINT ★</span>
-                    <span>Made with ♥ &amp; DETERMINATION</span>
+                    <span>Made with
+                        <svg width="12" height="9" viewBox="0 0 8 6" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle; margin:0 2px;">
+                            <rect x="1" y="0" width="2" height="1" fill="#FFD700"/>
+                            <rect x="5" y="0" width="2" height="1" fill="#FFD700"/>
+                            <rect x="0" y="1" width="8" height="2" fill="#FFD700"/>
+                            <rect x="1" y="3" width="6" height="1" fill="#FFD700"/>
+                            <rect x="2" y="4" width="4" height="1" fill="#FFD700"/>
+                            <rect x="3" y="5" width="2" height="1" fill="#FFD700"/>
+                        </svg>&amp; DETERMINATION
+                    </span>
                 </div>
             </div>
         </footer>
@@ -215,5 +256,70 @@
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+    (function () {
+        var ov = document.getElementById('pg-overlay');
+
+        function getAnim(path) {
+            path = (path || '/').toLowerCase().replace(/\/$/, '') || '/';
+            if (path === '/' || path === '/home/index' || path === '/home') return 'pg-a-fade';
+            if (path.startsWith('/product'))                               return 'pg-a-slide-up';
+            if (path.startsWith('/build'))                                 return 'pg-a-slide-down';
+            if (path.startsWith('/recommend'))                             return 'pg-a-slide-left';
+            if (path.startsWith('/cart'))                                   return 'pg-a-slide-right';
+            if (path.startsWith('/order'))                                 return 'pg-a-gold';
+            if (path.startsWith('/account/login'))                         return 'pg-a-split';
+            if (path.startsWith('/account'))                               return 'pg-a-fade';
+            if (path.startsWith('/home/error') || path.startsWith('/error')) return 'pg-a-glitch';
+            return 'pg-a-fade';
+        }
+
+        // Set animation for this page + reveal
+        ov.classList.add(getAnim(location.pathname));
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () { ov.classList.add('pg-loaded'); });
+        });
+
+        // Khi quay lại bằng nút Back/Forward, trình duyệt khôi phục trang từ
+        // bfcache mà KHÔNG chạy lại script → overlay "pg-leaving" còn nguyên
+        // gây màn hình đen. Reset về trạng thái phủ rồi chạy LẠI hiệu ứng lộ
+        // trang để giữ animation. Thêm pg-loaded ĐỒNG BỘ ngay sau reflow —
+        // reflow đã chốt trạng thái phủ làm mốc nên transition chắc chắn chạy
+        // (double rAF dễ bị trình duyệt gộp frame trên trang bfcache → mất hiệu ứng).
+        window.addEventListener('pageshow', function (e) {
+            if (e.persisted) {
+                ov.classList.remove('pg-leaving', 'pg-loaded'); // về trạng thái phủ
+                void ov.offsetWidth;                            // ép reflow, chốt mốc
+                ov.classList.add('pg-loaded');                  // lộ trang (có transition)
+            }
+        });
+
+        function leave(go) {
+            ov.classList.remove('pg-loaded');
+            ov.classList.add('pg-leaving');
+            setTimeout(go, 320);
+        }
+
+        document.addEventListener('click', function (e) {
+            var a = e.target.closest('a[href]');
+            if (!a) return;
+            var href = a.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('mailto:') ||
+                href.startsWith('javascript:') || a.target === '_blank' ||
+                a.hasAttribute('download')) return;
+            try { if (new URL(href, location.href).origin !== location.origin) return; }
+            catch (_) { return; }
+            e.preventDefault();
+            leave(function () { location.href = href; });
+        });
+
+        document.addEventListener('submit', function (e) {
+            if (e.target.dataset.noTransition) return;
+            e.preventDefault();
+            var f = e.target;
+            leave(function () { f.submit(); });
+        });
+    })();
+    </script>
 </body>
 </html>

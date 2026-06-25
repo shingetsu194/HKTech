@@ -1,0 +1,8 @@
+@model HKTech.Models.ViewModels.ProductFormViewModel
+@{
+    ViewData["Title"] = "Sửa sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* Reuse Create view — ProductAdminController trả về Create.cshtml cho cả Create lẫn Edit *@
+@await Html.PartialAsync("Create", Model)

@@ -1,0 +1,104 @@
+@{
+    ViewData["Title"] = "Thanh toán";
+    var items = ViewBag.CartItems as List<HKTech.Services.CartItem> ?? new();
+    var total = (decimal)(ViewBag.Total ?? 0m);
+}
+
+@section Styles {
+<style>
+    .checkout-grid { display: grid; grid-template-columns: 1fr 360px; gap: var(--space-xl); align-items: start; }
+    @@media (max-width: 900px) { .checkout-grid { grid-template-columns: 1fr; } }
+    .checkout-summary {
+        background: var(--bg-surface);
+        border: var(--border-gold);
+        padding: var(--space-lg);
+        position: sticky; top: 80px;
+    }
+    .checkout-item { display: flex; justify-content: space-between; gap: 8px;
+                     font-family: var(--font-mono); font-size: 0.8rem;
+                     color: var(--text-secondary); padding: 6px 0;
+                     border-bottom: 1px solid #1E1E1E; }
+    .checkout-item-name { color: var(--text-primary); flex: 1; }
+</style>
+}
+
+<div class="container-hk" style="padding-top: var(--space-xl);">
+    <div class="section-header">
+        <h1 class="section-title-pixel">💳 CHECKOUT</h1>
+        <div class="section-line"></div>
+    </div>
+
+    <div class="checkout-grid mt-4">
+        <!-- LEFT: Shipping Form -->
+        <div>
+            <div class="panel-label-en mb-3">📍 SHIPPING INFO</div>
+            <form asp-action="Checkout" asp-controller="Order" method="post" class="form-hk">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="panel-label-en" style="font-size:0.4rem; margin-bottom:6px; display:block;">
+                        FULL NAME
+                    </label>
+                    <input type="text" class="form-control-hk" value="@ViewBag.UserName"
+                           placeholder="Họ và tên người nhận" readonly style="opacity:0.7;" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="panel-label-en" style="font-size:0.4rem; margin-bottom:6px; display:block;">
+                        SHIPPING ADDRESS *
+                    </label>
+                    <textarea name="shippingAddress" class="form-control-hk" rows="3" required
+                              placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành phố..."
+                              style="resize:vertical; min-height:80px;"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="panel-label-en" style="font-size:0.4rem; margin-bottom:6px; display:block;">
+                        NOTE (OPTIONAL)
+                    </label>
+                    <input type="text" name="note" class="form-control-hk"
+                           placeholder="Ghi chú cho đơn hàng (nếu có)..." />
+                </div>
+
+                <!-- Payment Method (display only for now) -->
+                <div class="dialog-box mb-4">
+                    <div class="panel-label-en mb-2" style="font-size:0.38rem;">💵 PAYMENT METHOD</div>
+                    <div class="d-flex gap-3">
+                        <label class="d-flex align-items-center gap-2 text-mono" style="cursor:pointer;">
+                            <input type="radio" name="payment" value="cod" checked /> COD (Thanh toán khi nhận hàng)
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-ut btn-ut-primary btn-en"
+                        style="width:100%; padding:14px; font-size:0.55rem;">
+                    ♥ PLACE ORDER
+                </button>
+            </form>
+        </div>
+
+        <!-- RIGHT: Order Summary -->
+        <div class="checkout-summary">
+            <div class="panel-label-en mb-3">🛒 YOUR CART (@items.Count items)</div>
+            @foreach (var item in items)
+            {
+                <div class="checkout-item">
+                    <span class="checkout-item-name">@item.Name</span>
+                    <span style="white-space:nowrap; color:var(--text-muted);">×@item.Quantity</span>
+                    <span style="white-space:nowrap; color:var(--gold);">@item.Subtotal.ToString("N0") ₫</span>
+                </div>
+            }
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <span class="text-mono" style="font-size:0.85rem;">TOTAL</span>
+                <span style="font-family:var(--font-pixel); font-size:0.9rem;
+                             color:var(--gold); text-shadow:var(--glow-gold);">
+                    @total.ToString("N0") ₫
+                </span>
+            </div>
+            <a href="/Cart" class="btn-ut btn-ut-ghost btn-en mt-3"
+               style="width:100%; text-align:center; display:block; font-size:0.4rem;">
+                ← EDIT CART
+            </a>
+        </div>
+    </div>
+</div>
